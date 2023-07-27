@@ -73,11 +73,3 @@ function listner(cell) {
     });
   });
 }
-
-// e.preventDefault();
-//   const range = document.createRange();
-//   range.selectNodeContents(e.target);
-//   const selection = window.getSelection();
-//   selection.removeAllRanges();
-//   selection.addRange(range);
-//   className="text text-ellipsis overflow-hidden px-5 border-b-2 border-slate-600 w-6"

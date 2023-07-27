@@ -20,7 +20,7 @@ const SideBar = () => {
             </div>
             
 
-            <div className='bg-secondary bg-shadedGrey pl-4 pb-2 pt-2 overflow-hidden rounded-[7px]'>
+            <div className=' bg-shadedGrey pl-4 pb-2 pt-2 overflow-hidden rounded-[7px]'>
                 <ul className='flex flex-col gap-2'>
                     {/* Home */}
                     <li>
@@ -63,7 +63,7 @@ const SideBar = () => {
                 <p className='hidden sm:flex'>Projects</p>
             </div>
 
-            <div className='bg-secondary bg-shadedGrey pl-4 overflow-hidden rounded-[7px] pb-2 pt-2'>
+            <div className=' bg-shadedGrey pl-4 overflow-hidden rounded-[7px] pb-2 pt-2'>
                 <ul className='flex flex-col gap-2'>
                     {/* Ongoing Projects */}
                     <li>
