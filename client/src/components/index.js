@@ -1,6 +1,7 @@
 import SideBar from "./SideBar";
-
+import ApiKeyPage from "./apiKeyPage";
 
 export{
-    SideBar
+    SideBar,
+    ApiKeyPage
 }
