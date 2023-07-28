@@ -1,14 +1,10 @@
 import React from 'react'
-import { SideBar } from './components'
+import { SideBar, SigninLeftImage, SigninRightForm } from './components'
+import {SigninPage} from "./pages"
 
 const App = () => (
-    <div className='bg-primary w-full overflow-hidden flex absolute'>
-      <div className='fixed'>
-        <SideBar/>
-      </div>
-      <div className="relative left-[70px] md:left-[250px] sm:left-[200px]" >
-        
-      </div>
+    <div>     
+      <SigninPage/>
     </div>
 )
 
