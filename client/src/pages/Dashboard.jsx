@@ -1,5 +1,5 @@
 import React from 'react';
-import { SideBar } from '../components';
+import { MainBody, SideBar } from '../components';
 
 
 const Dashboard = () => (
@@ -8,7 +8,7 @@ const Dashboard = () => (
             <SideBar/>
         </div>
         <div className="relative left-[70px] md:left-[250px] sm:left-[200px]" >
-
+            <MainBody/>
         </div>
     </div>
 )
