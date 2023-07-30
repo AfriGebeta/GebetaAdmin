@@ -3,3 +3,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.fit{
+    width: fit-content;
+}
+.auto{
+    width: auto;
+}
+.max{
+    width: max-content;
+}
+.min{
+    width: min-content;
+}

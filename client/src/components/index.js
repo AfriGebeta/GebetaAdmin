@@ -3,6 +3,7 @@ import SigninForm from "./SigninForm";
 import SigninLeftImage from "./SigninLeftImage";
 import SigninRightForm from "./SigninRightForm";
 import { MainBody } from "./MainBody";
+import ClientTable from "./ClientTable";
 
 
 
@@ -12,5 +13,6 @@ export{
     SigninForm,
     SigninLeftImage,
     SigninRightForm,
-    MainBody
+    MainBody,
+    ClientTable
 }

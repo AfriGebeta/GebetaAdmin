@@ -3,11 +3,11 @@ import { MainBody, SideBar } from '../components';
 
 
 const Dashboard = () => (
-    <div>
-        <div className='fixed'>
+    <div className='flex'>
+        <div className='w-[70px] md:w-[250px] sm:w-[200px] h-screen'>
             <SideBar/>
         </div>
-        <div className="relative left-[70px] md:left-[250px] sm:left-[200px]" >
+        <div className= "flex-1 overflow-x-auto" >
             <MainBody/>
         </div>
     </div>
