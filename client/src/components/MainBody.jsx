@@ -4,7 +4,7 @@ import ClientTable from './ClientTable'
 export const MainBody = () => {
   return (
     <div className='bg-primary w-[100%] h-[100vh]'>
-      <div className='h-full w-full flex flex-col p-10'>
+      <div className='h-full w-full flex flex-col p-5 ss:p-10'>
         {/* Design above the client-table */}
         <div className='bg-primary h-2/6'>
             Above Client

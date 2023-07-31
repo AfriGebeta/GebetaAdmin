@@ -5,7 +5,8 @@ import { Toggle, Up } from '../assets';
 const ClientTable = () => {
   return (
     <div className='pb-5'>
-      <div className='max-h-[270px] overflow-x-auto scrollbar-hide'>
+      {/* Client Table on larger screens */}
+      <div className='max-h-[270px] overflow-x-auto scrollbar-hide hidden ss:block'>
         <div className=" w-[90%] scrollbar-hide">
           <table className='w-full overflow-y-auto'>
             <thead className='sticky top-0 bg-primary text-secondary'>
@@ -44,6 +45,33 @@ const ClientTable = () => {
 
           </table>
         </div>
+      </div>
+      {/* Client Table on Smaller Screens: Turns into a grid view */}
+      <div className="grid grid-cols-1 gap-2 ss:hidden max-h-[250px] overflow-y-auto p-5">
+        {dummyClients.map((client,index) => (
+          <div className='bg-primary p-2 rounded-lg max-w-[95%] shadow-lg text-sm'>
+            <div className='flex items-center gap-[5px] text-sm flex-wrap mb-3'>
+              <div className='underline'>Usage: {client.totalUsage}</div>
+              <div className = "text-blue-400">{client.subscriptionType}</div>
+              <div className='bg-green-200 tracking-wider uppercase p-[3px] rounded-lg text-[10px] min-w-[35px] text-center'>Paid</div>
+            </div>
+            <div className='text-[12px] text-grey-50 flex flex-col mb-2'>
+              <div className=''>{client.name}</div>
+              <div className=''>{client.contact}</div>
+              <div className='flex gap-2'>
+                {client.apiKey}
+                <img src={Toggle} alt="gain-icon" className='min-w-[15px] min-h-[15px] w-[12px] h-[12px]left-0'/>
+              </div>
+            </div>
+            <div className='rounded-md flex'>
+              Revenue: 
+              <p className='text-green-600'>
+               {client.revenue}
+              </p>
+              <img src={Up} alt="gain-icon" className='min-w-[15px] min-h-[15px] w-[12px] h-[12px]left-0'/>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
