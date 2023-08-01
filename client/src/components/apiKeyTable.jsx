@@ -16,7 +16,7 @@ const ApiKeyTable = () => {
           <tr>
             <th className=" text-left text-zinc-200 pl-3 w-1/3">Name</th>
             <th className=" text-left text-zinc-200 pl-3 w-1/4 ">ID</th>
-            <th className=" text-left text-zinc-200 pl-3 w-1/4 "></th>
+            <th className=" text-left text-zinc-200 pl-3 w-1/4 ">Date</th>
             <th className=" text-left text-zinc-200 pl-3 w-1/3">apiKey</th>
           </tr>
         </thead>
