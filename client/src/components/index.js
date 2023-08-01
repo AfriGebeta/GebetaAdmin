@@ -1,5 +1,5 @@
 import SideBar from "./SideBar";
-import ApiKeyTable from "./apiKeyTable";
+import ApiKeyTable from "./ApiKeyTable";
 import SigninForm from "./SigninForm";
 import SigninLeftImage from "./SigninLeftImage";
 import SigninRightForm from "./SigninRightForm";

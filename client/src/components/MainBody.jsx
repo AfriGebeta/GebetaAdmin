@@ -1,5 +1,6 @@
 import React from 'react'
-import ClientMgmtPage from '../pages/ClientMgmtPage'
+import { ClientMgmtPage } from '../pages'
+
 
 export const MainBody = () => {
   return (
