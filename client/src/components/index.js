@@ -1,7 +1,7 @@
 import SideBar from "./SideBar";
-import ApiKeyPage from "./apiKeyPage";
+import ApiKeyTable from "./apiKeyTable";
 
 export{
     SideBar,
-    ApiKeyPage
+    ApiKeyTable
 }

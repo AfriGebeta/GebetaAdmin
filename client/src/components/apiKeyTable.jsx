@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const ApiKeyPage = () => {
+const ApiKeyTable = () => {
   useEffect(() => {
     const apiKeyCell = document.querySelectorAll("tr td:last-child");
     const unknownCell = document.querySelectorAll("tr td:nth-child(3)");
@@ -59,7 +59,7 @@ const ApiKeyPage = () => {
   );
 };
 
-export default ApiKeyPage;
+export default ApiKeyTable;
 
 function listner(cell) {
   cell.forEach((event) => {
