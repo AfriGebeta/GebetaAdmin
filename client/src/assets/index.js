@@ -9,6 +9,8 @@ import Meetings from "./meetings-logo.png"
 import Newsletter from "./newsletter-logo.svg"
 import OngoingProjects from "./ongoing-projects-logo.svg"
 import Home from "./home-logo.svg"
+import Up from './up-icon.svg'
+import Toggle from "./toggle-icon.svg"
 
 
 export {
@@ -22,5 +24,7 @@ export {
     Meetings,
     Newsletter,
     OngoingProjects,
-    Home
+    Home,
+    Up,
+    Toggle
 }

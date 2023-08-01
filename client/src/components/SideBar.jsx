@@ -14,10 +14,13 @@ const SideBar = () => {
 
         {/* Clients */}
         <div>
-            <div className='flex gap-2 pb-5'>
-                <img src={Clients} alt="" className='w-[20px] h-[20px]' />
-                <p className='hidden sm:flex'>Clients</p>
+            <div className='flex'>
+                <div className='flex gap-2 pb-5'>
+                    <img src={Clients} alt="" className='w-[20px] h-[20px]' />
+                    <p className='hidden sm:flex'>Clients</p>
+                </div>
             </div>
+            
             
 
             <div className=' bg-shadedGrey pl-4 pb-2 pt-2 overflow-hidden rounded-[7px]'>
