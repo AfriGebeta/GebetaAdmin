@@ -5,6 +5,7 @@ import SigninLeftImage from "./SigninLeftImage";
 import SigninRightForm from "./SigninRightForm";
 import { MainBody } from "./MainBody";
 import ClientTable from "./ClientTable";
+import UsagePage from "./usagePage";
 
 export{
     SideBar,
@@ -13,5 +14,6 @@ export{
     SigninRightForm,
     MainBody,
     ClientTable,
-    ApiKeyTable
+    ApiKeyTable,
+    UsagePage
 }
