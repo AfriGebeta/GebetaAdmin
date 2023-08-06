@@ -1,6 +1,55 @@
+import { useState } from "react";
 import { Logo } from "../assets";
+import LineChart from "./lineChart";
+import { UserData } from "./Data";
 
 const UsagePage = () => {
+  const [userData, setUserData] = useState({
+    labels: UserData.map((data) => data.year),
+    datasets: [
+      {
+        label: "Api Usage Graph",
+        data: UserData.map((data) => data.userGain),
+        borderColor: "rgb(196, 107, 19)",
+        pointBackgroundColor: "rgb(196, 107, 19)",
+        pointBorderColor: "rgb(196, 107, 19)",
+        backgroundColor: "rgb(69, 49, 25)",
+        fill: true,
+      },
+    ],
+  });
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Api Usage Graph",
+      },
+    },
+    scales: {
+      y: {
+        display: true,
+        grid: {
+          display: false,
+          drawBorder: false,
+        },
+      },
+      x: {
+        display: true,
+        grid: {
+          display: false,
+          drawBorder: false,
+        },
+      },
+    },
+   
+  };
+
+  // console.log(userData);
   return (
     // TODO
     // 1. complete the uperpart of the page
@@ -24,41 +73,41 @@ const UsagePage = () => {
         </div>
 
         <div className=" p-2  outline outline-2 outline-black grid grid-flow-col grid-cols-10 w-full">
-          <div className=" col-span-8 ">
+          <div className=" col-span-5 ">
             <p className=" font-bold text-2xl">ONM</p>
             <p className=" text-gray-300 ">endpoint</p>
           </div>
-          <div className="self-end col-span-1  grid grid-flow-col">
+          <div className="self-end col-span-5 justify-end grid grid-flow-col">
             <div className="text-5xl">0</div>
             <div className=" text-xs self-end">calls</div>
           </div>
         </div>
         <div className=" p-2  outline outline-2 outline-black grid grid-flow-col grid-cols-10 w-full">
-          <div className=" col-span-8 ">
+          <div className=" col-span-5 ">
             <p className=" font-bold text-2xl">Matrix</p>
             <p className=" text-gray-300 ">endpoint</p>
           </div>
-          <div className="self-end col-span-1  grid grid-flow-col">
+          <div className="self-end col-span-5 justify-end  grid grid-flow-col">
             <div className="text-5xl">0</div>
             <div className=" text-xs self-end">calls</div>
           </div>
         </div>
         <div className=" p-2  outline outline-2 outline-black grid grid-flow-col grid-cols-10 w-full">
-          <div className=" col-span-8 ">
+          <div className=" col-span-5 ">
             <p className=" font-bold text-2xl">Direction</p>
             <p className=" text-gray-300 ">endpoint</p>
           </div>
-          <div className="self-end col-span-1  grid grid-flow-col">
+          <div className="self-end col-span-5 justify-end  grid grid-flow-col">
             <div className="text-5xl">43</div>
             <div className=" text-xs self-end">calls</div>
           </div>
         </div>
         <div className=" p-2  outline outline-2 outline-black grid grid-flow-col grid-cols-10 w-full">
-          <div className=" col-span-8 ">
+          <div className=" col-span-5 ">
             <p className=" font-bold text-2xl">Tss</p>
             <p className=" text-gray-300 ">endpoint</p>
           </div>
-          <div className="self-end col-span-1  grid grid-flow-col">
+          <div className="self-end col-span-5 justify-end  grid grid-flow-col">
             <div className="text-5xl">0</div>
             <div className=" text-xs self-end">calls</div>
           </div>
@@ -67,8 +116,14 @@ const UsagePage = () => {
 
       {/* graph */}
       <div>
-        <div>
-          <p></p>
+        <div className=" mx-auto ">
+          <div>
+            <p className=" text-2xl font-medium">API Usage</p>
+            <p> Track your api usage here</p>
+          </div>
+          <div className=" outline-dashed outline-2 outline-slate-400 w-full p-10 ">
+            <LineChart chartData={userData} options={options} />
+          </div>
         </div>
       </div>
     </div>
