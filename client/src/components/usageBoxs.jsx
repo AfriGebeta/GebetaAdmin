@@ -2,7 +2,7 @@ import { Logo } from "../assets";
 
 const UsageBoxs = () => {
   return (
-    <div className=" w-full mx-auto  grid grid-cols-3 grid-rows-2 gap-4 mb-8">
+    <div className=" w-full mx-auto  grid grid-cols-3 grid-rows-2 gap-4 mb-8 p-5 pb-0">
       <div className=" outline outline-2 outline-slate-300 row-span-2 p-5 grid">
         <div className=" grid grid-flow-col grid-flow-cols-6 gap-2 ">
           <div className="self-center justify-self-center ">
