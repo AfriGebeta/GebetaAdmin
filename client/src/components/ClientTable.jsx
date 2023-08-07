@@ -49,7 +49,7 @@ const ClientTable = () => {
       {/* Client Table on Smaller Screens: Turns into a grid view */}
       <div className="grid grid-cols-1 gap-2 ss:hidden max-h-[250px] overflow-y-auto p-5">
         {dummyClients.map((client,index) => (
-          <div className='bg-primary p-2 rounded-lg max-w-[95%] shadow-lg text-sm'>
+          <div key={index} className='bg-primary p-2 rounded-lg max-w-[95%] shadow-lg text-sm'>
             <div className='flex items-center gap-[5px] text-sm flex-wrap mb-3'>
               <div className='underline'>Usage: {client.totalUsage}</div>
               <div className = "text-blue-400">{client.subscriptionType}</div>
