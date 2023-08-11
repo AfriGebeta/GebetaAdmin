@@ -2,6 +2,7 @@ import { useState } from "react";
 import LineChart from "./lineChart";
 import { UserData } from "./Data";
 import UsageBoxs from "./usageBoxs";
+import UsagePageSearchForm from "./usagePageSearchForm";
 
 const UsagePage = () => {
   const [userData, setUserData] = useState({
@@ -54,12 +55,12 @@ const UsagePage = () => {
     // 1. complete the uperpart of the page
     // 2. complete the graph
     <div className=" m-5 ">
+      <UsagePageSearchForm/>
+      
       <UsageBoxs />
 
       {/* graph */}
-      <div>
         <LineChart chartData={userData} options={options} />
-      </div>
     </div>
   );
 };
