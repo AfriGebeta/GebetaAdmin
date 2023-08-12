@@ -6,7 +6,10 @@ import SigninRightForm from "./SigninRightForm";
 import { MainBody } from "./MainBody";
 import ClientTable from "./ClientTable";
 import MapArea from "./MapArea";
-import UsagePage from "./UsagePage";
+import UsagePage from "../pages/UsagePage";
+import LineChart from "./lineChart";
+import UsageBoxs from "./UsageBoxs";
+import UsagePageSearchForm from "./UsagePageSearchForm";
 
 export{
     SideBar,
@@ -17,5 +20,8 @@ export{
     ClientTable,
     ApiKeyTable,
     MapArea,
-    UsagePage
+    UsagePage,
+    LineChart,
+    UsagePageSearchForm,
+    UsageBoxs
 }

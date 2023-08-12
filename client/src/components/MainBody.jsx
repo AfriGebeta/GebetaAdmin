@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ActivitiesPage } from '../pages'
 import { ClientMgmtPage } from '../pages'
-import UsagePage from './UsagePage'
+import UsagePage from '../pages/UsagePage'
 
 export const MainBody = () => {
   return (

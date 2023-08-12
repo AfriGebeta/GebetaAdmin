@@ -1,8 +1,6 @@
 import { useState } from "react";
-import LineChart from "./lineChart";
-import { UserData } from "./Data";
-import UsageBoxs from "./usageBoxs";
-import UsagePageSearchForm from "./usagePageSearchForm";
+import {LineChart, UsageBoxs, UsagePageSearchForm} from "../components/lineChart";
+import { UserData } from "../constants/Data";
 
 const UsagePage = () => {
   const [userData, setUserData] = useState({
