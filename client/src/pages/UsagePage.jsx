@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {LineChart, UsageBoxs, UsagePageSearchForm} from "../components/lineChart";
+import {LineChart, UsageBoxs, UsagePageSearchForm} from "../components";
 import { UserData } from "../constants/Data";
 
 const UsagePage = () => {

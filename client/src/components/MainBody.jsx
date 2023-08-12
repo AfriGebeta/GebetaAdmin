@@ -9,7 +9,7 @@ export const MainBody = () => {
     <div className='bg-primary w-full h-[100vh]'>
       {/* <ClientMgmtPage/> */}
       {/* <ActivitiesPage/> */}
-      {/* <UsagePage /> */}
+      <UsagePage />
     </div>
   )
 }
