@@ -1,5 +1,5 @@
 import React from 'react'
-import { ClientTable } from '../components'
+import { ApiKeyTable, ClientTable } from '../components'
 
 const ClientMgmtPage = () => {
   return (
@@ -12,6 +12,7 @@ const ClientMgmtPage = () => {
         <div className='bg-primary w-full'>
             <h1 className="text-[18px] mb-10">Client Managment</h1>
             <ClientTable/>
+            {/* <ApiKeyTable/> */}
         </div>
         {/* Footer */}
         <div className='bg-primary w-[100%] flex-1 min-h-[60px]'>
