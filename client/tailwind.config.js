@@ -7,7 +7,8 @@ module.exports = {
       colors: {
         primary: "#ffffff",
         secondary: "#d3d3d3",
-        shadedGrey: "#DFDFDF"
+        shadedGrey: "#DFDFDF",
+        colorAction: "#FF971D"
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],

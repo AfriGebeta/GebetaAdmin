@@ -11,6 +11,8 @@ import OngoingProjects from "./ongoing-projects-logo.svg"
 import Home from "./home-logo.svg"
 import Up from './up-icon.svg'
 import Toggle from "./toggle-icon.svg"
+import SearchIcon from "./search-icon.svg"
+import ActivityIcon from "./activitymap.svg"
 
 
 export {
@@ -26,5 +28,7 @@ export {
     OngoingProjects,
     Home,
     Up,
-    Toggle
+    Toggle,
+    SearchIcon,
+    ActivityIcon
 }

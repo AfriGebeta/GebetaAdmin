@@ -1,6 +1,6 @@
 import React from 'react'
 import { styles } from '../styles'
-import {Clients, Logo, Logout, Projects, Home, ClientMgmt, ApiKey, Newsletter, OngoingProjects, Meetings, Basket} from '../assets'
+import {Clients, Logo, Logout, Projects, Home, ClientMgmt, ApiKey, Newsletter, OngoingProjects, Meetings, Basket, ActivityIcon} from '../assets'
 
 const SideBar = () => {
   return (
@@ -46,11 +46,11 @@ const SideBar = () => {
                             <p className='hidden sm:flex'>API Keys</p>
                         </a>
                     </li>
-                    {/* NewsLetter */}
+                    {/* Activities */}
                     <li>
                          <a href="#" className='flex gap-2 hover:text-primary hover:scale-105 active:scale-90 focus:scale-90 focus:text-primary'>
-                            <img src={Newsletter} alt="" className='w-[20px] h-[20px]' />
-                            <p className='hidden sm:flex'>Newsletter</p>
+                            <img src={ActivityIcon} alt="" className='w-[20px] h-[20px]' />
+                            <p className='hidden sm:flex'>Activities</p>
                         </a>
                     </li>
                 </ul>
