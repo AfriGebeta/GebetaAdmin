@@ -1,11 +1,17 @@
 import React from 'react'
-import { SideBar, SigninLeftImage, SigninRightForm } from './components'
+import { MapArea, SideBar, SigninLeftImage, SigninRightForm } from './components'
 import {Dashboard, SigninPage} from "./pages"
 
-const App = () => (
-    <div>     
+// import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+
+
+
+const App = () => {
+  return (
+    <div>
       <Dashboard/>
     </div>
-)
+  );
+};
 
 export default App

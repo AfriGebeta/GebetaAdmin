@@ -21,3 +21,17 @@
 .arrow{
     clip-path: polygon(40% 0%, 40% 20%, 100% 20%, 100% 80%, 40% 80%, 40% 100%, 0% 50%);
 }
+
+#error-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.leaflet-container {
+    width: 100%;
+    height: 100%;
+    background-color: red;
+  } 
