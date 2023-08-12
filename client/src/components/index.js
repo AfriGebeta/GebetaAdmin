@@ -6,7 +6,7 @@ import SigninRightForm from "./SigninRightForm";
 import { MainBody } from "./MainBody";
 import ClientTable from "./ClientTable";
 import MapArea from "./MapArea";
-import UsagePage from "./usagePage";
+import UsagePage from "./UsagePage";
 
 export{
     SideBar,
@@ -16,6 +16,6 @@ export{
     MainBody,
     ClientTable,
     ApiKeyTable,
-    MapArea
+    MapArea,
     UsagePage
 }
