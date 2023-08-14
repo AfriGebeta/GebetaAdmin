@@ -1,17 +1,17 @@
 import React from 'react'
-import { ApiKeyTable, ClientTable } from '../components'
+import { ApiKeyTable } from '../components'
 
-const ClientMgmtPage = () => {
+const ApiKeyPage = () => {
   return (
     <div className='h-full w-full flex flex-col p-5 ss:p-10'>
-        {/* Design above the client-table */}
+        {/* Design above the ApiKey-table */}
         <div className='bg-primary h-2/6'>
-            Above Client
+            Above ApiKey Table
         </div>
-        {/* Client Table */}
+        {/* ApiKey Table */}
         <div className='bg-primary w-full'>
-            <h1 className="text-[18px] mb-10">Client Managment</h1>
-            <ClientTable/>
+            <h1 className="text-[18px] mb-10">ApiKeys</h1>
+            <ApiKeyTable/>
         </div>
         {/* Footer */}
         <div className='bg-primary w-[100%] flex-1 min-h-[60px]'>
@@ -21,4 +21,4 @@ const ClientMgmtPage = () => {
   )
 }
 
-export default ClientMgmtPage
+export default ApiKeyPage

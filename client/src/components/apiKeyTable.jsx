@@ -14,7 +14,7 @@ const ApiKeyTable = () => {
       <div className='max-h-[270px] overflow-x-auto scrollbar-hide'>
         <div className=" w-[90%] scrollbar-hide">
             <table className="border-separate border-spacing-y-2 w-11/12 mx-8">
-              <thead className="">
+              <thead className="sticky top-0 bg-primary text-secondary">
                 <tr>
                   <th className=" text-left text-zinc-200 pl-3 w-1/3">Name</th>
                   <th className=" text-left text-zinc-200 pl-3 w-1/4 ">ID</th>
