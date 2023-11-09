@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   MapArea,
   SideBar,
@@ -13,19 +13,20 @@ import axios from "axios";
 // import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  // const [data, setData] = useState("");
+  const [authentication, setAuthentication] = useState(false);
+  const [Loading, setIsLoading] = useState(true);
 
   function checkValidation(formData) {
-    console.log(formData, "from App");
     axios
       .post("https://mapapi.gebeta.app/api/v1/users/login", formData)
       .then((res) => {
-        setData(res);
-        // console.log(res.data.msg);
         if (res.status === 200) {
-          if (res.data.msg === "ok") setIsLoading(false);
-          // console.log(res.status, "fine ");
+          if (res.data.msg === "ok") {
+            console.log(res.data.data.token);
+            setAuthentication(true);
+            setIsLoading(false);
+            localStorage.setItem("token", res.data.data.token);
+          }
         } else {
           console.log(res.status);
         }
@@ -33,10 +34,20 @@ const App = () => {
       .catch((e) => {
         console.log(e.message);
       });
+    setIsLoading(true);
   }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setAuthentication(true);
+    }
+    setIsLoading(false);
+  }, []);
   return (
     <div>
-      {isLoading ? (
+      {Loading ? (
+        <div> Loading............... </div>
+      ) : !authentication ? (
         <SigninPage checkValidation={checkValidation} />
       ) : (
         <Dashboard />
