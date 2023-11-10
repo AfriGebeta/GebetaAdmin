@@ -11,7 +11,7 @@ const ClientTable = () => {
     axios
       .get("https://mapapi.gebeta.app/api/v1/getAllUsers")
       .then((res) => {
-        console.log(res.data.data);
+        // console.log(res.data.data);
         setData(res.data.data);
         setIsLoading(false);
       })
@@ -160,7 +160,7 @@ function listner(cell) {
       e.preventDefault();
       const range = document.createRange();
       range.selectNodeContents(e.target);
-      console.log(e.target);
+      // console.log(e.target);
       const selection = window.getSelection();
       selection.removeAllRanges();
       selection.addRange(range);

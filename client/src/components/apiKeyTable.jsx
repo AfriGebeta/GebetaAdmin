@@ -8,7 +8,7 @@ const ApiKeyTable = () => {
     axios
       .get("https://mapapi.gebeta.app/api/v1/getAllUsers")
       .then((res) => {
-        console.log(res.data.data);
+        // console.log(res.data.data);
         setData(res.data.data);
         setIsLoading(false);
       })
