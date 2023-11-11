@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { QueryClientProvider, QueryClient } from "react-query";
 import {
   MapArea,
   SideBar,
@@ -7,15 +8,14 @@ import {
   UsagePage,
 } from "./components";
 import { Dashboard, SigninPage } from "./pages";
-import { Route, Routes, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 
 const App = () => {
-  const navigate = useNavigate();
   const [authentication, setAuthentication] = useState(false);
   const [Loading, setIsLoading] = useState(true);
+  const queryClient = new QueryClient();
 
   function checkValidation(formData) {
     axios
@@ -41,26 +41,19 @@ const App = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setAuthentication(true);
-      // navigate("/l");
     }
     setIsLoading(false);
   }, []);
   return (
-    <div>
-      {!authentication ? (
-        <SigninPage checkValidation={checkValidation} />
-      ) : (
-        <Dashboard />
-      )}
-    </div>
-    // <Routes>
-    //   <Route
-    //     path="/l"
-    //     element={<SigninPage checkValidation={checkValidation} />}
-    //   />
-    //   <Route path="/dash" element={<Dashboard />} />
-    //   {/* Add more routes as needed */}
-    // </Routes>
+    <QueryClientProvider client={queryClient}>
+      <div>
+        {!authentication ? (
+          <SigninPage checkValidation={checkValidation} />
+        ) : (
+          <Dashboard />
+        )}
+      </div>
+    </QueryClientProvider>
   );
 };
 

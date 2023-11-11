@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { dummyClients } from "../constants/dummyClient";
+import { useQuery } from "react-query";
+// import { dummyClients } from "../constants/dummyClient";
 import { Toggle, Up } from "../assets";
 import axios from "axios";
 
 const ClientTable = () => {
-  const [Loading, setIsLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const { isLoading, data, isError, isFetching } = useQuery("all-users", () => {
+    return axios.get("https://mapapi.gebeta.app/api/v1/getAllUsers");
+  });
+  // if (isFetching) console.log("//////////");
 
-  useEffect(() => {
-    axios
-      .get("https://mapapi.gebeta.app/api/v1/getAllUsers")
-      .then((res) => {
-        // console.log(res.data.data);
-        setData(res.data.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("https://mapapi.gebeta.app/api/v1/getAllUsers")
+  //     .then((res) => {
+  //       // console.log(res.data.data);
+  //       setData(res.data.data);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error.message);
+  //     });
+  // }, []);
 
   useEffect(() => {
     const unknownCell = document.querySelectorAll("tr td:nth-child(3)");
@@ -61,7 +64,7 @@ const ClientTable = () => {
             </thead>
 
             <tbody>
-              {data.map((client, index) => (
+              {data?.data?.data.map((client, index) => (
                 <tr
                   key={index}
                   className={
@@ -113,7 +116,7 @@ const ClientTable = () => {
       </div>
       {/* Client Table on Smaller Screens: Turns into a grid view */}
       <div className="grid grid-cols-1 gap-2 ss:hidden max-h-[250px] overflow-y-auto p-5">
-        {dummyClients.map((client, index) => (
+        {data?.data?.data.map((client, index) => (
           <div
             key={index}
             className="bg-primary p-2 rounded-lg max-w-[95%] shadow-lg text-sm"
@@ -126,8 +129,8 @@ const ClientTable = () => {
               </div>
             </div>
             <div className="text-[12px] text-grey-50 flex flex-col mb-2">
-              <div className="">{client.name}</div>
-              <div className="">{client.contact}</div>
+              <div className="">{client.username}</div>
+              <div className="">{client.email}</div>
               <div className="flex gap-2">
                 {client.apiKey}
                 <img
