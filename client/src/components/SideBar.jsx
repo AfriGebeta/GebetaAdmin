@@ -85,7 +85,7 @@ const SideBar = () => {
       </div>
 
       {/* Projects */}
-      <div>
+      {/* <div>
         <div className="flex gap-2 pb-5">
           <img src={Projects} alt="" className="w-[20px] h-[20px]" />
           <p className="hidden sm:flex">Projects</p>
@@ -93,7 +93,7 @@ const SideBar = () => {
 
         <div className=" bg-shadedGrey pl-4 overflow-hidden rounded-[7px] pb-2 pt-2">
           <ul className="flex flex-col gap-2">
-            {/* Ongoing Projects */}
+         
             <li>
               <a
                 href="#"
@@ -107,7 +107,7 @@ const SideBar = () => {
                 <p className="hidden sm:flex">Ongoing Projects</p>
               </a>
             </li>
-            {/* Meetings */}
+     
             <li>
               <a
                 href="#"
@@ -117,7 +117,7 @@ const SideBar = () => {
                 <p className="hidden sm:flex">Meetings</p>
               </a>
             </li>
-            {/* Basket */}
+         
             <li>
               <a
                 href="#"
@@ -129,7 +129,7 @@ const SideBar = () => {
             </li>
           </ul>
         </div>
-      </div>
+      </div> */}
 
       <div
         className="bottom-6 fixed"

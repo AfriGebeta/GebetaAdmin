@@ -8,7 +8,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import {ErrorPage,ClientMgmtPage, Dashboard, ActivitiesPage} from './pages';
-import ApiKeyTable from './components/ApiKeyTable.jsx';
+import ApiKeyTable from './components/apiKeyTable.jsx';
 import UsagePage from './pages/UsagePage.jsx';
 
 const router = createBrowserRouter([

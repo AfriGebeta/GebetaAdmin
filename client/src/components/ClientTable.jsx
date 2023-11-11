@@ -29,7 +29,7 @@ const ClientTable = () => {
   return (
     <div className="pb-5">
       {/* Client Table on larger screens */}
-      <div className="max-h-[270px] overflow-x-auto scrollbar-hide hidden ss:block">
+      <div className="max-h-[700px] overflow-x-auto scrollbar-hide hidden ss:block">
         <div className=" w-[90%] scrollbar-hide">
           <table className="w-full overflow-y-auto">
             <thead className="sticky top-0 bg-primary text-secondary">
