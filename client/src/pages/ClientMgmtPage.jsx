@@ -1,5 +1,4 @@
-import React from "react";
-import { ApiKeyTable, ClientTable } from "../components";
+import { ClientTable } from "../components";
 
 const ClientMgmtPage = () => {
   return (

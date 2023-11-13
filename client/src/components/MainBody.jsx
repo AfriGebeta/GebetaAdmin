@@ -1,9 +1,13 @@
 import React from "react";
-
-import { ActivitiesPage, ApiKeyPage } from "../pages";
-import { ClientMgmtPage } from "../pages";
-import UsagePage from "../pages/UsagePage";
 import { Route, Routes } from "react-router-dom";
+
+import {
+  ActivitiesPage,
+  ApiKeyPage,
+  ClientMgmtPage,
+  PlaceTablePage,
+  UsagePage,
+} from "../pages";
 
 export const MainBody = () => {
   return (
@@ -15,6 +19,7 @@ export const MainBody = () => {
           element={<ClientMgmtPage />}
         />
         <Route path="/dashboard/apikeys" element={<ApiKeyPage />} />
+        <Route path="/dashboard/place" element={<PlaceTablePage />} />
         <Route path="/dashboard/activities" element={<ActivitiesPage />} />
       </Routes>
     </div>

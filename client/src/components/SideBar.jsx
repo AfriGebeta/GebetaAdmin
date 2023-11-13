@@ -8,6 +8,7 @@ import {
   Home,
   ClientMgmt,
   ApiKey,
+  PlaceIcon,
   Newsletter,
   OngoingProjects,
   Meetings,
@@ -68,6 +69,17 @@ const SideBar = () => {
               >
                 <img src={ApiKey} alt="" className="w-[20px] h-[20px]" />
                 <p className="hidden sm:flex">API Keys</p>
+              </Link>
+            </li>
+            {/* places table */}
+            <li>
+              <Link
+                // to={"/dashboard/apikeys"}
+                to={"/dashboard/place"}
+                className="flex gap-2 hover:text-primary hover:scale-105 active:scale-90 focus:scale-90 focus:text-primary"
+              >
+                <img src={PlaceIcon} alt="" className="w-[20px] h-[20px]" />
+                <p className="hidden sm:flex">Places</p>
               </Link>
             </li>
             {/* Activities */}
