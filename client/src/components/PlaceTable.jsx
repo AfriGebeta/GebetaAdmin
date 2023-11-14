@@ -53,7 +53,6 @@ const PlaceTable = () => {
                 <th className="pb-5 text-[11px] font-normal tracking-wide text-left">
                   Longitude
                 </th>
-                <th className=""></th>
                 <th className="pb-5 text-[11px] font-normal tracking-wide text-left">
                   City
                 </th>
@@ -95,7 +94,7 @@ const PlaceTable = () => {
         </div>
       </div>
 
-      <div>
+      <div className="m-5">
         {pages.map((page) => {
           return (
             <ul
