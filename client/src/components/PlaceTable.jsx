@@ -15,7 +15,10 @@ const PlaceTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { isLoading, data, isError } = useQuery("places", () => {
-    return axios.get("https://jsonplaceholder.typicode.com/photos");
+    return axios.get(
+      // "https://mapapi.gebeta.app/api/v1/getAllPlaces?page=1&apiKey=[token]"
+      "https://jsonplaceholder.typicode.com/photos"
+    );
   });
 
   useEffect(() => {

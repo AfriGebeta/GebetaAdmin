@@ -1,20 +1,55 @@
-import React, { useState } from "react";
+import axios from "axios";
+import { useState, useContext } from "react";
+import { useMutation } from "react-query";
+import { userContext } from "../App";
 
 const Form = () => {
+  const userToken = useContext(userContext);
   const [formData, setFormData] = useState({
     name: "",
     country: "",
     city: "",
-    latitude: "",
-    longitude: "",
+    lat: "",
+    lon: "",
     type: "",
+    apikey: userToken,
   });
+
+  const { mutate } = useMutation(
+    (formData) => {
+      return axios.post(
+        "https://mapapi.gebeta.app/api/v1/route/addPlace",
+        formData
+      );
+    },
+    {
+      onSuccess: (responseData) => {
+        console.log("Mutation successful:", responseData);
+      },
+      onError: (error) => {
+        console.log("error", error);
+      },
+    }
+  );
+
+  const handleSubmit = (event) => {
+    console.log(formData);
+    event.preventDefault();
+    mutate(formData);
+    setFormData({
+      name: "",
+      country: "",
+      city: "",
+      lat: "",
+      lon: "",
+      type: "",
+      apikey: userToken,
+    });
+  };
+
   const changeHandler = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
-  };
-  const clickHandler = (event) => {
-    console.log("clicked");
   };
   return (
     <div className=" pb-5 w-full ">
@@ -64,8 +99,8 @@ const Form = () => {
           </label>
           <input
             type="text"
-            name="latitude"
-            value={formData.latitude}
+            name="lat"
+            value={formData.lat}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
             required
@@ -77,8 +112,8 @@ const Form = () => {
           </label>
           <input
             type="text"
-            name="longitude"
-            value={formData.longitude}
+            name="lon"
+            value={formData.lon}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
             required
@@ -101,7 +136,7 @@ const Form = () => {
           <button
             className="bg-lime-600 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
-            onClick={clickHandler}
+            onClick={handleSubmit}
           >
             Submit
           </button>

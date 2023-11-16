@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { QueryClientProvider, QueryClient } from "react-query";
 import {
   MapArea,
@@ -8,9 +9,10 @@ import {
   UsagePage,
 } from "./components";
 import { Dashboard, SigninPage } from "./pages";
-import axios from "axios";
 
 // import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+
+export const userContext = React.createContext();
 
 const App = () => {
   const [authentication, setAuthentication] = useState(false);
@@ -46,13 +48,15 @@ const App = () => {
   }, []);
   return (
     <QueryClientProvider client={queryClient}>
-      <div>
-        {!authentication ? (
-          <SigninPage checkValidation={checkValidation} />
-        ) : (
-          <Dashboard />
-        )}
-      </div>
+      <userContext.Provider value={localStorage.getItem("token")}>
+        <div>
+          {!authentication ? (
+            <SigninPage checkValidation={checkValidation} />
+          ) : (
+            <Dashboard />
+          )}
+        </div>
+      </userContext.Provider>
     </QueryClientProvider>
   );
 };
