@@ -4,9 +4,11 @@ import { useQuery } from "react-query";
 import { Toggle, Up } from "../assets";
 import axios from "axios";
 
+const getAllUsersApi = import.meta.env.VITE_GETALLUSERS_API;
+
 const ClientTable = () => {
   const { isLoading, data, isError, isFetching } = useQuery("all-users", () => {
-    return axios.get("https://mapapi.gebeta.app/api/v1/getAllUsers");
+    return axios.get(getAllUsersApi);
   });
   // if (isFetching) console.log("//////////");
 

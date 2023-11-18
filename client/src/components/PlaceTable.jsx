@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { useQuery } from "react-query";
 import { useState } from "react";
+import { userContext } from "../App";
 import axios from "axios";
 
 const active =
@@ -9,14 +10,17 @@ const notActive =
   "m-1 relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex";
 const pageSize = 100;
 
+const getAllPlaces = import.meta.env.VITE_GRTALLPLACE_API;
+
 const PlaceTable = () => {
+  const userToken = useContext(userContext);
   const [paginated, setPaginated] = useState([]);
   const [startIndex, setStartIndex] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { isLoading, data, isError } = useQuery("places", () => {
     return axios.get(
-      // "https://mapapi.gebeta.app/api/v1/getAllPlaces?page=1&apiKey=[token]"
+      // getAllPlaces + userToken
       "https://jsonplaceholder.typicode.com/photos"
     );
   });
