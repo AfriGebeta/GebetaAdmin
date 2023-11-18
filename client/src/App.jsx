@@ -13,15 +13,17 @@ import { Dashboard, SigninPage } from "./pages";
 // import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 
 export const userContext = React.createContext();
+const queryClient = new QueryClient();
+
+const loginApi = import.meta.VITE_LOGIN_API;
 
 const App = () => {
   const [authentication, setAuthentication] = useState(false);
   const [Loading, setIsLoading] = useState(true);
-  const queryClient = new QueryClient();
 
   function checkValidation(formData) {
     axios
-      .post("https://mapapi.gebeta.app/api/v1/users/login", formData)
+      .post(loginApi, formData)
       .then((res) => {
         if (res.status === 200) {
           if (res.data.msg === "ok") {

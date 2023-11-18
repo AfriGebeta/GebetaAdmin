@@ -3,6 +3,8 @@ import { useState, useContext } from "react";
 import { useMutation } from "react-query";
 import { userContext } from "../App";
 
+const addPlaceApi = import.meta.env.VITE_ADDPLACE_API;
+
 const Form = () => {
   const userToken = useContext(userContext);
   const [formData, setFormData] = useState({
@@ -17,10 +19,7 @@ const Form = () => {
 
   const { mutate } = useMutation(
     (formData) => {
-      return axios.post(
-        "https://mapapi.gebeta.app/api/v1/route/addPlace",
-        formData
-      );
+      return axios.post(addPlaceApi, formData);
     },
     {
       onSuccess: (responseData) => {
