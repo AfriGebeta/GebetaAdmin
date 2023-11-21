@@ -10,23 +10,19 @@ const notActive =
   "m-1 relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex";
 const pageSize = 100;
 
-const getAllPlaces = import.meta.env.VITE_GRTALLPLACE_API;
-
 const PlaceTable = () => {
-  const userToken = useContext(userContext);
+  const token = useContext(userContext);
+  const getAllPlaces = import.meta.env.VITE_GETALLPLACE_API + token;
   const [paginated, setPaginated] = useState([]);
   const [startIndex, setStartIndex] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { isLoading, data, isError } = useQuery("places", () => {
-    return axios.get(
-      // getAllPlaces + userToken
-      "https://jsonplaceholder.typicode.com/photos"
-    );
+    return axios.get(getAllPlaces);
   });
 
   useEffect(() => {
-    setPaginated(data?.data.slice(0, pageSize));
+    setPaginated(data?.data?.data?.slice(0, pageSize));
   }, [isLoading]);
 
   useEffect(() => {
@@ -80,19 +76,19 @@ const PlaceTable = () => {
                   }
                 >
                   <td className="pb-3 pt-3 pr-5 text-[12px] font-semibold">
-                    {client.id}
+                    {client.name}
                   </td>
                   <td className="pb-3 pt-3 pr-5 text-[12px] font-semibold">
-                    {client.albumId}
+                    {client.latitude}
                   </td>
                   <td className="pb-3 pt-3 pr-5 text-[12px] font-semibold ">
-                    <p className="truncate w-32">{client.url}</p>
+                    <p className="truncate w-32">{client.longtitude}</p>
                   </td>
                   <td className="pb-3 pt-3 pr-5 text-[12px] font-semibold">
-                    {client.title}
+                    {client.city}
                   </td>
                   <td className="pb-3 pt-3 pr-5 text-[12px] font-semibold">
-                    {client.thumbnailUrl}
+                    {client.country}
                   </td>
                 </tr>
               ))}

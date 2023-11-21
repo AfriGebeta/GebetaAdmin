@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useQuery } from "react-query";
 // import { dummyClients } from "../constants/dummyClient";
 import { Toggle, Up } from "../assets";
 import axios from "axios";
+import { userContext } from "../App";
 
 const getAllUsersApi = import.meta.env.VITE_GETALLUSERS_API;
 
 const ClientTable = () => {
+  const token = useContext(userContext);
   const { isLoading, data, isError, isFetching } = useQuery("all-users", () => {
-    return axios.get(getAllUsersApi);
+    return axios.get(getAllUsersApi + token);
   });
   // if (isFetching) console.log("//////////");
 

@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useEffect, useState, useContext } from "react";
+import { onlineManager, useQuery } from "react-query";
 import axios from "axios";
+import { userContext } from "../App";
 
+const getAllUsers = import.meta.env.VITE_GETALLUSERS_API;
 const ApiKeyTable = () => {
+  const token = useContext(userContext);
   const { isLoading, data, isError, isFetching } = useQuery("all-users", () => {
-    return axios.get("https://mapapi.gebeta.app/api/v1/getAllUsers");
+    return axios.get(getAllUsers + token);
   });
 
   // useEffect(() => {

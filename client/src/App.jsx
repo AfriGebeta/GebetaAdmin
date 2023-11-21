@@ -15,7 +15,7 @@ import { Dashboard, SigninPage } from "./pages";
 export const userContext = React.createContext();
 const queryClient = new QueryClient();
 
-const loginApi = import.meta.VITE_LOGIN_API;
+const loginApi = import.meta.env.VITE_LOGIN_API;
 
 const App = () => {
   const [authentication, setAuthentication] = useState(false);
