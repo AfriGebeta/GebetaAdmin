@@ -9,12 +9,12 @@ const Form = () => {
   const userToken = useContext(userContext);
   const [formData, setFormData] = useState({
     name: "",
-    country: "",
-    city: "",
-    lat: "",
-    lon: "",
+    lat: 0.0,
+    lon: 0.0,
     type: "",
-    apikey: userToken,
+    city: "",
+    country: "",
+    apiKey: String(userToken),
   });
 
   const { mutate } = useMutation(
@@ -23,7 +23,7 @@ const Form = () => {
     },
     {
       onSuccess: (responseData) => {
-        console.log("Mutation successful:", responseData);
+        console.log("Mutation successful");
       },
       onError: (error) => {
         console.log("error", error);
@@ -32,27 +32,30 @@ const Form = () => {
   );
 
   const handleSubmit = (event) => {
-    console.log(formData);
+    // console.log(typeof formData, formData);
     event.preventDefault();
     mutate(formData);
     setFormData({
       name: "",
       country: "",
       city: "",
-      lat: "",
-      lon: "",
+      lat: 0,
+      lon: 0,
       type: "",
-      apikey: userToken,
+      apiKey: userToken,
     });
   };
 
   const changeHandler = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({
+      ...formData,
+      [name]: name === "lat" || name === "lon" ? parseFloat(value) : value,
+    });
   };
   return (
     <div className=" pb-5 w-full ">
-      <form className="grid grid-cols-2 ">
+      <form className="grid grid-cols-2 " onSubmit={handleSubmit}>
         <div className="grid pr-4 group">
           <label className="pb-2 text-secondary text-[13px] font-normal text-left group-focus-within:text-lime-400">
             Name
@@ -60,6 +63,7 @@ const Form = () => {
           <input
             type="text"
             name="name"
+            placeholder="Meskel Flower"
             value={formData.name}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
@@ -73,10 +77,11 @@ const Form = () => {
           <input
             type="text"
             name="country"
+            required
+            placeholder="Ethiopia"
             value={formData.country}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
-            required
           ></input>
         </div>
         <div className="grid pr-4 group">
@@ -86,6 +91,7 @@ const Form = () => {
           <input
             type="text"
             name="city"
+            placeholder="Addis Ababa"
             value={formData.city}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
@@ -99,10 +105,11 @@ const Form = () => {
           <input
             type="text"
             name="lat"
-            value={formData.lat}
+            required
+            placeholder="8.987685259188599"
+            value={formData.lat !== 0 ? formData.lat : ""}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
-            required
           ></input>
         </div>
         <div className="grid pr-4 group">
@@ -112,7 +119,8 @@ const Form = () => {
           <input
             type="text"
             name="lon"
-            value={formData.lon}
+            placeholder="38.764792722654455"
+            value={formData.lon !== 0 ? formData.lon : ""}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
             required
@@ -125,6 +133,7 @@ const Form = () => {
           <input
             type="text"
             name="type"
+            placeholder="neighborhood"
             value={formData.type}
             onChange={changeHandler}
             className="border rounded mb-4 shadow appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-lime-600"
@@ -134,8 +143,7 @@ const Form = () => {
         <div>
           <button
             className="bg-lime-600 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
           >
             Submit
           </button>
