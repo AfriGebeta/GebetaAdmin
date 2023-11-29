@@ -1,14 +1,29 @@
-import { useState } from "react";
-import {LineChart, UsageBoxs, UsagePageSearchForm} from "../components";
-import { UserData } from "../constants/Data";
+import { useState, useContext, useEffect } from "react";
+import { LineChart, UsageBoxs, UsagePageSearchForm } from "../components";
+// import { UserData } from "../constants/Data"; // no need for static data anymore
+import { userId } from "../App";
+import { useQuery } from "react-query";
+import axios from "axios";
 
+const getGraphData = import.meta.env.VITE_GET_GRAPH_DATA_API;
 const UsagePage = () => {
+  const UserId = useContext(userId);
+  const { isLoading, data, isError, isFetching } = useQuery(
+    "graph-data",
+    () => {
+      return axios.get(getGraphData + UserId);
+    }
+  );
   const [userData, setUserData] = useState({
-    labels: UserData.map((data) => data.year),
+    labels: Object.entries(data?.data?.data || {}).map(
+      ([key, value]) => key.split("-")[0]
+    ),
     datasets: [
       {
         label: "Api Usage Graph",
-        data: UserData.map((data) => data.userGain),
+        data: Object.entries(data?.data?.data || {}).map(
+          ([key, value]) => value
+        ),
         borderColor: "rgb(196, 107, 19)",
         pointBackgroundColor: "rgb(196, 107, 19)",
         pointBorderColor: "rgb(196, 107, 19)",
@@ -17,6 +32,27 @@ const UsagePage = () => {
       },
     ],
   });
+  useEffect(() => {
+    // console.log("data", data?.data?.data);
+    setUserData({
+      labels: Object.entries(data?.data?.data || {}).map(
+        ([key, value]) => key.split("-")[0]
+      ),
+      datasets: [
+        {
+          label: "Api Usage Graph",
+          data: Object.entries(data?.data?.data || {}).map(([key, value]) => {
+            return value;
+          }),
+          borderColor: "rgb(196, 107, 19)",
+          pointBackgroundColor: "rgb(196, 107, 19)",
+          pointBorderColor: "rgb(196, 107, 19)",
+          backgroundColor: "rgb(69, 49, 25)",
+          fill: true,
+        },
+      ],
+    });
+  }, [isFetching]);
 
   const options = {
     responsive: true,
@@ -47,18 +83,14 @@ const UsagePage = () => {
     },
   };
 
-  // console.log(userData);
   return (
-    // TODO
-    // 1. complete the uperpart of the page
-    // 2. complete the graph
     <div className=" m-5 ">
-      <UsagePageSearchForm/>
-      
+      <UsagePageSearchForm />
+
       <UsageBoxs />
 
       {/* graph */}
-        <LineChart chartData={userData} options={options} />
+      <LineChart chartData={userData} options={options} />
     </div>
   );
 };
