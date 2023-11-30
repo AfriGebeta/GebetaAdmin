@@ -5,12 +5,12 @@ import { Toggle, Up } from "../assets";
 import axios from "axios";
 import { userContext } from "../App";
 
-const getAllUsersApi = import.meta.env.VITE_GETALLUSERS_API;
-
 const ClientTable = () => {
   const token = useContext(userContext);
+  const getAllUsersApi = import.meta.env.VITE_GETALLUSERS_API + token;
+  // print(getAllUsersApi);
   const { isLoading, data, isError, isFetching } = useQuery("all-users", () => {
-    return axios.get(getAllUsersApi + token);
+    return axios.get(getAllUsersApi);
   });
   // if (isFetching) console.log("//////////");
 
