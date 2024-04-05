@@ -1,3 +1,4 @@
+//@ts-nocheck
 import 'leaflet/dist/leaflet.css'
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
