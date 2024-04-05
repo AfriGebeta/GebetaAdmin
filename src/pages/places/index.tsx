@@ -1,3 +1,4 @@
+import 'leaflet/dist/leaflet.css'
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
 import { Layout, LayoutBody, LayoutHeader } from '@/components/custom/layout'
@@ -170,7 +171,7 @@ export default function Places() {
             </div>
           </TabsContent>
           <TabsContent value='mapview' className='space-y-4'>
-            <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
+            <div className='-mx-4 mx-2 my-1 flex-1 overflow-auto overflow-hidden rounded-md border lg:flex-row lg:space-x-12 lg:space-y-0'>
               <MapContainer
                 style={{ height: '30rem', width: '100%', overflow: 'hidden' }}
                 center={[9.03, 38.74]}
@@ -194,14 +195,10 @@ export default function Places() {
                       <br />
                       {`Status: ${v.status}`} <br />
                       {`Image count: ${Number(v.images?.length)}`} <br />
-                      {`Type: ${Number(v.type)}`} <br />
+                      {`Type: ${v.type}`} <br />
                     </Popup>
                   </Marker>
                 ))}
-
-                <ZoomControl position='topright' />
-
-                <ScaleControl position='bottomleft' />
               </MapContainer>
             </div>
           </TabsContent>
