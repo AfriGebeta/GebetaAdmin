@@ -6,7 +6,7 @@ import { Layout, LayoutBody, LayoutHeader } from '@/components/custom/layout'
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 import { useEffect, useRef, useState } from 'react'
-import { Place } from '@/model'
+import { Place, PlaceType } from '@/model'
 import eventsource from '@/services/eventsource.ts'
 import api, { RequestError } from '@/services/api.ts'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
@@ -23,6 +23,7 @@ import {
   selectPlaces,
 } from '@/data/redux/slices/places.ts'
 import { PaginationState } from '@tanstack/react-table'
+import { iconCurrent, iconMap } from '@/pages/places/data/map-icons.ts'
 
 export default function Places() {
   const dispatch = useAppDispatch()
@@ -244,6 +245,11 @@ export default function Places() {
                   <Marker
                     key={v.id}
                     position={[v.location.latitude, v.location.longitude]}
+                    icon={
+                      v.id === lastPlaceId
+                        ? iconCurrent
+                        : iconMap[v.type] ?? iconMap[PlaceType.OTHER]
+                    }
                   >
                     <Popup>
                       {`Name: ${v.names.official['EN']}`} <br />
