@@ -5,64 +5,64 @@ import { UserNav } from '@/components/user-nav'
 import { Layout, LayoutBody, LayoutHeader } from '@/components/custom/layout'
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
-import { useContext, useEffect, useState } from 'react'
-import { Place, PlacesContext } from '@/contexts'
+import { useEffect, useRef, useState } from 'react'
+import { Place } from '@/model'
 import eventsource from '@/services/eventsource.ts'
 import api, { RequestError } from '@/services/api.ts'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 import { useToast } from '@/components/ui/use-toast.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import moment from 'moment'
-import {
-  MapContainer,
-  Marker,
-  Popup,
-  ScaleControl,
-  TileLayer,
-  ZoomControl,
-} from 'react-leaflet'
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { TabsContent } from '@radix-ui/react-tabs'
+import { useAppDispatch, useAppSelector } from '@/data/redux/hooks.ts'
+import {
+  addPlace,
+  addPlaces,
+  selectPlaces,
+} from '@/data/redux/slices/places.ts'
+import { PaginationState } from '@tanstack/react-table'
 
 export default function Places() {
-  const { toast } = useToast()
-  const placesContext = useContext(PlacesContext)
-  const [____, setRequesting] = useState(false)
+  const dispatch = useAppDispatch()
 
-  const [___, setCount] = useState(0)
-  const [_, setOffset] = useState(0)
+  const { toast } = useToast()
 
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
     defaultValue: null,
   })
 
-  useEffect(() => {
-    const eventSource = eventsource.subscribeToPlaces()
+  const places = useAppSelector(selectPlaces)
 
-    eventSource.addEventListener('PLACE_ADDED', (event) => {
-      console.log({ event })
+  const [requesting, setRequesting] = useState(false)
 
-      console.log({ data: event.data })
+  const [count, setCount] = useState(Object.keys(places).length)
 
-      const addedPlace = JSON.parse(event.data).data
+  const [lastPlaceId, setLastPlaceId] = useState<string | null>(null)
 
-      console.log({ addedPlace })
+  const pagination = useRef<PaginationState>({
+    pageSize: 10,
+    pageIndex: 0,
+  })
 
-      placesContext.addPlace(addedPlace.place)
-    })
-
-    return () => eventSource.close()
-  }, [])
-
-  async function fetchPlaces() {
+  async function fetchPlaces({
+    limit,
+    offset,
+  }: {
+    limit: number
+    offset: number
+  }) {
     try {
       setRequesting(true)
 
+      console.log('calling with: ', { limit, offset })
+
       const response = await api.getPlaces({
         apiAccessToken: String(apiAccessToken),
-        offset: Object.keys(placesContext.places).length,
-        limit: 10,
+        offset,
+        limit,
         orderBy: JSON.stringify([{ by: 'createdAt', direction: 'DESC' }]),
       })
 
@@ -73,10 +73,8 @@ export default function Places() {
           data: Array<Place>
         }
 
+        dispatch(addPlaces(result.data))
         setCount(result.count)
-        setOffset(result.atOffset)
-
-        placesContext.addPlaces(result.data)
       } else {
         const responseData = (await response.json()).error as RequestError
 
@@ -94,7 +92,15 @@ export default function Places() {
         description: 'Check your network connection!',
         variant: 'destructive',
         action: (
-          <ToastAction altText='Try again' onClick={fetchPlaces}>
+          <ToastAction
+            altText='Try again'
+            onClick={() =>
+              fetchPlaces({
+                limit: pagination.current.pageSize,
+                offset: Object.keys(places).length,
+              })
+            }
+          >
             Try again
           </ToastAction>
         ),
@@ -105,9 +111,45 @@ export default function Places() {
   }
 
   useEffect(() => {
-    const id = setTimeout(() => void fetchPlaces(), 0)
+    const eventSource = eventsource.subscribeToPlaces()
+
+    eventSource.addEventListener('PLACE_ADDED', (event) => {
+      console.log({ event })
+
+      console.log({ data: event.data })
+
+      const addedPlace = JSON.parse(event.data).data.place as Place
+
+      console.log({ addedPlace })
+
+      dispatch(addPlace(addedPlace))
+      setCount((_count) => _count + 1)
+    })
+
+    return () => eventSource.close()
+  }, [])
+
+  useEffect(() => {
+    const id = setTimeout(
+      () =>
+        void fetchPlaces({
+          limit: pagination.current.pageSize,
+          offset: Object.keys(places).length,
+        }),
+      0
+    )
     return () => clearTimeout(id)
   }, [])
+
+  useEffect(() => {
+    if (Object.keys(places).length)
+      setLastPlaceId(
+        Object.values(places).sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0].id
+      )
+  }, [places])
 
   return (
     <Layout>
@@ -145,7 +187,7 @@ export default function Places() {
             <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
               <DataTable
                 data={
-                  Object.values(placesContext.places)
+                  Object.values(places)
                     .sort(
                       (a, b) =>
                         new Date(b.createdAt).getTime() -
@@ -160,7 +202,7 @@ export default function Places() {
                       name: v.names.official,
                       status: v.status,
                       createdAt: moment(v.createdAt).format(
-                        'ddd DD, YYYY [at] HH:mm:ss a'
+                        'ddd DD, MMM YYYY [at] HH:mm:ss a'
                       ),
                       addedBy: v.addedBy,
                       images: v.images,
@@ -168,22 +210,37 @@ export default function Places() {
                     })) as any
                 }
                 columns={columns}
+                onFetch={() =>
+                  fetchPlaces({
+                    limit: pagination.current.pageSize,
+                    offset: Object.keys(places).length,
+                  })
+                }
+                fetching={requesting}
+                count={count}
+                onPaginationChange={(_pagination) => {
+                  pagination.current = _pagination
+                }}
               />
             </div>
           </TabsContent>
           <TabsContent value='mapview' className='space-y-4'>
-            <div className='-mx-4 mx-2 my-1 flex-1 overflow-auto overflow-hidden rounded-md border lg:flex-row lg:space-x-12 lg:space-y-0'>
+            <div className='-mx-4 mx-1 my-1 flex-1 overflow-auto overflow-hidden rounded-md border lg:flex-row lg:space-x-12 lg:space-y-0'>
               <MapContainer
                 style={{ height: '30rem', width: '100%', overflow: 'hidden' }}
-                center={[9.03, 38.74]}
-                zoom={13}
+                center={[
+                  places[lastPlaceId]?.location?.latitude ?? 9.03,
+                  places[lastPlaceId]?.location?.longitude ?? 38.74,
+                ]}
+                zoom={18}
+                maxZoom={30}
                 scrollWheelZoom={true}
               >
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                 />
-                {Object.values(placesContext.places).map((v) => (
+                {Object.values(places).map((v) => (
                   <Marker
                     key={v.id}
                     position={[v.location.latitude, v.location.longitude]}

@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from './data-table-column-header'
 
 import { statuses } from '../data/data'
-import { Address, PlaceStatus, PlaceType, Profile } from '@/contexts'
+import { Address, PlaceStatus, PlaceType, Profile } from '@/model'
 
 export const columns: ColumnDef<{
   id: string
@@ -70,6 +70,7 @@ export const columns: ColumnDef<{
     },
     enableSorting: false,
     enableHiding: false,
+    enableResizing: true,
   },
   {
     accessorKey: 'latitude',
@@ -188,7 +189,7 @@ export const columns: ColumnDef<{
     cell: ({ row }) => {
       return (
         <div className='flex w-[100px] items-center'>
-          {row.original.address?.borough}
+          {String(row.original.address?.borough)}
         </div>
       )
     },
@@ -206,7 +207,7 @@ export const columns: ColumnDef<{
     cell: ({ row }) => {
       return (
         <div className='flex w-[100px] items-center'>
-          {row.original.address?.district}
+          {String(row.original.address?.district)}
         </div>
       )
     },

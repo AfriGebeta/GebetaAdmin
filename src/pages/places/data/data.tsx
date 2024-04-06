@@ -6,7 +6,7 @@ import {
   QuestionMarkCircledIcon,
   StopwatchIcon,
 } from '@radix-ui/react-icons'
-import { PlaceStatus, PlaceType } from '@/contexts'
+import { PlaceStatus, PlaceType } from '@/model'
 
 export const labels = [
   {

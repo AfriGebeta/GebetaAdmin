@@ -1,6 +1,4 @@
 //@ts-nocheck
-import { createContext } from 'react'
-
 export const Role = {
   COLLECTOR: 'COLLECTOR',
   CROWD: 'CROWD',
@@ -31,11 +29,3 @@ export interface Profile {
   createdAt: Date
   updatedAt: Date
 }
-
-export const ProfilesContext = createContext({
-  profiles: {} as { [placeId: string]: Profile },
-  setProfiles: (profiles: { [profileId: string]: Profile }) => {},
-  addProfile: (profile: Profile) => {},
-  removeProfile: (profileId: string) => {},
-  removeProfiles: (profileIds: Array<string>) => {},
-})

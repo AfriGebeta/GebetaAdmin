@@ -1,6 +1,5 @@
 //@ts-nocheck
-import { createContext } from 'react'
-import { Profile } from '@/contexts/profiles-context.ts'
+import { Profile } from '@/model'
 
 export const PlaceType = {
   DWELLING: 'DWELLING',
@@ -148,12 +147,3 @@ export interface Place {
   entity: Entity | null
   contact: Contact | null
 }
-
-export const PlacesContext = createContext({
-  places: {} as { [placeId: string]: Place },
-  setPlaces: (placeIds: { [placeId: string]: Place }) => {},
-  addPlaces: (places: Array<Place>) => {},
-  addPlace: (place: Place) => {},
-  removePlace: (placeId: string) => {},
-  removePlaces: (placeIds: Array<string>) => {},
-})
