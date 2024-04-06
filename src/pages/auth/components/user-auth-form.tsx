@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 import { useToast } from '@/components/ui/use-toast.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
-import { AuthContext, Profile } from '@/contexts'
+import { AuthContext } from '@/contexts'
 import api, { RequestError } from '@/services/api.ts'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {

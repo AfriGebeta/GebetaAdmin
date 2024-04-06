@@ -12,6 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  PaginationState,
 } from '@tanstack/react-table'
 
 import {
@@ -25,6 +26,9 @@ import {
 
 import { DataTablePagination } from '../components/data-table-pagination'
 import { DataTableToolbar } from '../components/data-table-toolbar'
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/custom/button.tsx'
+import Loader from '@/components/loader.tsx'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -34,7 +38,16 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+  onPaginationChange,
+  onFetch,
+  fetching,
+  count,
+}: DataTableProps<TData, TValue> & {
+  fetching: boolean
+  count: number
+  onFetch: () => Promise<void>
+  onPaginationChange: (value: PaginationState) => void
+}) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -42,6 +55,11 @@ export function DataTable<TData, TValue>({
     []
   )
   const [sorting, setSorting] = React.useState<SortingState>([])
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageSize: 10,
+    pageIndex: 0,
+  })
 
   const table = useReactTable({
     data,
@@ -51,6 +69,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -63,6 +82,15 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    onPaginationChange(updaterOrValue) {
+      setPagination((pagination) => {
+        const ret = updaterOrValue(pagination)
+
+        onPaginationChange(ret)
+
+        return ret
+      })
+    },
   })
 
   return (
@@ -89,7 +117,16 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {fetching ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 items-center justify-center text-center'
+                >
+                  <Loader />
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -109,16 +146,24 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className='h-24 items-center justify-center text-center'
                 >
-                  No results.
+                  No results. <br />
+                  <Button
+                    variant={'outline'}
+                    className={'mt-1'}
+                    disabled={fetching}
+                    onClick={onFetch}
+                  >
+                    Try to fetch
+                  </Button>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination count={count} onNextPage={onFetch} table={table} />
     </div>
   )
 }

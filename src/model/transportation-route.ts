@@ -1,6 +1,5 @@
 //@ts-nocheck
-import { createContext } from 'react'
-import { OpenHours, Place } from '@/contexts/places-context.ts'
+import { OpenHours, Place } from '@/model'
 
 export const SearchedFrom = {
   TELEGRAM: 'TELEGRAM',
@@ -69,17 +68,3 @@ export interface TransportationRoute {
   createdAt: string
   updatedAt: string
 }
-
-export const TransportationRoutesContext = createContext({
-  routes: {} as { [placeId: string]: TransportationRoute },
-  setRoutes: (
-    //@ts-nocheck
-    routes: { [routeId: string]: TransportationRoute }
-  ) => {},
-  //@ts-nocheck
-  addRoute: (route: TransportationRoute) => {},
-  //@ts-nocheck
-  removeRoute: (routeId: string) => {},
-  //@ts-nocheck
-  removeRoutes: (routeIds: Array<string>) => {},
-})
