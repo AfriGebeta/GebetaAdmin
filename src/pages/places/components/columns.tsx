@@ -5,6 +5,23 @@ import { DataTableColumnHeader } from './data-table-column-header'
 
 import { statuses } from '../data/data'
 import { Address, PlaceStatus, PlaceType, Profile } from '@/model'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog.tsx'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
+import { Card, CardContent } from '@/components/ui/card.tsx'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel.tsx'
 
 export const columns: ColumnDef<{
   id: string
@@ -61,9 +78,11 @@ export const columns: ColumnDef<{
     ),
     cell: ({ row }) => {
       return (
-        <div className='w-[80px]'>
+        <div className='w-[80px] overflow-hidden'>
           {row.original.type === PlaceType.OTHER
-            ? row.original.customType ?? 'OTHER'
+            ? row.original.customType
+              ? `OTHER (${row.original.customType})`
+              : 'OTHER'
             : row.original.type}
         </div>
       )
@@ -166,12 +185,44 @@ export const columns: ColumnDef<{
   {
     accessorKey: 'image-count',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Image Count' />
+      <DataTableColumnHeader column={column} title='Images' />
     ),
     cell: ({ row }) => {
       return (
-        <div className='flex w-[100px] items-center'>
-          {Number(row.original.images.length)}
+        <div className='flex w-[100px] items-center gap-2 overflow-hidden'>
+          <Dialog>
+            {row.original.images?.map((image, index) => (
+              <>
+                <DialogTrigger>
+                  <Avatar className='border border-muted'>
+                    <AvatarImage src={image} />
+                    <AvatarFallback>{index + 1}</AvatarFallback>
+                  </Avatar>
+                </DialogTrigger>
+              </>
+            ))}
+            <DialogContent className='max-w-screen h-full items-center justify-center border-none bg-transparent'>
+              <Carousel className='w-full max-w-xs'>
+                <CarouselContent className='items-center'>
+                  {row.original.images?.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <div className='p-1'>
+                        <div className='flex items-center justify-center overflow-hidden rounded-md border border-muted'>
+                          <img src={image} alt={'image'} />
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {row.original.images?.length > 1 && (
+                  <>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </>
+                )}
+              </Carousel>
+            </DialogContent>
+          </Dialog>
         </div>
       )
     },
