@@ -170,15 +170,9 @@ export const columns: ColumnDef<{
       <DataTableColumnHeader column={column} title='Created At' />
     ),
     cell: ({ row }) => {
-      const createdAt = row.original.createdAt
-
-      if (!createdAt) {
-        return null
-      }
-
       return (
         <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
-          <span>{createdAt}</span>
+          <span>{row.original.createdAt ?? ''}</span>
         </div>
       )
     },
@@ -212,7 +206,7 @@ export const columns: ColumnDef<{
     },
   },
   {
-    accessorKey: 'image-count',
+    accessorKey: 'images',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Images' />
     ),
