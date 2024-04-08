@@ -3,7 +3,7 @@ import { ColumnDef } from '@tanstack/react-table'
 
 import { DataTableColumnHeader } from './data-table-column-header'
 
-import { statuses } from '../data/data'
+import { statuses, types } from '../data/data'
 import {
   Address,
   Contact,
@@ -103,13 +103,18 @@ export const columns: ColumnDef<{
       <DataTableColumnHeader column={column} title='Type' />
     ),
     cell: ({ row }) => {
+      const type = types.find((status) => status.value === row.original.type)
+
+      if (!type) return null
+
       return (
-        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
-          {row.original.type === PlaceType.OTHER
-            ? row.original.customType
-              ? `OTHER (${row.original.customType})`
-              : 'OTHER'
-            : row.original.type}
+        <div className='hidden-scrollbar hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
+          <strong>
+            {type.label}
+            {type.value === PlaceType.OTHER && row.original.customType
+              ? ` (${row.original.customType})`
+              : ''}
+          </strong>
         </div>
       )
     },
@@ -118,55 +123,47 @@ export const columns: ColumnDef<{
     enableResizing: true,
   },
   {
-    accessorKey: 'latitude',
+    accessorKey: 'coordinates',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Latitude' />
+      <DataTableColumnHeader column={column} title='Coordinates' />
     ),
     cell: ({ row }) => (
       <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
-        {Number(row.original.latitude)}
+        <Link
+          target='_blank'
+          to={`https://www.google.com/maps?q=${Number(row.original.latitude)},${Number(row.original.longitude)}`}
+        >
+          <Badge variant='outline' className='whitespace-nowrap'>
+            {`${Number(row.original.latitude)}, ${Number(row.original.longitude)}`}
+          </Badge>
+        </Link>
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: 'longitude',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Longitude' />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
-          {Number(row.original.longitude)}
-        </div>
-      )
-    },
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'addedBy',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Added By' />
-    ),
-    cell: ({ row }) => {
-      const addedBy = row.original.addedBy
-
-      if (!addedBy) return null
-
-      return (
-        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
-          <span>{`${addedBy.firstName}${addedBy.lastName ? ` ${addedBy.lastName}` : ''}`}</span>
-        </div>
-      )
-    },
-    enableSorting: false,
-    enableHiding: false,
-    // filterFn: (row, id, value) => {
-    //   return value.includes(row.original.addedBy)
-    // },
-  },
+  // {
+  //   accessorKey: 'addedBy',
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title='Added By' />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const addedBy = row.original.addedBy
+  //
+  //     if (!addedBy) return null
+  //
+  //     return (
+  //       <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
+  //         <span>{`${addedBy.firstName}${addedBy.lastName ? ` ${addedBy.lastName}` : ''}`}</span>
+  //       </div>
+  //     )
+  //   },
+  //   enableSorting: false,
+  //   enableHiding: false,
+  //   // filterFn: (row, id, value) => {
+  //   //   return value.includes(row.original.addedBy)
+  //   // },
+  // },
   {
     accessorKey: 'createdAt',
     header: ({ column }) => (
