@@ -208,6 +208,7 @@ export default function Places() {
                       addedBy: v.addedBy,
                       images: v.images,
                       address: v.address,
+                      contact: v.contact,
                     })) as any
                 }
                 columns={columns}

@@ -4,17 +4,21 @@ import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from './data-table-column-header'
 
 import { statuses } from '../data/data'
-import { Address, PlaceStatus, PlaceType, Profile } from '@/model'
+import {
+  Address,
+  Contact,
+  FacebookAccountType,
+  MessagingPlatformAccountType,
+  PlaceStatus,
+  PlaceType,
+  Profile,
+} from '@/model'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog.tsx'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
-import { Card, CardContent } from '@/components/ui/card.tsx'
 import {
   Carousel,
   CarouselContent,
@@ -22,6 +26,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel.tsx'
+import { Badge } from '@/components/ui/badge.tsx'
+import { Link } from 'react-router-dom'
 
 export const columns: ColumnDef<{
   id: string
@@ -35,6 +41,7 @@ export const columns: ColumnDef<{
   createdAt: string
   images: Array<string>
   address: Address
+  contact: Contact
 }>[] = [
   // {
   //   id: 'select',
@@ -66,7 +73,26 @@ export const columns: ColumnDef<{
       <DataTableColumnHeader column={column} title='Name' />
     ),
     cell: ({ row }) => {
-      return <div className='w-[80px]'>{row.original.name['EN' as any]}</div>
+      return (
+        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
+          {row.original.name['EN' as any]}
+        </div>
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'amharicName',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Amharic Name' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
+          {row.original.name['AM' as any]}
+        </div>
+      )
     },
     enableSorting: false,
     enableHiding: false,
@@ -78,7 +104,7 @@ export const columns: ColumnDef<{
     ),
     cell: ({ row }) => {
       return (
-        <div className='w-[80px] overflow-hidden'>
+        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
           {row.original.type === PlaceType.OTHER
             ? row.original.customType
               ? `OTHER (${row.original.customType})`
@@ -97,7 +123,9 @@ export const columns: ColumnDef<{
       <DataTableColumnHeader column={column} title='Latitude' />
     ),
     cell: ({ row }) => (
-      <div className='w-[80px]'>{Number(row.original.latitude)}</div>
+      <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
+        {Number(row.original.latitude)}
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -108,7 +136,11 @@ export const columns: ColumnDef<{
       <DataTableColumnHeader column={column} title='Longitude' />
     ),
     cell: ({ row }) => {
-      return <div className='w-[80px]'>{Number(row.original.longitude)}</div>
+      return (
+        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
+          {Number(row.original.longitude)}
+        </div>
+      )
     },
     enableSorting: false,
     enableHiding: false,
@@ -124,7 +156,7 @@ export const columns: ColumnDef<{
       if (!addedBy) return null
 
       return (
-        <div className='flex w-[100px] items-center'>
+        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
           <span>{`${addedBy.firstName}${addedBy.lastName ? ` ${addedBy.lastName}` : ''}`}</span>
         </div>
       )
@@ -148,7 +180,7 @@ export const columns: ColumnDef<{
       }
 
       return (
-        <div className='flex w-[100px] items-center'>
+        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
           <span>{createdAt}</span>
         </div>
       )
@@ -170,7 +202,7 @@ export const columns: ColumnDef<{
       if (!status) return null
 
       return (
-        <div className='flex w-[100px] items-center'>
+        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
           {status.icon && (
             <status.icon className='mr-2 h-4 w-4 text-muted-foreground' />
           )}
@@ -189,7 +221,7 @@ export const columns: ColumnDef<{
     ),
     cell: ({ row }) => {
       return (
-        <div className='flex w-[100px] items-center gap-2 overflow-hidden'>
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
           <Dialog>
             {row.original.images?.map((image, index) => (
               <>
@@ -239,7 +271,7 @@ export const columns: ColumnDef<{
     ),
     cell: ({ row }) => {
       return (
-        <div className='flex w-[100px] items-center'>
+        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
           {String(row.original.address?.borough)}
         </div>
       )
@@ -257,8 +289,241 @@ export const columns: ColumnDef<{
     ),
     cell: ({ row }) => {
       return (
-        <div className='flex w-[100px] items-center'>
+        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
           {String(row.original.address?.district)}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'phoneNumber',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Phone Number' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          <Link
+            target='_blank'
+            to={`tel:${String(row.original.contact?.phone?.primary ?? '')}`}
+          >
+            {String(row.original.contact?.phone?.primary ?? '')}
+          </Link>
+
+          {row.original.contact?.phone?.alternatives?.map((v) => {
+            return (
+              <Link target='_blank' to={`tel:${v}`}>
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  {v}
+                </Badge>
+              </Link>
+            )
+          })}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'email',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Email' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          <Link
+            target='_blank'
+            to={`mailto:${String(row.original.contact?.email?.primary ?? '')}`}
+          >
+            {String(row.original.contact?.email?.primary ?? '')}
+          </Link>
+
+          {row.original.contact?.email?.alternatives?.map((v) => {
+            return (
+              <Link target='_blank' to={`mailto:${v}`}>
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  {v}
+                </Badge>
+              </Link>
+            )
+          })}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'website',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Website' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
+          <Link
+            target='_blank'
+            to={`${String(row.original.contact?.socialMedia?.website ?? '')}`}
+          >
+            <u>{String(row.original.contact?.socialMedia?.website ?? '')}</u>
+          </Link>
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'telegram',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Telegram' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          {row.original.contact?.socialMedia?.telegram?.map((v) => {
+            return (
+              <Link target='_blank' to={`https://t.me/${v.handle}`}>
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  @{v.handle}
+                </Badge>
+              </Link>
+            )
+          })}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'whatsapp',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Whatsapp' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          {row.original.contact?.socialMedia?.whatsapp?.map((v) => {
+            return v.type === MessagingPlatformAccountType.BOT ? (
+              <Badge
+                variant='outline'
+                className='whitespace-nowrap text-muted-foreground'
+              >
+                @{v.handle}
+              </Badge>
+            ) : (
+              <Link
+                target='_blank'
+                to={`${v.type === MessagingPlatformAccountType.PERSONAL ? `https://wa.me/` : v.type === MessagingPlatformAccountType.GROUP ? 'https://chat.whatsapp.com/' : ''}${v.handle}`}
+              >
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  {v.type !== MessagingPlatformAccountType.CHANNEL ? '@' : ''}
+                  {v.handle}
+                </Badge>
+              </Link>
+            )
+          })}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'facebook',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Facebook' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          {row.original.contact?.socialMedia?.facebook?.map((v) => {
+            return (
+              <Link
+                target='_blank'
+                to={`https://www.facebook.com/${v.type === FacebookAccountType.GROUP ? 'groups/' : ''}${v.handle}`}
+              >
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  @{v.handle}
+                </Badge>
+              </Link>
+            )
+          })}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'twitter',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Twitter' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          {row.original.contact?.socialMedia?.x?.map((v) => {
+            return (
+              <Link target='_blank' to={`https://twitter.com/${v}`}>
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  @{v}
+                </Badge>
+              </Link>
+            )
+          })}
+        </div>
+      )
+    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.original?.[id])
+    // },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'instagram',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Instagram' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar flex w-[100px] items-center gap-2 overflow-hidden overflow-x-auto'>
+          {row.original.contact?.socialMedia?.instagram?.map((v) => {
+            return (
+              <Link target='_blank' to={`https://instagram.com/${v}`}>
+                <Badge variant='outline' className='whitespace-nowrap'>
+                  @{v}
+                </Badge>
+              </Link>
+            )
+          })}
         </div>
       )
     },

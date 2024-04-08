@@ -41,6 +41,17 @@
     />
 
     <meta name="theme-color" content="#fff" />
+
+    <style>
+      .hidden-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .hidden-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
