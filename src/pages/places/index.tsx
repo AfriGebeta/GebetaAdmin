@@ -24,6 +24,22 @@ import {
 } from '@/data/redux/slices/places.ts'
 import { PaginationState } from '@tanstack/react-table'
 import { iconCurrent, iconMap } from '@/pages/places/data/map-icons.ts'
+import { Link } from 'react-router-dom'
+import { Badge } from '@/components/ui/badge.tsx'
+import { Card, CardContent } from '@/components/ui/card.tsx'
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/ui/dialog.tsx'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel.tsx'
 
 export default function Places() {
   const dispatch = useAppDispatch()
@@ -253,14 +269,97 @@ export default function Places() {
                     }
                   >
                     <Popup>
-                      {`Name: ${v.names.official['EN']}`} <br />
-                      {`Location: ${v.location?.latitude} ${v.location?.latitude}`}{' '}
-                      <br />
-                      {`Address: ${v.address?.borough}, ${v.address?.district}`}{' '}
-                      <br />
-                      {`Status: ${v.status}`} <br />
-                      {`Image count: ${Number(v.images?.length)}`} <br />
-                      {`Type: ${v.type}`} <br />
+                      <Card>
+                        <CardContent>
+                          <br />
+                          {`${v.names.official['EN']}`} <br /> <br />
+                          {`${v.names.official['AM']}`} <br /> <br />
+                          <b>{`${v.type}${v.type === PlaceType.OTHER ? ` (${v.customType})` : ''}`}</b>{' '}
+                          <br /> <br />
+                          {``}{' '}
+                          <Link
+                            target='_blank'
+                            to={`https://www.google.com/maps?q=${v.location?.latitude}, ${v.location?.latitude}`}
+                          >
+                            <Badge variant='outline'>
+                              {v.location?.latitude}, {v.location?.latitude}
+                            </Badge>
+                          </Link>{' '}
+                          <br /> <br />
+                          {`${moment(v.createdAt).format(
+                            'ddd DD, MMM YYYY [at] HH:mm:ss a'
+                          )}`}{' '}
+                          <br /> <br />
+                          <b>{`${v.status}`}</b> <br /> <br />
+                          <Dialog>
+                            {v.images?.map((image, index) => (
+                              <>
+                                <DialogTrigger>
+                                  <Avatar className='border border-muted'>
+                                    <AvatarImage src={image} />
+                                    <AvatarFallback>{index + 1}</AvatarFallback>
+                                  </Avatar>
+                                </DialogTrigger>
+                              </>
+                            ))}
+                            <DialogContent className='max-w-screen z-[1000] h-full items-center justify-center border-none bg-transparent'>
+                              <Carousel className='w-full max-w-xs'>
+                                <CarouselContent className='items-center'>
+                                  {v.images?.map((image, index) => (
+                                    <CarouselItem key={index}>
+                                      <div className='p-1'>
+                                        <div className='flex items-center justify-center overflow-hidden rounded-md border border-muted'>
+                                          <img src={image} alt={'image'} />
+                                        </div>
+                                      </div>
+                                    </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                {v.images?.length > 1 && (
+                                  <>
+                                    <CarouselPrevious />
+                                    <CarouselNext />
+                                  </>
+                                )}
+                              </Carousel>
+                            </DialogContent>
+                          </Dialog>
+                          <br /> <br />
+                          {Boolean(v.contact?.phone?.primary) && (
+                            <>
+                              <Link
+                                target='_blank'
+                                to={`tel:${v.contact?.phone?.primary}`}
+                              >
+                                {`${v.contact?.phone?.primary}`}{' '}
+                              </Link>{' '}
+                              <br /> <br />
+                            </>
+                          )}
+                          {Boolean(v.contact?.email?.primary) && (
+                            <>
+                              <Link
+                                target='_blank'
+                                to={`mailto:${v.contact?.email?.primary}`}
+                              >
+                                {`${v.contact?.email?.primary}`}{' '}
+                              </Link>{' '}
+                              <br /> <br />
+                            </>
+                          )}
+                          {Boolean(v.contact?.socialMedia?.website) && (
+                            <>
+                              <Link
+                                target='_blank'
+                                to={v.contact?.socialMedia?.website}
+                              >
+                                <u>{`${v.contact?.socialMedia?.website}`}</u>
+                              </Link>{' '}
+                              <br />
+                            </>
+                          )}
+                        </CardContent>
+                      </Card>
                     </Popup>
                   </Marker>
                 ))}
