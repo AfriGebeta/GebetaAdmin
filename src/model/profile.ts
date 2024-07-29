@@ -8,13 +8,13 @@ export const Role = {
 export type Role = (typeof Role)[keyof typeof Role]
 
 export interface Boundary {
-  id: string
+  id?: string
   bounds: Array<string>
-  radius: number
-  createdAt: string
-  updatedAt: string
-  centerId: string
-  center: Location | null
+  radius?: number
+  createdAt?: string
+  updatedAt?: string
+  centerId?: string
+  center?: Location | null
 }
 
 export interface Profile {
@@ -22,10 +22,12 @@ export interface Profile {
   role?: Role
   firstName: string
   lastName?: string
+  password: string
   phoneNumber: string
   email: string | null
+  active: boolean
   collectionBoundaryId: string
-  collectionBoundary: Boundary
+  collectionBoundary: { latitude: string; longitude: string }[]
   createdAt: Date
   updatedAt: Date
 }

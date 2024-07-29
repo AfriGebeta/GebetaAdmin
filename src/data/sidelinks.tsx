@@ -1,4 +1,4 @@
-import { BusIcon, LucideLocateFixed } from 'lucide-react'
+import { BusIcon, LucideLocateFixed, UserRoundCog, Users } from 'lucide-react'
 
 export interface NavLink {
   title: string
@@ -29,6 +29,18 @@ export const sidelinks: SideLink[] = [
     label: '',
     href: '/transportation-routes',
     icon: <BusIcon size={18} />,
+  },
+  {
+    title: 'Collectors',
+    label: '',
+    href: '/profiles',
+    icon: <Users size={18} />,
+  },
+  {
+    title: 'Admin',
+    label: '',
+    href: '/admins',
+    icon: <UserRoundCog size={18} />,
   },
   // {
   //   title: 'Chats',
