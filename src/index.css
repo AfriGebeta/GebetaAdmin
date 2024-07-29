@@ -107,3 +107,19 @@
     @apply min-h-svh w-full bg-background text-foreground;
   }
 }
+
+/* Add this to your global styles or specific CSS file */
+.table-head {
+  font-weight: bold;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table-head:first-child {
+  border-top-left-radius: 4px;
+}
+
+.table-head:last-child {
+  border-top-right-radius: 4px;
+}
