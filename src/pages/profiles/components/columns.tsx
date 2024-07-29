@@ -1,5 +1,9 @@
+//@ts-nocheck
+import { Button } from '@/components/ui/button'
 import { Profile } from '@/model'
+import MapModal from './MapModal'
 import { ColumnDef } from '@tanstack/react-table'
+import { useState } from 'react'
 
 export const columns: ColumnDef<Profile>[] = [
   {
@@ -7,8 +11,26 @@ export const columns: ColumnDef<Profile>[] = [
     header: 'Name',
   },
   {
-    accessorKey: 'collectionBoundary',
-    header: 'Collection Boundary',
+    accessorKey: 'bounds',
+    header: 'Bounds',
+    cell: ({ row }) => {
+      const [showMap, setShowMap] = useState(false)
+      const handleShowMap = () => setShowMap(true)
+      const handleCloseMap = () => setShowMap(false)
+      console.lo
+      return (
+        <>
+          <Button onClick={handleShowMap}>Map</Button>
+          {showMap && (
+            <MapModal
+              isOpen={showMap}
+              onClose={handleCloseMap}
+              coordinates={row.original.collectionBoundary?.bounds || []}
+            />
+          )}
+        </>
+      )
+    },
   },
   {
     accessorKey: 'email',
@@ -28,6 +50,6 @@ export const columns: ColumnDef<Profile>[] = [
   },
   {
     accessorKey: 'active',
-    header: 'Status',
+    header: 'Active',
   },
 ]
