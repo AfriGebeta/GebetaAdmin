@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useState } from 'react'
 import {
   Dialog,
@@ -74,7 +75,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
     })
   }
 
-  // Convert coordinates to a format suitable for Polyline
   const polylinePositions = coordinates.map((coord) => [
     parseFloat(coord.latitude),
     parseFloat(coord.longitude),
@@ -153,7 +153,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
             <div className='flex items-center'>
               <Button
                 onClick={handleAddCoordinate}
-                variant='outline'
                 className='translate-y-[10px] bg-[#ffa818]'
               >
                 <PlusIcon size={18} />
@@ -178,7 +177,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                             e.target.value
                           )
                         }
-                        className='mr-2 w-24'
+                        className='mr-2 w-1/2'
                       />
                       <Input
                         value={coord.longitude}
@@ -189,7 +188,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                             e.target.value
                           )
                         }
-                        className='w-24'
+                        className='w-1/2'
                       />
                     </div>
                     <Button
@@ -205,7 +204,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
             )}
           </div>
 
-          {/* Map Container */}
           {coordinates.length > 0 && (
             <div className='mt-4 h-48'>
               <MapContainer

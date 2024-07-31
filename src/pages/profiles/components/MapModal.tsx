@@ -30,7 +30,6 @@ const MapModal: React.FC<MapModalProps> = ({
     [coordinates]
   )
 
-  // Calculate the center of the polyline
   const center = useMemo(() => {
     if (polylinePositions.length === 0) return [0, 0]
 

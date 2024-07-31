@@ -165,6 +165,10 @@ export const columns: ColumnDef<{
   //   // },
   // },
   {
+    accessorKey: 'collectors',
+    header: 'Collectors',
+  },
+  {
     accessorKey: 'createdAt',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Created At' />

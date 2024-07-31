@@ -28,11 +28,12 @@ export function DataTablePagination<TData>({
   count: number
   onNextPage: () => Promise<void>
 }) {
+  console.log(count)
   return (
     <div className='flex items-center justify-between overflow-auto px-2'>
       <div className='hidden flex-1 text-sm text-muted-foreground sm:block'>
         {/*{table.getFilteredSelectedRowModel().rows.length} of{' '}*/}
-        {table.getFilteredRowModel().rows.length} total row(s)
+        {count} total row(s)
       </div>
       <div className='flex items-center sm:space-x-6 lg:space-x-8'>
         <div className='flex items-center space-x-2'>
@@ -57,7 +58,7 @@ export function DataTablePagination<TData>({
         </div>
         <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
           Page {table.getState().pagination.pageIndex + 1} of{' '}
-          {table.getPageCount()}
+          {Math.ceil(count / table.getState().pagination.pageSize)}
         </div>
         <div className='flex items-center space-x-2'>
           <Button
@@ -84,8 +85,9 @@ export function DataTablePagination<TData>({
             onClick={async () => {
               console.log({ count, rows: table.getRowCount() })
 
-              if (table.getCanNextPage()) table.nextPage()
-              else if (count > table.getRowCount()) {
+              if (table.getCanNextPage()) {
+                table.nextPage()
+              } else if (count > table.getRowCount()) {
                 console.log({ shouldcall: true })
                 await onNextPage()
                 console.log({ nextPage: table.getPageCount() })

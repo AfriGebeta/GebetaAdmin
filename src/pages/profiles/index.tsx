@@ -23,6 +23,8 @@ import AddProfileModal from './components/AddProfileModal.tsx'
 import { columns } from './components/columns.tsx'
 import { DataTable } from './components/data-table.tsx'
 
+import EditProfileModal from './components/EditProfileModal.tsx'
+
 export default function Profiles() {
   const dispatch = useAppDispatch()
   const { toast } = useToast()
@@ -75,8 +77,8 @@ export default function Profiles() {
       setRequesting(false)
     }
   }
-
   console.log(profiles)
+
   useEffect(() => {
     fetchProfiles()
   }, [])
@@ -172,6 +174,70 @@ export default function Profiles() {
     }
   }
 
+  const handleEditProfile = (profile: Profile) => {
+    setSelectedProfile(profile)
+    setEditProfileModalOpen(true)
+  }
+
+  const handleUpdateProfile = async (data: {
+    firstName: string
+    lastName: string
+    email: string
+    collectionBoundary: { bounds: string[] }
+  }) => {
+    if (selectedProfile) {
+      try {
+        console.log('Updating profile with ID:', selectedProfile.id)
+        console.log('Payload:', {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          collectionBoundary: data.collectionBoundary,
+        })
+
+        const response = await api.updateProfile({
+          apiAccessToken: String(apiAccessToken),
+          id: selectedProfile.id,
+          data: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phoneNumber: selectedProfile.phoneNumber,
+            email: data.email,
+            active: selectedProfile.active,
+            collectionBoundary: data.collectionBoundary,
+          },
+        })
+
+        console.log('Response status:', response.status)
+        if (response.ok) {
+          toast({
+            title: 'Profile Updated',
+            description: 'The profile has been updated successfully!',
+            variant: 'default',
+          })
+          fetchProfiles()
+        } else {
+          const error = await response.json()
+          console.error('Update error:', error)
+          toast({
+            title: 'Error Updating Profile',
+            description: error.message,
+            variant: 'destructive',
+          })
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error)
+        toast({
+          title: 'Request Failed',
+          description: 'Check your network connection!',
+          variant: 'destructive',
+        })
+      } finally {
+        setEditProfileModalOpen(false)
+      }
+    }
+  }
+
   return (
     <Layout>
       <LayoutHeader>
@@ -219,19 +285,24 @@ export default function Profiles() {
             onFetch={() => fetchProfiles()}
             fetching={requesting}
             onToggleActivation={handleToggleActivation}
+            onEdit={handleEditProfile}
           />
         </div>
-        {/* <EditProfileModal
-        isOpen={isEditProfileModalOpen}
-        onClose={() => setEditProfileModalOpen(false)}
-        onSubmit={handleEditProfile}
-        profile={selectedProfile as any}
-      /> */}
+
         <AddProfileModal
           isOpen={isAddProfileModalOpen}
           onClose={() => setAddProfileModalOpen(false)}
           onSubmit={handleAddProfile}
         />
+
+        {selectedProfile && (
+          <EditProfileModal
+            profileData={selectedProfile}
+            isOpen={isEditProfileModalOpen}
+            onClose={() => setEditProfileModalOpen(false)}
+            onSubmit={handleUpdateProfile}
+          />
+        )}
       </LayoutBody>
     </Layout>
   )

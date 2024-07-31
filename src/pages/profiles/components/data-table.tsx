@@ -45,10 +45,12 @@ export function DataTable<TData, TValue>({
   onFetch,
   fetching,
   onToggleActivation,
+  onEdit,
 }: DataTableProps<TData, TValue> & {
   fetching: boolean
   onFetch: () => Promise<void>
   onToggleActivation: (id: string, isActive: boolean) => void
+  onEdit: (profile: TData) => void
 }) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -122,13 +124,14 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
-                  <TableRow>
+                  <TableCell>
                     <DataTableRowActions
                       row={row}
                       apiAccessToken={apiAccessToken}
                       onToggleActivation={onToggleActivation}
+                      onEdit={onEdit}
                     ></DataTableRowActions>
-                  </TableRow>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
