@@ -44,6 +44,13 @@ export function DataTableToolbar<TData>({
               options={types}
             />
           )}
+          {table.getColumn('type') && (
+            <DataTableFacetedFilter
+              column={table.getColumn('type')}
+              title='Collector'
+              options={types}
+            />
+          )}
         </div>
         {isFiltered && (
           <Button
