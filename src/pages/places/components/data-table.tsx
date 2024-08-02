@@ -164,7 +164,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination count={count} table={table} onNextPage={onFetch} />
+      <DataTablePagination count={count} onNextPage={onFetch} table={table} />
     </div>
   )
 }

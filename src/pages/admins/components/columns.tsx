@@ -22,9 +22,4 @@ export const columns: ColumnDef<Profile>[] = [
     accessorKey: 'role',
     header: 'Role',
   },
-  // {
-  //   id: 'actions',
-  //   cell: ({ row }) => <DataTableRowActions row={row} />,
-  //   size: 50,
-  // },
 ]

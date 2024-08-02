@@ -1,4 +1,10 @@
-import { BusIcon, LucideLocateFixed, UserRoundCog, Users } from 'lucide-react'
+import {
+  BusIcon,
+  LucideLocateFixed,
+  RectangleEllipsisIcon,
+  UserRoundCog,
+  Users,
+} from 'lucide-react'
 
 export interface NavLink {
   title: string
@@ -31,6 +37,12 @@ export const sidelinks: SideLink[] = [
     icon: <BusIcon size={18} />,
   },
   {
+    title: 'Boundary',
+    label: '',
+    href: '/boundary',
+    icon: <RectangleEllipsisIcon size={18} />,
+  },
+  {
     title: 'Collectors',
     label: '',
     href: '/profiles',
@@ -42,6 +54,7 @@ export const sidelinks: SideLink[] = [
     href: '/admins',
     icon: <UserRoundCog size={18} />,
   },
+
   // {
   //   title: 'Chats',
   //   label: '9',

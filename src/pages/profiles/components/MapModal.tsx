@@ -59,7 +59,7 @@ const MapModal: React.FC<MapModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className='h-fit w-1/2'>
         <DialogHeader>
           <DialogTitle>Map View</DialogTitle>
         </DialogHeader>
@@ -73,7 +73,7 @@ const MapModal: React.FC<MapModalProps> = ({
               url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             />
-            <Polyline positions={polylinePositions} color='blue' />
+            <Polyline positions={polylinePositions} color='#ffa818' />
             <MapContent />
           </MapContainer>
         </div>

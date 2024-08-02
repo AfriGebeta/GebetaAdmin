@@ -15,6 +15,7 @@ interface DataTableRowActionsProps<TData> {
   apiAccessToken: string
   onToggleActivation: (id: string, isActive: boolean) => void
   onEdit: (profile: any) => void
+  onDelete: (profile: any) => void
 }
 
 export function DataTableRowActions<TData>({
@@ -22,6 +23,7 @@ export function DataTableRowActions<TData>({
   apiAccessToken,
   onToggleActivation,
   onEdit,
+  onDelete,
 }: DataTableRowActionsProps<TData>) {
   const { toast } = useToast()
 
@@ -34,6 +36,10 @@ export function DataTableRowActions<TData>({
   const handleEdit = () => {
     onEdit(row.original)
     // console.log("Editing profile")
+  }
+
+  const handleDelete = () => {
+    onDelete(row.original)
   }
 
   return (
@@ -49,6 +55,7 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
         <DropdownMenuItem onClick={handleToggle}>
           {row.original.active ? 'Deactivate' : 'Activate'}
         </DropdownMenuItem>

@@ -129,7 +129,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               id='phoneNumber'
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder='Phone Number(+251------)'
+              placeholder='Phone Number'
             />
           </div>
           <div className='flex items-center space-x-2'>
@@ -218,7 +218,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                   url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                   attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <Polyline positions={polylinePositions} color='blue' />
+                <Polyline positions={polylinePositions} color='#ffa818' />
               </MapContainer>
             </div>
           )}

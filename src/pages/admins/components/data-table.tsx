@@ -1,12 +1,20 @@
+//@ts-nocheck
+import * as React from 'react'
 import {
   ColumnDef,
+  ColumnFiltersState,
+  SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
+  PaginationState,
 } from '@tanstack/react-table'
-import * as React from 'react'
 
 import {
   Table,
@@ -17,12 +25,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { DataTablePagination } from '../components/data-table-pagination'
+import { DataTableToolbar } from '../components/data-table-toolbar'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button.tsx'
 import Loader from '@/components/loader.tsx'
-import useLocalStorage from '@/hooks/use-local-storage'
-import { useState } from 'react'
-import { DataTableToolbar } from '../components/data-table-toolbar'
-import { DataTableRowActions } from './data-table-row-actions'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -41,26 +48,36 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const [apiAccessToken, __] = useLocalStorage({
-    key: 'apiAccessToken',
-    defaultValue: null,
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  )
+  const [sorting, setSorting] = React.useState<SortingState>([])
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageSize: 10,
+    pageIndex: 0,
   })
 
-  // Step 1: Add state for data
-  const [dataState, setData] = useState(data)
-
   const table = useReactTable({
-    data: dataState, // Step 2: Use dataState here
+    data,
     columns,
     state: {
+      sorting,
       columnVisibility,
       rowSelection,
+      columnFilters,
+      pagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
   return (
@@ -71,16 +88,18 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -108,22 +127,6 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
-                  <TableCell>
-                    <DataTableRowActions
-                      row={row}
-                      apiAccessToken={String(apiAccessToken)}
-                      onToggleActivation={(id, isActive) => {
-                        // Update the state to reflect the new activation state
-                        setData((prev) =>
-                          prev.map((item: any) =>
-                            item.id === id
-                              ? { ...item, active: isActive }
-                              : item
-                          )
-                        )
-                      }}
-                    />
-                  </TableCell>
                 </TableRow>
               ))
             ) : (
