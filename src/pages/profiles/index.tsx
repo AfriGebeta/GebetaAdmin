@@ -24,6 +24,7 @@ import { columns } from './components/columns.tsx'
 import { DataTable } from './components/data-table.tsx'
 
 import EditProfileModal from './components/EditProfileModal.tsx'
+import DeleteProfileModal from './components/DeleteProfileModal.tsx'
 
 export default function Profiles() {
   const dispatch = useAppDispatch()
@@ -38,6 +39,8 @@ export default function Profiles() {
   const [isMapModalOpen, setMapModalOpen] = useState(false)
   const [isAddProfileModalOpen, setAddProfileModalOpen] = useState(false)
   const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false)
+  const [isDeleteProfileModalOpen, setDeleteProfileModalOpen] = useState(false)
+  setDeleteProfileModalOpen
 
   async function fetchProfiles() {
     try {
@@ -179,6 +182,23 @@ export default function Profiles() {
     setEditProfileModalOpen(true)
   }
 
+  const handleDeleteProfile = (profile: Profile) => {
+    setSelectedProfile(profile)
+    setDeleteProfileModalOpen(true)
+  }
+
+  const handleDeleteProfile2 = async (id: string) => {
+    if (selectedProfile) {
+      const selectedId = selectedProfile.id
+      try {
+        console.log(`zuzu : ${selectedId}`)
+        await api.deleteProfile({ apiAccessToken, selectedId })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
   const handleUpdateProfile = async (data: {
     firstName: string
     lastName: string
@@ -286,6 +306,7 @@ export default function Profiles() {
             fetching={requesting}
             onToggleActivation={handleToggleActivation}
             onEdit={handleEditProfile}
+            onDelete={handleDeleteProfile}
           />
         </div>
 
@@ -301,6 +322,14 @@ export default function Profiles() {
             isOpen={isEditProfileModalOpen}
             onClose={() => setEditProfileModalOpen(false)}
             onSubmit={handleUpdateProfile}
+          />
+        )}
+        {selectedProfile && (
+          <DeleteProfileModal
+            id={selectProfiles.id}
+            isOpen={isDeleteProfileModalOpen}
+            onClose={() => setDeleteProfileModalOpen(false)}
+            onSubmit={handleDeleteProfile2}
           />
         )}
       </LayoutBody>
