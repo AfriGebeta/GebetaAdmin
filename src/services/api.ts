@@ -179,7 +179,7 @@ export default {
     selectedId: string
   }) {
     return fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/profiles/${selectedId}/delete`,
+      `${import.meta.env.VITE_API_BASE_URL}/profiles/${selectedId}`,
       {
         method: 'DELETE',
         headers: {
