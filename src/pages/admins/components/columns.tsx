@@ -18,8 +18,4 @@ export const columns: ColumnDef<Profile>[] = [
     accessorKey: 'createdAt',
     header: 'Created At',
   },
-  {
-    accessorKey: 'role',
-    header: 'Role',
-  },
 ]

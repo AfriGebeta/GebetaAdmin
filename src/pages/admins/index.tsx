@@ -135,7 +135,10 @@ export default function Profiles() {
               Admins that manage application
             </p>
           </div>
-          <Button onClick={() => setAddProfileModalOpen(true)}>
+          <Button
+            onClick={() => setAddProfileModalOpen(true)}
+            className='font-semibold'
+          >
             <PlusIcon size={18} className='mr-2' />
             Add Admin
           </Button>
@@ -156,7 +159,6 @@ export default function Profiles() {
                   phoneNumber: v.phoneNumber,
                   createdAt: moment(v.createdAt).format('ddd DD, MMM YYYY'),
                   email: v.email,
-                  role: v.role,
                 })) as any
             }
             columns={columns}

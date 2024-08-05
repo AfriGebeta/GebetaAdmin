@@ -48,11 +48,10 @@ export const columns: ColumnDef<Profile>[] = [
     header: 'Created At',
   },
   {
-    accessorKey: 'role',
-    header: 'Role',
-  },
-  {
     accessorKey: 'active',
     header: 'Active',
+    cell: ({ row }) => {
+      return <p>{row.original.active === true ? 'Active' : 'Inactive'}</p>
+    },
   },
 ]

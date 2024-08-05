@@ -1,4 +1,3 @@
-import Loader from '@/components/loader'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -10,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+import mapLoader from '/animation.webm'
 
 interface EditProfileModalProps {
   isOpen: boolean
@@ -108,12 +109,15 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className='h-[80%]'>
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
         </DialogHeader>
         {loading ? (
-          <Loader />
+          <div className='flex w-full flex-col items-center '>
+            <video autoPlay loop src={mapLoader} />
+            <h3 className=''>Updating profile...</h3>
+          </div>
         ) : (
           <div className='space-y-4'>
             <div>
