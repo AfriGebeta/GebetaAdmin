@@ -20,9 +20,8 @@ import { useEffect, useState } from 'react'
 import AddProfileModal from './components/AddProfileModal.tsx'
 import { columns } from './components/columns.tsx'
 import { DataTable } from './components/data-table.tsx'
-import EditProfileModal from './components/EditProfileModal.tsx'
 
-export default function Admins() {
+export default function Profiles() {
   const dispatch = useAppDispatch()
   const { toast } = useToast()
   const [apiAccessToken, __] = useLocalStorage({
@@ -31,9 +30,7 @@ export default function Admins() {
   })
   const profiles = useAppSelector(selectProfiles)
   const [requesting, setRequesting] = useState(false)
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
   const [isAddProfileModalOpen, setAddProfileModalOpen] = useState(false)
-  const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false)
 
   async function fetchProfiles() {
     try {
@@ -47,8 +44,8 @@ export default function Admins() {
           atOffset: number
           data: Array<Profile>
         }
-        console.log(result.data)
         dispatch(addProfiles(result.data))
+        console.log(profiles)
       } else {
         const responseData = (await response.json()).error as RequestError
         toast({
@@ -73,6 +70,7 @@ export default function Admins() {
       setRequesting(false)
     }
   }
+  console.log(profiles)
 
   useEffect(() => {
     fetchProfiles()
@@ -86,15 +84,9 @@ export default function Admins() {
     phoneNumber: string
   }) => {
     try {
-      const response = await api.createProfile({
+      const response = await api.createAdminProfile({
         apiAccessToken: String(apiAccessToken),
-        profileData: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          password: data.password,
-          phoneNumber: data.phoneNumber,
-        },
+        profileData: data,
       })
 
       if (response.ok) {
@@ -125,46 +117,7 @@ export default function Admins() {
       setAddProfileModalOpen(false)
     }
   }
-  const handleEditProfile = async (data: {
-    name: string
-    email: string
-    phoneNumber: string
-  }) => {
-    if (!selectedProfile) return
 
-    try {
-      const response = await api.updateProfile({
-        apiAccessToken: String(apiAccessToken),
-        id: selectedProfile.id,
-        data,
-      })
-
-      if (response.ok) {
-        toast({
-          title: 'Profile Updated',
-          description: 'The profile has been updated successfully!',
-          variant: 'default',
-        })
-        fetchProfiles()
-      } else {
-        const error = (await response.json()).error
-        toast({
-          title: 'Error Updating Profile',
-          description: error.message,
-          variant: 'destructive',
-        })
-      }
-    } catch (e) {
-      console.error(e)
-      toast({
-        title: 'Request Failed',
-        description: 'Check your network connection!',
-        variant: 'destructive',
-      })
-    } finally {
-      setEditProfileModalOpen(false)
-    }
-  }
   return (
     <Layout>
       <LayoutHeader>
@@ -182,7 +135,10 @@ export default function Admins() {
               Admins that manage application
             </p>
           </div>
-          <Button onClick={() => setAddProfileModalOpen(true)}>
+          <Button
+            onClick={() => setAddProfileModalOpen(true)}
+            className='font-semibold'
+          >
             <PlusIcon size={18} className='mr-2' />
             Add Admin
           </Button>
@@ -203,7 +159,6 @@ export default function Admins() {
                   phoneNumber: v.phoneNumber,
                   createdAt: moment(v.createdAt).format('ddd DD, MMM YYYY'),
                   email: v.email,
-                  role: v.role,
                 })) as any
             }
             columns={columns}
@@ -211,12 +166,7 @@ export default function Admins() {
             fetching={requesting}
           />
         </div>
-        <EditProfileModal
-          isOpen={isEditProfileModalOpen}
-          onClose={() => setEditProfileModalOpen(false)}
-          onSubmit={handleEditProfile}
-          profile={selectedProfile as any}
-        />
+
         <AddProfileModal
           isOpen={isAddProfileModalOpen}
           onClose={() => setAddProfileModalOpen(false)}

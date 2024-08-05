@@ -265,7 +265,7 @@ export default function Places() {
                     icon={
                       v.id === lastPlaceId
                         ? iconCurrent
-                        : iconMap[v.type] ?? iconMap[PlaceType.OTHER]
+                        : (iconMap[v.type] ?? iconMap[PlaceType.OTHER])
                     }
                   >
                     <Popup>

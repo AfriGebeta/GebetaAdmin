@@ -1,16 +1,13 @@
-// AddProfileModal.tsx
-
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { PlusIcon } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { useState } from 'react'
 
 interface AddProfileModalProps {
   isOpen: boolean
@@ -21,7 +18,6 @@ interface AddProfileModalProps {
     email: string
     password: string
     phoneNumber: string
-    collectionBoundary: { latitude: string; longitude: string }[]
   }) => void
 }
 
@@ -35,19 +31,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [latitude, setLatitude] = useState('')
-  const [longitude, setLongitude] = useState('')
-  const [coordinates, setCoordinates] = useState<
-    { latitude: string; longitude: string }[]
-  >([])
-
-  const handleAddCoordinate = () => {
-    if (latitude && longitude) {
-      setCoordinates([...coordinates, { latitude, longitude }])
-      setLatitude('')
-      setLongitude('')
-    }
-  }
 
   const handleSubmit = () => {
     onSubmit({
@@ -56,13 +39,11 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
       email,
       password,
       phoneNumber,
-      collectionBoundary: coordinates,
     })
   }
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className='h-[70%]'>
         <DialogHeader>
           <DialogTitle>Add Profile</DialogTitle>
         </DialogHeader>
@@ -73,6 +54,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               id='firstName'
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              placeholder='First name'
             />
           </div>
           <div>
@@ -81,6 +63,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               id='lastName'
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              placeholder='Last name'
             />
           </div>
           <div>
@@ -89,6 +72,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               id='email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder='Email'
             />
           </div>
           <div>
@@ -97,6 +81,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               id='password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder='Password'
             />
           </div>
           <div>
@@ -105,49 +90,14 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               id='phoneNumber'
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder='Phone Number(+251------)'
             />
           </div>
-          <div className='flex items-center space-x-2'>
-            <Label htmlFor='latitude'>Coordinate</Label>
-            <div className='flex-1'>
-              <Input
-                id='latitude'
-                value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
-              />
-            </div>
-            <div className='flex-1'>
-              <Input
-                id='longitude'
-                value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
-              />
-            </div>
-            <div className='flex items-center'>
-              <Button
-                onClick={handleAddCoordinate}
-                variant='outline'
-                className='translate-y-[10px] bg-[#ffa818]'
-              >
-                <PlusIcon size={18} />
-              </Button>
-            </div>
-          </div>
-          <div>
-            {coordinates.length > 0 && (
-              <ul className='mt-2'>
-                {coordinates.map((coord, index) => (
-                  <li
-                    className='mr-2 mt-2 inline-flex items-center whitespace-nowrap rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-                    key={index}
-                  >
-                    {`Lat: ${coord.latitude}, Lng: ${coord.longitude}`}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <Button onClick={handleSubmit} className='bg-[#ffa818]'>
+          <Button
+            onClick={handleSubmit}
+            variant='outline'
+            className='bg-[#ffa818] font-semibold text-white'
+          >
             Submit
           </Button>
         </div>

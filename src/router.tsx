@@ -12,6 +12,8 @@ import MaintenanceError from './pages/errors/maintenance-error'
 import React, { Suspense, useMemo, useState } from 'react'
 import { AuthContext } from '@/contexts'
 
+import mapLoader from '/animation.webm'
+
 export function Router() {
   const [signedIn, setSignedIn] = useState(
     Boolean(localStorage.getItem('apiAccessToken'))
@@ -28,7 +30,13 @@ export function Router() {
   return (
     <AuthContext.Provider value={authContextProviderValue}>
       <BrowserRouter>
-        <Suspense fallback={<p> Loading...</p>}>
+        <Suspense
+          fallback={
+            <div className='flex h-svh w-full flex-col items-center justify-center'>
+              <video autoPlay loop src={mapLoader} />
+            </div>
+          }
+        >
           <Routes>
             <Route
               path='/auth'

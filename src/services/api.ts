@@ -146,6 +146,50 @@ export default {
       }),
     })
   },
+
+  async createAdminProfile({
+    profileData,
+  }: {
+    apiAccessToken: string
+    profileData: {
+      firstName: string
+      lastName: string
+      email: string
+      password: string
+      phoneNumber: string
+    }
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...profileData,
+        role: 'ADMIN',
+      }),
+    })
+  },
+
+  async deleteProfile({
+    apiAccessToken,
+    selectedId,
+  }: {
+    apiAccessToken: string
+    selectedId: string
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/profiles/${selectedId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${apiAccessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  },
+
   async activateProfile({
     apiAccessToken,
     id,
