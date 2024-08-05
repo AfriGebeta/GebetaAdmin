@@ -281,7 +281,6 @@ export default function Profiles() {
                   phoneNumber: v.phoneNumber,
                   createdAt: moment(v.createdAt).format('ddd DD, MMM YYYY'),
                   email: v.email,
-                  role: v.role,
                   collectionBoundary: v.collectionBoundary,
                   active: v.active,
                 })) as any

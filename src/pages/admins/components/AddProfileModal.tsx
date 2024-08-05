@@ -43,7 +43,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
   }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className='h-[70%]'>
         <DialogHeader>
           <DialogTitle>Add Profile</DialogTitle>
         </DialogHeader>

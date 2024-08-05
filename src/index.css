@@ -131,3 +131,7 @@ body {
 .table-head:last-child {
   border-top-right-radius: 4px;
 }
+
+*:focus {
+  outline: none;
+}
