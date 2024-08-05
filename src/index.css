@@ -109,6 +109,14 @@
 }
 
 /* Add this to your global styles or specific CSS file */
+@font-face {
+  font-family: 'arieva';
+  src: url(/public/AvenirLTStd-Roman.otf);
+}
+body {
+  font-family: arieva !important;
+  font-optical-sizing: auto;
+}
 .table-head {
   font-weight: bold;
   background-color: #f8f9fa;

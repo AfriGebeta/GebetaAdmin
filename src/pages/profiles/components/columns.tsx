@@ -9,6 +9,9 @@ export const columns: ColumnDef<Profile>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
+    cell: ({ row }) => {
+      return <p>{row.original?.firstName + ' ' + row.original?.lastName}</p>
+    },
   },
   {
     accessorKey: 'bounds',

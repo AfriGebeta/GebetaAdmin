@@ -104,7 +104,7 @@ function NavLink({
       aria-current={checkActiveNav(href) ? 'page' : undefined}
     >
       <div className='mr-2'>{icon}</div>
-      {title}
+      <h4 className='text-sm font-semibold'>{title}</h4>
       {label && (
         <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
           {label}

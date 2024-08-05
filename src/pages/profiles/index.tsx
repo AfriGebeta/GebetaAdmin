@@ -40,7 +40,6 @@ export default function Profiles() {
   const [isAddProfileModalOpen, setAddProfileModalOpen] = useState(false)
   const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false)
   const [isDeleteProfileModalOpen, setDeleteProfileModalOpen] = useState(false)
-  setDeleteProfileModalOpen
 
   async function fetchProfiles() {
     try {
@@ -55,7 +54,6 @@ export default function Profiles() {
           data: Array<Profile>
         }
         dispatch(addProfiles(result.data))
-        console.log(profiles)
       } else {
         const responseData = (await response.json()).error as RequestError
         toast({
@@ -65,7 +63,6 @@ export default function Profiles() {
         })
       }
     } catch (e) {
-      console.error(e)
       toast({
         title: 'Request Failed',
         description: 'Check your network connection!',
@@ -80,7 +77,6 @@ export default function Profiles() {
       setRequesting(false)
     }
   }
-  console.log(profiles)
 
   useEffect(() => {
     fetchProfiles()
@@ -125,7 +121,6 @@ export default function Profiles() {
         })
       }
     } catch (error) {
-      console.error('Error toggling activation:', error)
       toast({
         title: 'Request Failed',
         description: 'Check your network connection!',
@@ -150,7 +145,6 @@ export default function Profiles() {
 
       if (response.ok) {
         const result = await response.json()
-        console.log(result)
         dispatch(addProfile(result.data))
         toast({
           title: 'Profile Added',
@@ -166,7 +160,6 @@ export default function Profiles() {
         })
       }
     } catch (error) {
-      console.error('Error adding profile:', error)
       toast({
         title: 'Request Failed',
         description: 'Check your network connection!',
@@ -191,10 +184,10 @@ export default function Profiles() {
     if (selectedProfile) {
       const selectedId = selectedProfile.id
       try {
-        console.log(`zuzu : ${selectedId}`)
         await api.deleteProfile({ apiAccessToken, selectedId })
+        setDeleteProfileModalOpen(false)
       } catch (error) {
-        console.log(error)
+        toast({ title: 'Unsuccesfull Deleting profile' })
       }
     }
   }
@@ -207,14 +200,6 @@ export default function Profiles() {
   }) => {
     if (selectedProfile) {
       try {
-        console.log('Updating profile with ID:', selectedProfile.id)
-        console.log('Payload:', {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          collectionBoundary: data.collectionBoundary,
-        })
-
         const response = await api.updateProfile({
           apiAccessToken: String(apiAccessToken),
           id: selectedProfile.id,
@@ -228,7 +213,6 @@ export default function Profiles() {
           },
         })
 
-        console.log('Response status:', response.status)
         if (response.ok) {
           toast({
             title: 'Profile Updated',
@@ -238,7 +222,6 @@ export default function Profiles() {
           fetchProfiles()
         } else {
           const error = await response.json()
-          console.error('Update error:', error)
           toast({
             title: 'Error Updating Profile',
             description: error.message,
@@ -246,7 +229,6 @@ export default function Profiles() {
           })
         }
       } catch (error) {
-        console.error('Error updating profile:', error)
         toast({
           title: 'Request Failed',
           description: 'Check your network connection!',
@@ -257,7 +239,6 @@ export default function Profiles() {
       }
     }
   }
-
   return (
     <Layout>
       <LayoutHeader>
@@ -275,7 +256,10 @@ export default function Profiles() {
               Profiles managed by the application
             </p>
           </div>
-          <Button onClick={() => setAddProfileModalOpen(true)}>
+          <Button
+            onClick={() => setAddProfileModalOpen(true)}
+            className='font-semibold'
+          >
             <PlusIcon size={18} className='mr-2' />
             Add Collector
           </Button>
@@ -292,7 +276,8 @@ export default function Profiles() {
                 )
                 .map((v) => ({
                   id: v.id,
-                  name: v.firstName + ' ' + v.lastName,
+                  firstName: v.firstName,
+                  lastName: v.lastName,
                   phoneNumber: v.phoneNumber,
                   createdAt: moment(v.createdAt).format('ddd DD, MMM YYYY'),
                   email: v.email,
