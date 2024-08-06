@@ -7,8 +7,10 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
+
+import { Fullscreen } from 'lucide-react'
 
 interface MapModalProps {
   isOpen: boolean
@@ -21,6 +23,8 @@ const MapModal: React.FC<MapModalProps> = ({
   onClose,
   coordinates,
 }) => {
+  const mapRef = useRef(null)
+
   const polylinePositions = useMemo(
     () =>
       coordinates.map((coord) => {
@@ -57,13 +61,23 @@ const MapModal: React.FC<MapModalProps> = ({
     return null
   }
 
+  const handleFullScreen = () => {
+    if (mapRef.current) {
+      if (!document.fullscreenElement) {
+        mapRef.current.requestFullscreen()
+      } else {
+        document.exitFullscreen()
+      }
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='h-fit w-1/2'>
         <DialogHeader>
           <DialogTitle>Map View</DialogTitle>
         </DialogHeader>
-        <div className='h-64'>
+        <div className='relative h-64' ref={mapRef}>
           <MapContainer
             center={center}
             zoom={18}
@@ -76,6 +90,21 @@ const MapModal: React.FC<MapModalProps> = ({
             <Polyline positions={polylinePositions} color='#ffa818' />
             <MapContent />
           </MapContainer>
+          <button
+            onClick={handleFullScreen}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              zIndex: 1000,
+              background: 'white',
+              border: 'none',
+              padding: '10px',
+              cursor: 'pointer',
+            }}
+          >
+            <Fullscreen size={20} />
+          </button>
         </div>
         <Button onClick={onClose} className='mt-4'>
           Close

@@ -146,17 +146,17 @@ export default function Places() {
     return () => eventSource.close()
   }, [])
 
-  useEffect(() => {
-    const id = setTimeout(
-      () =>
-        void fetchPlaces({
-          limit: pagination.current.pageSize,
-          offset: Object.keys(places).length,
-        }),
-      0
-    )
-    return () => clearTimeout(id)
-  }, [])
+  // useEffect(() => {
+  //   const id = setTimeout(
+  //     () =>
+  //       void fetchPlaces({
+  //         limit: pagination.current.pageSize,
+  //         offset: Object.keys(places).length,
+  //       }),
+  //     0
+  //   )
+  //   return () => clearTimeout(id)
+  // }, [])
 
   useEffect(() => {
     if (Object.keys(places).length)
@@ -167,6 +167,13 @@ export default function Places() {
         )[0].id
       )
   }, [places])
+
+  useEffect(() => {
+    fetchPlaces({
+      limit: pagination.current.pageSize,
+      offset: pagination.current.pageIndex * pagination.current.pageSize,
+    })
+  }, [pagination.current.pageIndex, pagination.current.pageSize])
 
   return (
     <Layout>
