@@ -11,6 +11,7 @@ import {
   addProfiles,
   selectProfiles,
   updateProfileActivation,
+  updateProfile,
 } from '@/data/redux/slices/profiles'
 import useLocalStorage from '@/hooks/use-local-storage'
 import { Profile } from '@/model'
@@ -145,7 +146,8 @@ export default function Profiles() {
 
       if (response.ok) {
         const result = await response.json()
-        dispatch(addProfile(result.data))
+        console.log(result)
+        dispatch(addProfile(result.data.user))
         toast({
           title: 'Profile Added',
           description: 'The profile has been added successfully!',
@@ -214,12 +216,13 @@ export default function Profiles() {
         })
 
         if (response.ok) {
+          console.log(selectedProfile.id, data)
+          dispatch(updateProfile({ id: selectedProfile.id, data }))
           toast({
             title: 'Profile Updated',
             description: 'The profile has been updated successfully!',
             variant: 'default',
           })
-          fetchProfiles()
         } else {
           const error = await response.json()
           toast({
@@ -229,6 +232,7 @@ export default function Profiles() {
           })
         }
       } catch (error) {
+        console.log(error)
         toast({
           title: 'Request Failed',
           description: 'Check your network connection!',
@@ -249,7 +253,7 @@ export default function Profiles() {
       </LayoutHeader>
 
       <LayoutBody className='flex flex-col' fixedHeight>
-        <div className='mb-2 flex items-center justify-between space-y-2'>
+        <div className='mb-2 flex justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Collectors</h2>
             <p className='mb-4 text-muted-foreground'>
@@ -286,7 +290,7 @@ export default function Profiles() {
                 })) as any
             }
             columns={columns}
-            onFetch={() => fetchProfiles()}
+            onFetch={fetchProfiles}
             fetching={requesting}
             onToggleActivation={handleToggleActivation}
             onEdit={handleEditProfile}
