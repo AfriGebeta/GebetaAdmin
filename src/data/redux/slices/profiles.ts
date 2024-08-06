@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { Profile } from '@/model'
+import { Boundary, Profile } from '@/model'
 import { arrayToHashMap } from '@/utils'
 
 const NAME = 'profiles'
@@ -49,11 +49,41 @@ export const profilesSlice = createSlice({
         profile.active = isActive
       }
     },
-    updateProfile: (state, action: PayloadAction<Profile>) => {
-      state.profiles = {
-        ...state.profiles,
-        [action.payload.id]: action.payload,
+    updateProfile: (
+      state,
+      action: PayloadAction<{
+        id: string
+        data: {
+          firstName: string
+          lastName: string
+          email: string
+          collectionBoundary: { latitude: string; longitude: string }[]
+        }
+      }>
+    ) => {
+      const {
+        id,
+        data: { firstName, lastName, email, collectionBoundary },
+      } = action.payload
+      console.log(
+        'updateProfile',
+        id,
+        firstName,
+        lastName,
+        email,
+        collectionBoundary
+      )
+      const profile = state.profiles[id]
+      if (profile) {
+        profile.firstName = firstName
+        profile.lastName = lastName
+        profile.email = email
+        profile.collectionBoundary = collectionBoundary
       }
+      // state.profiles = {
+      //   ...state.profiles,
+      //   [action.payload.id]: action.payload,
+      // }
     },
     removeProfile: (state, action: PayloadAction<string>) => {
       const { [action.payload]: _, ...remainingProfiles } = state.profiles

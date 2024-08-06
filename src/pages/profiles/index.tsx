@@ -11,6 +11,7 @@ import {
   addProfiles,
   selectProfiles,
   updateProfileActivation,
+  updateProfile,
 } from '@/data/redux/slices/profiles'
 import useLocalStorage from '@/hooks/use-local-storage'
 import { Profile } from '@/model'
@@ -214,12 +215,13 @@ export default function Profiles() {
         })
 
         if (response.ok) {
+          console.log(selectedProfile.id, data)
+          dispatch(updateProfile({ id: selectedProfile.id, data }))
           toast({
             title: 'Profile Updated',
             description: 'The profile has been updated successfully!',
             variant: 'default',
           })
-          fetchProfiles()
         } else {
           const error = await response.json()
           toast({
@@ -229,6 +231,7 @@ export default function Profiles() {
           })
         }
       } catch (error) {
+        console.log(error)
         toast({
           title: 'Request Failed',
           description: 'Check your network connection!',
@@ -286,7 +289,7 @@ export default function Profiles() {
                 })) as any
             }
             columns={columns}
-            onFetch={() => fetchProfiles()}
+            onFetch={fetchProfiles}
             fetching={requesting}
             onToggleActivation={handleToggleActivation}
             onEdit={handleEditProfile}
