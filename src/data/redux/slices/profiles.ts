@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { Boundary, Profile } from '@/model'
+import { Profile } from '@/model'
 import { arrayToHashMap } from '@/utils'
 
 const NAME = 'profiles'
