@@ -249,7 +249,7 @@ export default function Profiles() {
       </LayoutHeader>
 
       <LayoutBody className='flex flex-col' fixedHeight>
-        <div className='mb-2 flex items-center justify-between space-y-2'>
+        <div className='mb-2 flex justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Collectors</h2>
             <p className='mb-4 text-muted-foreground'>
