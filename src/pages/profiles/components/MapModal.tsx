@@ -98,6 +98,7 @@ const MapModal: React.FC<MapModalProps> = ({
               right: '10px',
               zIndex: 1000,
               background: 'white',
+              borderRadius: '10px',
               border: 'none',
               padding: '10px',
               cursor: 'pointer',
