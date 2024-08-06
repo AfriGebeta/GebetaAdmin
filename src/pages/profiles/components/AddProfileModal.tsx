@@ -70,12 +70,13 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
 
   const handleSubmit = async () => {
     setLoading(true)
+    const phoneNumber2 = `+251${phoneNumber}`
     await onSubmit({
       firstName,
       lastName,
       email,
       password,
-      phoneNumber,
+      phoneNumber: phoneNumber2,
       collectionBoundary: coordinates,
     })
     setLoading(false)
@@ -93,9 +94,9 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
           <DialogTitle>Add Profile</DialogTitle>
         </DialogHeader>
         {loading ? (
-          <div className='flex w-full flex-col items-center justify-center'>
+          <div className='flex w-full flex-col items-center'>
             <video autoPlay loop src={mapLoader} />
-            <p>Updating profile...</p>
+            <p>Adding collector...</p>
           </div>
         ) : (
           <div className='space-y-4'>
@@ -136,13 +137,19 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               />
             </div>
             <div>
-              <Label htmlFor='phoneNumber'>Phone Number</Label>
-              <Input
-                id='phoneNumber'
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder='Phone Number'
-              />
+              {/* <Label htmlFor='phoneNumber'>Phone Number</Label> */}
+              <div className='relative mt-1 rounded-md shadow-sm'>
+                <span className='absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium  text-muted-foreground'>
+                  +251
+                </span>
+                <Input
+                  id='phoneNumber'
+                  className='pl-12'
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder=''
+                />
+              </div>
             </div>
             <div className='flex items-center space-x-2'>
               <div className='flex-1'>

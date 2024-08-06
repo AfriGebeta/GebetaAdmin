@@ -85,15 +85,16 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onPaginationChange(updaterOrValue) {
       setPagination((pagination) => {
-        const ret = updaterOrValue(pagination)
-
-        onPaginationChange(ret)
-
-        return ret
+        const newPagination = updaterOrValue(pagination)
+        onPaginationChange(newPagination)
+        return newPagination
       })
     },
   })
 
+  useEffect(() => {
+    onFetch()
+  }, [pagination.pageIndex, pagination.pageSize])
   return (
     <div className='space-y-4'>
       <DataTableToolbar table={table} />

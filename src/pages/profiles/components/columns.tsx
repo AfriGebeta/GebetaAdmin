@@ -23,7 +23,12 @@ export const columns: ColumnDef<Profile>[] = [
       console.lo
       return (
         <>
-          <Button onClick={handleShowMap}>Map</Button>
+          <Button
+            onClick={handleShowMap}
+            disabled={!row.original?.collectionBoundary}
+          >
+            Map
+          </Button>
           {showMap && (
             <MapModal
               isOpen={showMap}
