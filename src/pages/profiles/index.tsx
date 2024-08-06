@@ -146,7 +146,8 @@ export default function Profiles() {
 
       if (response.ok) {
         const result = await response.json()
-        dispatch(addProfile(result.data))
+        console.log(result)
+        dispatch(addProfile(result.data.user))
         toast({
           title: 'Profile Added',
           description: 'The profile has been added successfully!',
