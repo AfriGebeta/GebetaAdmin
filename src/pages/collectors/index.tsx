@@ -27,7 +27,7 @@ import { DataTable } from './components/data-table.tsx'
 import EditProfileModal from './components/EditProfileModal.tsx'
 import DeleteProfileModal from './components/DeleteProfileModal.tsx'
 
-export default function Profiles() {
+export default function Collectors() {
   const dispatch = useAppDispatch()
   const { toast } = useToast()
   const [apiAccessToken, __] = useLocalStorage({

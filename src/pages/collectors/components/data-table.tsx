@@ -25,8 +25,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { DataTablePagination } from '../components/data-table-pagination'
-import { DataTableToolbar } from '../components/data-table-toolbar'
+import { DataTablePagination } from './data-table-pagination'
+import { DataTableToolbar } from './data-table-toolbar'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button.tsx'
 import Loader from '@/components/loader.tsx'

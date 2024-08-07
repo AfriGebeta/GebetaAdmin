@@ -98,8 +98,8 @@ export function Router() {
               />
 
               <Route
-                path='profiles'
-                Component={React.lazy(() => import('./pages/profiles'))}
+                path='collectors'
+                Component={React.lazy(() => import('./pages/collectors'))}
               />
 
               <Route
