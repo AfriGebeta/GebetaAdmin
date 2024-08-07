@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -81,6 +81,19 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
     })
     setLoading(false)
   }
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFirstName('')
+      setLastName('')
+      setEmail('')
+      setPassword('')
+      setPhoneNumber('')
+      setLatitude('')
+      setLongitude('')
+      setCoordinates([])
+    }
+  }, [isOpen])
 
   const polylinePositions = coordinates.map((coord) => [
     parseFloat(coord.latitude),
