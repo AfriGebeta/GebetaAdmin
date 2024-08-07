@@ -147,15 +147,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 placeholder='Email'
               />
             </div>
-            <div>
-              <Label htmlFor='phoneNumber'>Phone Number</Label>
-              <Input
-                id='phoneNumber'
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder='Phone Number(+251------)'
-              />
-            </div>
             <div className='flex items-center space-x-2'>
               <div className='flex-1'>
                 <Label htmlFor='latitude'>Latitude</Label>
