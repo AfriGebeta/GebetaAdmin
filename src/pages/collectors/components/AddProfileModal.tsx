@@ -1,47 +1,42 @@
-import { Button } from '@/components/ui/button'
+//@ts-nocheck
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
 
 import mapLoader from '/animation.webm'
 
-interface EditProfileModalProps {
+interface AddProfileModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: {
     firstName: string
     lastName: string
     email: string
+    password: string
     phoneNumber: string
     collectionBoundary: { latitude: string; longitude: string }[]
   }) => void
-  profileData: {
-    firstName: string
-    lastName: string
-    email: string
-    phoneNumber: string
-    collectionBoundary: {
-      bounds: string[]
-    }
-  }
 }
 
-const EditProfileModal: React.FC<EditProfileModalProps> = ({
+const AddProfileModal: React.FC<AddProfileModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  profileData,
 }) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
@@ -51,37 +46,16 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setFirstName(profileData.firstName)
-    setLastName(profileData.lastName)
-    setEmail(profileData.email)
-    setPhoneNumber(profileData.phoneNumber)
-
-    const parsedCoordinates =
-      profileData?.collectionBoundary?.bounds?.map((coord) => {
-        const [lat, lng] = coord.split(' ')
-        return { latitude: lat, longitude: lng }
-      }) || []
-    setCoordinates(parsedCoordinates)
-  }, [profileData])
-
   const handleAddCoordinate = () => {
-    if (
-      latitude &&
-      longitude &&
-      !isNaN(parseFloat(latitude)) &&
-      !isNaN(parseFloat(longitude))
-    ) {
+    if (latitude && longitude) {
       setCoordinates([...coordinates, { latitude, longitude }])
       setLatitude('')
       setLongitude('')
-    } else {
-      console.log('please enter coordinate correctly')
     }
   }
 
   const handleDeleteCoordinate = (index: number) => {
-    setCoordinates(coordinates?.filter((_, i) => i !== index))
+    setCoordinates(coordinates.filter((_, i) => i !== index))
   }
 
   const handleCoordinateChange = (
@@ -96,27 +70,46 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const handleSubmit = async () => {
     setLoading(true)
-    console.log('submitting', loading)
+    const phoneNumber2 = `+251${phoneNumber}`
     await onSubmit({
       firstName,
       lastName,
       email,
-      phoneNumber,
+      password,
+      phoneNumber: phoneNumber2,
       collectionBoundary: coordinates,
     })
     setLoading(false)
   }
 
+  useEffect(() => {
+    if (!isOpen) {
+      setFirstName('')
+      setLastName('')
+      setEmail('')
+      setPassword('')
+      setPhoneNumber('')
+      setLatitude('')
+      setLongitude('')
+      setCoordinates([])
+    }
+  }, [isOpen])
+
+  const polylinePositions = coordinates.map((coord) => [
+    parseFloat(coord.latitude),
+    parseFloat(coord.longitude),
+  ])
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='h-[80%]'>
+      <DialogContent className='h-[70%]'>
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>Add Profile</DialogTitle>
         </DialogHeader>
         {loading ? (
-          <div className='flex w-full flex-col items-center '>
+          <div className='flex w-full flex-col items-center'>
             <video autoPlay loop src={mapLoader} />
-            <h3 className=''>Updating profile...</h3>
+            <p>Adding collector...</p>
           </div>
         ) : (
           <div className='space-y-4'>
@@ -148,17 +141,32 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               />
             </div>
             <div>
-              <Label htmlFor='phoneNumber'>Phone Number</Label>
+              <Label htmlFor='password'>Password</Label>
               <Input
-                id='phoneNumber'
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder='Phone Number(+251------)'
+                id='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder='Password'
               />
+            </div>
+            <div>
+              {/* <Label htmlFor='phoneNumber'>Phone Number</Label> */}
+              <div className='relative mt-1 rounded-md shadow-sm'>
+                <span className='absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium  text-muted-foreground'>
+                  +251
+                </span>
+                <Input
+                  id='phoneNumber'
+                  className='pl-12'
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder=''
+                />
+              </div>
             </div>
             <div className='flex items-center space-x-2'>
               <div className='flex-1'>
-                <Label htmlFor='latitude'>Latitude</Label>
+                <Label htmlFor='coordinate'>Coordinate</Label>
                 <Input
                   id='latitude'
                   value={latitude}
@@ -166,8 +174,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   placeholder='Latitude'
                 />
               </div>
-              <div className='flex-1'>
-                <Label htmlFor='longitude'>Longitude</Label>
+              <div className='mt-5 flex-1'>
                 <Input
                   id='longitude'
                   value={longitude}
@@ -185,7 +192,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               </div>
             </div>
             <div>
-              {coordinates?.length > 0 && (
+              {coordinates.length > 0 && (
                 <ul className='mt-2'>
                   {coordinates.map((coord, index) => (
                     <li
@@ -229,13 +236,31 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               )}
             </div>
 
+            {coordinates.length > 0 && (
+              <div className='mt-4 h-48'>
+                <MapContainer
+                  center={[
+                    parseFloat(coordinates[0].latitude),
+                    parseFloat(coordinates[0].longitude),
+                  ]}
+                  zoom={13}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <Polyline positions={polylinePositions} color='#ffa818' />
+                </MapContainer>
+              </div>
+            )}
+
             <Button
               onClick={handleSubmit}
-              variant='ghost'
+              variant='outline'
               className='bg-[#ffa818] font-semibold text-white'
-              disabled={loading}
             >
-              {loading ? 'Submitting...' : 'Submit'}
+              Submit
             </Button>
           </div>
         )}
@@ -244,4 +269,4 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   )
 }
 
-export default EditProfileModal
+export default AddProfileModal

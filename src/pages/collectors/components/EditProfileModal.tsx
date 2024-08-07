@@ -1,42 +1,47 @@
-//@ts-nocheck
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
-import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
+import { useEffect, useState } from 'react'
 
 import mapLoader from '/animation.webm'
 
-interface AddProfileModalProps {
+interface EditProfileModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: {
     firstName: string
     lastName: string
     email: string
-    password: string
     phoneNumber: string
     collectionBoundary: { latitude: string; longitude: string }[]
   }) => void
+  profileData: {
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    collectionBoundary: {
+      bounds: string[]
+    }
+  }
 }
 
-const AddProfileModal: React.FC<AddProfileModalProps> = ({
+const EditProfileModal: React.FC<EditProfileModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  profileData,
 }) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
@@ -46,16 +51,37 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
 
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    setFirstName(profileData.firstName)
+    setLastName(profileData.lastName)
+    setEmail(profileData.email)
+    setPhoneNumber(profileData.phoneNumber)
+
+    const parsedCoordinates =
+      profileData?.collectionBoundary?.bounds?.map((coord) => {
+        const [lat, lng] = coord.split(' ')
+        return { latitude: lat, longitude: lng }
+      }) || []
+    setCoordinates(parsedCoordinates)
+  }, [profileData])
+
   const handleAddCoordinate = () => {
-    if (latitude && longitude) {
+    if (
+      latitude &&
+      longitude &&
+      !isNaN(parseFloat(latitude)) &&
+      !isNaN(parseFloat(longitude))
+    ) {
       setCoordinates([...coordinates, { latitude, longitude }])
       setLatitude('')
       setLongitude('')
+    } else {
+      console.log('please enter coordinate correctly')
     }
   }
 
   const handleDeleteCoordinate = (index: number) => {
-    setCoordinates(coordinates.filter((_, i) => i !== index))
+    setCoordinates(coordinates?.filter((_, i) => i !== index))
   }
 
   const handleCoordinateChange = (
@@ -70,33 +96,27 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
 
   const handleSubmit = async () => {
     setLoading(true)
-    const phoneNumber2 = `+251${phoneNumber}`
+    console.log('submitting', loading)
     await onSubmit({
       firstName,
       lastName,
       email,
-      password,
-      phoneNumber: phoneNumber2,
+      phoneNumber,
       collectionBoundary: coordinates,
     })
     setLoading(false)
   }
 
-  const polylinePositions = coordinates.map((coord) => [
-    parseFloat(coord.latitude),
-    parseFloat(coord.longitude),
-  ])
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='h-[70%]'>
+      <DialogContent className='h-[80%]'>
         <DialogHeader>
-          <DialogTitle>Add Profile</DialogTitle>
+          <DialogTitle>Edit Profile</DialogTitle>
         </DialogHeader>
         {loading ? (
-          <div className='flex w-full flex-col items-center'>
+          <div className='flex w-full flex-col items-center '>
             <video autoPlay loop src={mapLoader} />
-            <p>Adding collector...</p>
+            <h3 className=''>Updating profile...</h3>
           </div>
         ) : (
           <div className='space-y-4'>
@@ -127,33 +147,9 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                 placeholder='Email'
               />
             </div>
-            <div>
-              <Label htmlFor='password'>Password</Label>
-              <Input
-                id='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder='Password'
-              />
-            </div>
-            <div>
-              {/* <Label htmlFor='phoneNumber'>Phone Number</Label> */}
-              <div className='relative mt-1 rounded-md shadow-sm'>
-                <span className='absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium  text-muted-foreground'>
-                  +251
-                </span>
-                <Input
-                  id='phoneNumber'
-                  className='pl-12'
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder=''
-                />
-              </div>
-            </div>
             <div className='flex items-center space-x-2'>
               <div className='flex-1'>
-                <Label htmlFor='coordinate'>Coordinate</Label>
+                <Label htmlFor='latitude'>Latitude</Label>
                 <Input
                   id='latitude'
                   value={latitude}
@@ -161,7 +157,8 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                   placeholder='Latitude'
                 />
               </div>
-              <div className='mt-5 flex-1'>
+              <div className='flex-1'>
+                <Label htmlFor='longitude'>Longitude</Label>
                 <Input
                   id='longitude'
                   value={longitude}
@@ -179,7 +176,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               </div>
             </div>
             <div>
-              {coordinates.length > 0 && (
+              {coordinates?.length > 0 && (
                 <ul className='mt-2'>
                   {coordinates.map((coord, index) => (
                     <li
@@ -223,31 +220,13 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               )}
             </div>
 
-            {coordinates.length > 0 && (
-              <div className='mt-4 h-48'>
-                <MapContainer
-                  center={[
-                    parseFloat(coordinates[0].latitude),
-                    parseFloat(coordinates[0].longitude),
-                  ]}
-                  zoom={13}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  <Polyline positions={polylinePositions} color='#ffa818' />
-                </MapContainer>
-              </div>
-            )}
-
             <Button
               onClick={handleSubmit}
-              variant='outline'
+              variant='ghost'
               className='bg-[#ffa818] font-semibold text-white'
+              disabled={loading}
             >
-              Submit
+              {loading ? 'Submitting...' : 'Submit'}
             </Button>
           </div>
         )}
@@ -256,4 +235,4 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
   )
 }
 
-export default AddProfileModal
+export default EditProfileModal
