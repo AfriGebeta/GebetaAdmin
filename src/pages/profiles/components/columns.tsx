@@ -4,6 +4,12 @@ import { Profile } from '@/model'
 import MapModal from './MapModal'
 import { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export const columns: ColumnDef<Profile>[] = [
   {
@@ -23,12 +29,26 @@ export const columns: ColumnDef<Profile>[] = [
       console.lo
       return (
         <>
-          <Button
-            onClick={handleShowMap}
-            disabled={!row.original?.collectionBoundary}
-          >
-            Map
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  onClick={handleShowMap}
+                  disabled={!row.original?.collectionBoundary}
+                >
+                  Map
+                </Button>
+              </TooltipTrigger>
+              {
+                <TooltipContent>
+                  {!row.original?.collectionBoundary
+                    ? 'No bounds available'
+                    : 'View on map'}
+                </TooltipContent>
+              }
+            </Tooltip>
+          </TooltipProvider>
+
           {showMap && (
             <MapModal
               isOpen={showMap}
