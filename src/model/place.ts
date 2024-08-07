@@ -18,6 +18,23 @@ export const PlaceType = {
 
 export type PlaceType = (typeof PlaceType)[keyof typeof PlaceType]
 
+export const placeTypes = Object.keys(PlaceType)
+
+export const PlaceTypeLabel: Record<PlaceType, string> = {
+  DWELLING: 'Dwelling',
+  BANK: 'Bank',
+  SUPERMARKET: 'Supermarket',
+  HOSPITAL: 'Hospital',
+  CLINIC: 'Clinic',
+  PHARMACY: 'Pharmacy',
+  SCHOOL: 'School',
+  RESTAURANT: 'Restaurant',
+  PARK: 'Park',
+  OFFICE: 'Office',
+  TRANSPORTATION_STATION: 'Transportation Station',
+  OTHER: 'Other',
+}
+
 export const PlaceStatus = {
   PENDING: 'PENDING',
   CHANGE_REQUESTED: 'CHANGE_REQUESTED',
@@ -25,6 +42,14 @@ export const PlaceStatus = {
 }
 
 export type PlaceStatus = (typeof PlaceStatus)[keyof typeof PlaceStatus]
+
+export const placeStatuses = Object.keys(PlaceStatus)
+
+export const PlaceStatusLabel = {
+  PENDING: 'Pending',
+  CHANGE_REQUESTED: 'Change Requested',
+  APPROVED: 'Approved',
+}
 
 export interface OpenHours {
   monday: { open: boolean; shifts: Array<Array<number>> }
@@ -79,6 +104,13 @@ export const FacebookAccountType = {
 export type FacebookAccountType =
   (typeof FacebookAccountType)[keyof typeof FacebookAccountType]
 
+export const facebookAccountTypes = Object.keys(FacebookAccountType)
+
+export const FacebookAccountTypeLabel = {
+  GROUP: 'Group',
+  PAGE: 'Page',
+}
+
 export const MessagingPlatformAccountType = {
   GROUP: 'GROUP',
   CHANNEL: 'CHANNEL',
@@ -88,6 +120,17 @@ export const MessagingPlatformAccountType = {
 
 export type MessagingPlatformAccountType =
   (typeof MessagingPlatformAccountType)[keyof typeof MessagingPlatformAccountType]
+
+export const messagingPlatformAccountTypes = Object.keys(
+  MessagingPlatformAccountType
+)
+
+export const MessagingPlatformAccountTypeLabel = {
+  GROUP: 'Group',
+  CHANNEL: 'Channel',
+  BOT: 'Bot',
+  PERSONAL: 'Personal',
+}
 
 export interface Contact {
   id: string
@@ -128,6 +171,9 @@ export interface Place {
   collectedNames: string
   type: PlaceType
   customType: string | null
+  test: boolean
+  hidden: boolean
+  hiddenUntil: string
   images: string[]
   status: PlaceStatus
   openHours: OpenHours | null

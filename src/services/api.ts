@@ -1,3 +1,5 @@
+import { Place } from '@/model'
+
 export default {
   async signIn(data: { phoneNumber: string; password: string }) {
     return await fetch(`${import.meta.env['VITE_API_BASE_URL']}/auth/login`, {
@@ -44,8 +46,23 @@ export default {
     id: string
   }) {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/${id}`, {
-      method: 'POST',
+      method: 'GET',
       headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+    })
+  },
+  async updatePlace({
+    apiAccessToken,
+    id,
+    place,
+  }: {
+    apiAccessToken: string
+    id: string
+    place: Partial<Place>
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/${id}`, {
+      method: 'PATCH',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify(place),
     })
   },
   async getTransportationRoutes({

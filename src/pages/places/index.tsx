@@ -59,10 +59,35 @@ export default function Places() {
 
   const [lastPlaceId, setLastPlaceId] = useState<string | null>(null)
 
+  const [currentPlace, setCurrentPlace] = useState<string | null>(null)
+
+  const [selected, setSelected] = useState<Record<string, boolean>>({})
+
+  const [openPlaceEditor, setOpenPlaceEditor] = useState(false)
+
   const pagination = useRef<PaginationState>({
     pageSize: 10,
     pageIndex: 0,
   })
+
+  // function updatePlaceEditFormState(id: string) {
+  //   const place = places[id];
+  //
+  //   const _place = {
+  //     ...defaultPlace,
+  //     ...pick(place, Object.keys(defaultPlace))
+  //   }
+  //
+  //   console.log({ _place, place, id, places });
+  //
+  //   Object
+  //     .keys(defaultPlace)
+  //     .forEach(key => {
+  //       if(key !== "location") { //@ts-ignore
+  //         placeEditForm.setValue(key, _place[key])
+  //       }
+  //     });
+  // }
 
   async function fetchPlaces({
     limit,
