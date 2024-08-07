@@ -45,7 +45,7 @@ export const sidelinks: SideLink[] = [
   {
     title: 'Collectors',
     label: '',
-    href: '/profiles',
+    href: '/collectors',
     icon: <Users size={18} />,
   },
   {
