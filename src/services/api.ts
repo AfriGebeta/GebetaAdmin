@@ -243,6 +243,14 @@ export default {
       }
     )
   },
+  async getBoundary({ apiAccessToken }: { apiAccessToken: string }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary`, {
+      method: 'GET',
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+      },
+    })
+  },
 }
 
 export interface RequestError<T extends any = any> {
