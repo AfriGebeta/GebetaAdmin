@@ -18,9 +18,11 @@ import { Input } from '@/components/ui/input.tsx'
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
+import { useToast } from '@/components/ui/use-toast.ts'
 
 export default function AddBoundary() {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
     defaultValue: null,
@@ -31,6 +33,7 @@ export default function AddBoundary() {
   >([])
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
+  const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleAddCoordinate = () => {
@@ -60,16 +63,29 @@ export default function AddBoundary() {
     parseFloat(coord.longitude),
   ])
 
+  // src/pages/boundary/addBoundary/index.tsx
   const handleSubmit = async () => {
     setLoading(true)
-    const reponse = await api.createBoundary({
-      boundaryData: coordinates,
+    const data = { collectionBoundary: { name, bounds: coordinates } }
+    console.log('Data being sent:', data)
+
+    const response = await api.createBoundary({
       apiAccessToken: String(apiAccessToken),
+      collectionBoundary: { name: name, bounds: coordinates },
     })
-    if (!reponse.ok) {
-      console.log('some problem in the backend')
+
+    if (response.ok) {
+      toast({
+        title: 'Adding boundary',
+        description: 'boundary added successfully',
+      })
     } else {
-      console.log('fine by me')
+      const error = (await response.json()).error
+      toast({
+        title: 'Error adding boundary',
+        description: error.message,
+        variant: 'destructive',
+      })
     }
     setLoading(false)
   }
@@ -102,18 +118,17 @@ export default function AddBoundary() {
             </div>
           ) : (
             <div className='space-y-4'>
+              <div className='mt-4 flex-1'>
+                <Input
+                  id='name'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder='Name'
+                  className='w-fit'
+                />
+              </div>
               <div className='mt-6 flex items-center space-x-2'>
-                {/*<div className="flex-1">*/}
-                {/*  <Label htmlFor="name">Name</Label>*/}
-                {/*  <Input*/}
-                {/*    id="latitude"*/}
-                {/*    value={name}*/}
-                {/*    onChange={(e) => setName(e.target.value)}*/}
-                {/*    placeholder="Name"*/}
-                {/*  />*/}
-                {/*</div>*/}
                 <div className='flex-1'>
-                  {/*<Label htmlFor="coordinate">Bounds</Label>*/}
                   <Input
                     id='latitude'
                     value={latitude}
