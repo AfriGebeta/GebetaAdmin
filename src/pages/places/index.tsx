@@ -40,6 +40,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel.tsx'
+import { Fullscreen } from 'lucide-react'
 
 export default function Places() {
   const dispatch = useAppDispatch()
@@ -59,35 +60,12 @@ export default function Places() {
 
   const [lastPlaceId, setLastPlaceId] = useState<string | null>(null)
 
-  const [currentPlace, setCurrentPlace] = useState<string | null>(null)
-
-  const [selected, setSelected] = useState<Record<string, boolean>>({})
-
-  const [openPlaceEditor, setOpenPlaceEditor] = useState(false)
-
   const pagination = useRef<PaginationState>({
     pageSize: 10,
     pageIndex: 0,
   })
 
-  // function updatePlaceEditFormState(id: string) {
-  //   const place = places[id];
-  //
-  //   const _place = {
-  //     ...defaultPlace,
-  //     ...pick(place, Object.keys(defaultPlace))
-  //   }
-  //
-  //   console.log({ _place, place, id, places });
-  //
-  //   Object
-  //     .keys(defaultPlace)
-  //     .forEach(key => {
-  //       if(key !== "location") { //@ts-ignore
-  //         placeEditForm.setValue(key, _place[key])
-  //       }
-  //     });
-  // }
+  const mapRef = useRef(null)
 
   async function fetchPlaces({
     limit,
@@ -152,6 +130,17 @@ export default function Places() {
     }
   }
 
+  //make the map full screen
+  const handleFullScreen = () => {
+    if (mapRef.current) {
+      if (!document.fullscreenElement) {
+        mapRef.current.requestFullscreen()
+      } else {
+        document.exitFullscreen()
+      }
+    }
+  }
+
   useEffect(() => {
     const eventSource = eventsource.subscribeToPlaces()
 
@@ -171,17 +160,17 @@ export default function Places() {
     return () => eventSource.close()
   }, [])
 
-  // useEffect(() => {
-  //   const id = setTimeout(
-  //     () =>
-  //       void fetchPlaces({
-  //         limit: pagination.current.pageSize,
-  //         offset: Object.keys(places).length,
-  //       }),
-  //     0
-  //   )
-  //   return () => clearTimeout(id)
-  // }, [])
+  useEffect(() => {
+    const id = setTimeout(
+      () =>
+        void fetchPlaces({
+          limit: pagination.current.pageSize,
+          offset: Object.keys(places).length,
+        }),
+      0
+    )
+    return () => clearTimeout(id)
+  }, [])
 
   useEffect(() => {
     if (Object.keys(places).length)
@@ -192,13 +181,6 @@ export default function Places() {
         )[0].id
       )
   }, [places])
-
-  useEffect(() => {
-    fetchPlaces({
-      limit: pagination.current.pageSize,
-      offset: pagination.current.pageIndex * pagination.current.pageSize,
-    })
-  }, [pagination.current.pageIndex, pagination.current.pageSize])
 
   return (
     <Layout>
@@ -274,128 +256,148 @@ export default function Places() {
               />
             </div>
           </TabsContent>
-          <TabsContent value='mapview' className='space-y-4'>
+          <TabsContent value='mapview' className='relative space-y-4'>
             <div className='-mx-4 mx-1 my-1 flex-1 overflow-auto overflow-hidden rounded-md border lg:flex-row lg:space-x-12 lg:space-y-0'>
-              <MapContainer
-                style={{ height: '30rem', width: '100%', overflow: 'hidden' }}
-                center={[
-                  places[lastPlaceId]?.location?.latitude ?? 9.03,
-                  places[lastPlaceId]?.location?.longitude ?? 38.74,
-                ]}
-                zoom={18}
-                maxZoom={30}
-                scrollWheelZoom={true}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                />
-                {Object.values(places).map((v) => (
-                  <Marker
-                    key={v.id}
-                    position={[v.location.latitude, v.location.longitude]}
-                    icon={
-                      v.id === lastPlaceId
-                        ? iconCurrent
-                        : (iconMap[v.type] ?? iconMap[PlaceType.OTHER])
-                    }
-                  >
-                    <Popup>
-                      <Card>
-                        <CardContent>
-                          <br />
-                          {`${v.names.official['EN']}`} <br /> <br />
-                          {`${v.names.official['AM']}`} <br /> <br />
-                          <b>{`${v.type}${v.type === PlaceType.OTHER ? ` (${v.customType})` : ''}`}</b>{' '}
-                          <br /> <br />
-                          {``}{' '}
-                          <Link
-                            target='_blank'
-                            to={`https://www.google.com/maps?q=${v.location?.latitude}, ${v.location?.latitude}`}
-                          >
-                            <Badge variant='outline'>
-                              {v.location?.latitude}, {v.location?.latitude}
-                            </Badge>
-                          </Link>{' '}
-                          <br /> <br />
-                          {`${moment(v.createdAt).format(
-                            'ddd DD, MMM YYYY [at] HH:mm:ss a'
-                          )}`}{' '}
-                          <br /> <br />
-                          <b>{`${v.status}`}</b> <br /> <br />
-                          <Dialog>
-                            {v.images?.map((image, index) => (
-                              <>
-                                <DialogTrigger>
-                                  <Avatar className='border border-muted'>
-                                    <AvatarImage src={image} />
-                                    <AvatarFallback>{index + 1}</AvatarFallback>
-                                  </Avatar>
-                                </DialogTrigger>
-                              </>
-                            ))}
-                            <DialogContent className='max-w-screen z-[1000] h-full items-center justify-center border-none bg-transparent'>
-                              <Carousel className='w-full max-w-xs'>
-                                <CarouselContent className='items-center'>
-                                  {v.images?.map((image, index) => (
-                                    <CarouselItem key={index}>
-                                      <div className='p-1'>
-                                        <div className='flex items-center justify-center overflow-hidden rounded-md border border-muted'>
-                                          <img src={image} alt={'image'} />
+              <div className='relative' ref={mapRef}>
+                <MapContainer
+                  style={{ height: '30rem', width: '100%', overflow: 'hidden' }}
+                  center={[
+                    places[lastPlaceId]?.location?.latitude ?? 9.03,
+                    places[lastPlaceId]?.location?.longitude ?? 38.74,
+                  ]}
+                  zoom={18}
+                  maxZoom={30}
+                  scrollWheelZoom={true}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                  />
+                  {Object.values(places).map((v) => (
+                    <Marker
+                      key={v.id}
+                      position={[v.location.latitude, v.location.longitude]}
+                      icon={
+                        v.id === lastPlaceId
+                          ? iconCurrent
+                          : iconMap[v.type] ?? iconMap[PlaceType.OTHER]
+                      }
+                    >
+                      <Popup>
+                        <Card>
+                          <CardContent>
+                            <br />
+                            {`${v.names.official['EN']}`} <br /> <br />
+                            {`${v.names.official['AM']}`} <br /> <br />
+                            <b>{`${v.type}${v.type === PlaceType.OTHER ? ` (${v.customType})` : ''}`}</b>{' '}
+                            <br /> <br />
+                            {``}{' '}
+                            <Link
+                              target='_blank'
+                              to={`https://www.google.com/maps?q=${v.location?.latitude}, ${v.location?.latitude}`}
+                            >
+                              <Badge variant='outline'>
+                                {v.location?.latitude}, {v.location?.latitude}
+                              </Badge>
+                            </Link>{' '}
+                            <br /> <br />
+                            {`${moment(v.createdAt).format(
+                              'ddd DD, MMM YYYY [at] HH:mm:ss a'
+                            )}`}{' '}
+                            <br /> <br />
+                            <b>{`${v.status}`}</b> <br /> <br />
+                            <Dialog>
+                              {v.images?.map((image, index) => (
+                                <>
+                                  <DialogTrigger>
+                                    <Avatar className='border border-muted'>
+                                      <AvatarImage src={image} />
+                                      <AvatarFallback>
+                                        {index + 1}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  </DialogTrigger>
+                                </>
+                              ))}
+                              <DialogContent className='max-w-screen z-[1000] h-full items-center justify-center border-none bg-transparent'>
+                                <Carousel className='w-full max-w-xs'>
+                                  <CarouselContent className='items-center'>
+                                    {v.images?.map((image, index) => (
+                                      <CarouselItem key={index}>
+                                        <div className='p-1'>
+                                          <div className='flex items-center justify-center overflow-hidden rounded-md border border-muted'>
+                                            <img src={image} alt={'image'} />
+                                          </div>
                                         </div>
-                                      </div>
-                                    </CarouselItem>
-                                  ))}
-                                </CarouselContent>
-                                {v.images?.length > 1 && (
-                                  <>
-                                    <CarouselPrevious />
-                                    <CarouselNext />
-                                  </>
-                                )}
-                              </Carousel>
-                            </DialogContent>
-                          </Dialog>
-                          <br /> <br />
-                          {Boolean(v.contact?.phone?.primary) && (
-                            <>
-                              <Link
-                                target='_blank'
-                                to={`tel:${v.contact?.phone?.primary}`}
-                              >
-                                {`${v.contact?.phone?.primary}`}{' '}
-                              </Link>{' '}
-                              <br /> <br />
-                            </>
-                          )}
-                          {Boolean(v.contact?.email?.primary) && (
-                            <>
-                              <Link
-                                target='_blank'
-                                to={`mailto:${v.contact?.email?.primary}`}
-                              >
-                                {`${v.contact?.email?.primary}`}{' '}
-                              </Link>{' '}
-                              <br /> <br />
-                            </>
-                          )}
-                          {Boolean(v.contact?.socialMedia?.website) && (
-                            <>
-                              <Link
-                                target='_blank'
-                                to={v.contact?.socialMedia?.website}
-                              >
-                                <u>{`${v.contact?.socialMedia?.website}`}</u>
-                              </Link>{' '}
-                              <br />
-                            </>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+                                      </CarouselItem>
+                                    ))}
+                                  </CarouselContent>
+                                  {v.images?.length > 1 && (
+                                    <>
+                                      <CarouselPrevious />
+                                      <CarouselNext />
+                                    </>
+                                  )}
+                                </Carousel>
+                              </DialogContent>
+                            </Dialog>
+                            <br /> <br />
+                            {Boolean(v.contact?.phone?.primary) && (
+                              <>
+                                <Link
+                                  target='_blank'
+                                  to={`tel:${v.contact?.phone?.primary}`}
+                                >
+                                  {`${v.contact?.phone?.primary}`}{' '}
+                                </Link>{' '}
+                                <br /> <br />
+                              </>
+                            )}
+                            {Boolean(v.contact?.email?.primary) && (
+                              <>
+                                <Link
+                                  target='_blank'
+                                  to={`mailto:${v.contact?.email?.primary}`}
+                                >
+                                  {`${v.contact?.email?.primary}`}{' '}
+                                </Link>{' '}
+                                <br /> <br />
+                              </>
+                            )}
+                            {Boolean(v.contact?.socialMedia?.website) && (
+                              <>
+                                <Link
+                                  target='_blank'
+                                  to={v.contact?.socialMedia?.website}
+                                >
+                                  <u>{`${v.contact?.socialMedia?.website}`}</u>
+                                </Link>{' '}
+                                <br />
+                              </>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
+                <button
+                  onClick={handleFullScreen}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    zIndex: 1000,
+                    background: 'white',
+                    borderRadius: '10px',
+                    border: 'none',
+                    padding: '10px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Fullscreen size={20} />
+                </button>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
