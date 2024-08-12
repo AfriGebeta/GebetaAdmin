@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import {
   Layout,
   LayoutHeader,
@@ -18,9 +20,11 @@ import api, { RequestError } from '@/services/api.ts'
 import { Boundary } from '@/model/profile.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import { addBoundary, selectBoundary } from '@/data/redux/slices/boundary.ts'
+import { useNavigate } from 'react-router-dom'
 
 export default function Boundaries() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { toast } = useToast()
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
@@ -89,7 +93,10 @@ export default function Boundaries() {
               Boundary managed by the application
             </p>
           </div>
-          <Button onClick={() => {}} className='font-semibold'>
+          <Button
+            onClick={() => navigate('/boundary/add')}
+            className='font-semibold'
+          >
             <PlusIcon size={18} className='mr-2' />
             Add Boundary
           </Button>
