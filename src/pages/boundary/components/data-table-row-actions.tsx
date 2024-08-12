@@ -9,37 +9,54 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
+import { useNavigate } from 'react-router-dom'
+import api from '@/services/api.ts'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
   apiAccessToken: string
-  onToggleActivation: (id: string, isActive: boolean) => void
-  onEdit: (profile: any) => void
-  onDelete: (profile: any) => void
 }
 
 export function DataTableRowActions<TData>({
   row,
   apiAccessToken,
-  onToggleActivation,
-  onEdit,
-  onDelete,
 }: DataTableRowActionsProps<TData>) {
   const { toast } = useToast()
-
-  const handleToggle = () => {
-    const id = row.original.id
-    const isActive = row.original.active
-    onToggleActivation(id, isActive)
-  }
+  const navigate = useNavigate()
 
   const handleEdit = () => {
-    onEdit(row.original)
-    // console.log("Editing profile")
+    navigate(`/boundary/update/${row.original.id}`)
   }
 
-  const handleDelete = () => {
-    onDelete(row.original)
+  const handleDelete = async () => {
+    try {
+      const response = await api.deleteBoundary({
+        apiAccessToken,
+        id: row.original.id,
+      })
+
+      toast({
+        title: 'Boundary deleted',
+        description: 'Boundary has been deleted',
+      })
+
+      if (!response.status === 201) {
+        const responseData = (await response.json()).error
+
+        toast({
+          title: `${responseData.namespace} / ${responseData.code}`,
+          description: responseData.message,
+          variant: 'destructive',
+        })
+      }
+    } catch (e) {
+      console.log(e)
+      toast({
+        title: 'Error',
+        description: 'An error occurred',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (
@@ -56,9 +73,6 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
         <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
-        <DropdownMenuItem onClick={handleToggle}>
-          {row.original.active ? 'Deactivate' : 'Activate'}
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
