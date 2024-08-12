@@ -135,8 +135,12 @@ export default function Places() {
     if (mapRef.current) {
       if (!document.fullscreenElement) {
         mapRef.current.requestFullscreen()
+        mapRef.current.style.width = '100vw'
+        mapRef.current.style.height = '100vh'
       } else {
         document.exitFullscreen()
+        mapRef.current.style.width = '100%'
+        mapRef.current.style.height = '30rem'
       }
     }
   }
@@ -258,9 +262,9 @@ export default function Places() {
           </TabsContent>
           <TabsContent value='mapview' className='relative space-y-4'>
             <div className='-mx-4 mx-1 my-1 flex-1 overflow-auto overflow-hidden rounded-md border lg:flex-row lg:space-x-12 lg:space-y-0'>
-              <div className='relative' ref={mapRef}>
+              <div className='relative h-[25rem]' ref={mapRef}>
                 <MapContainer
-                  style={{ height: '30rem', width: '100%', overflow: 'hidden' }}
+                  style={{ height: '100vh', width: '100%' }}
                   center={[
                     places[lastPlaceId]?.location?.latitude ?? 9.03,
                     places[lastPlaceId]?.location?.longitude ?? 38.74,
