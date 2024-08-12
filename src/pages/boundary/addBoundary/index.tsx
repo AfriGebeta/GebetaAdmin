@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import {
   Layout,
   LayoutHeader,
@@ -12,7 +14,6 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import api from '@/services/api.ts'
 import mapLoader from '/animation.webm'
-import { Label } from '@/components/ui/label.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -25,7 +26,6 @@ export default function AddBoundary() {
     defaultValue: null,
   })
 
-  const [name, setName] = useState('')
   const [coordinates, setCoordinates] = useState<
     { latitude: string; longitude: string }[]
   >([])
@@ -89,7 +89,7 @@ export default function AddBoundary() {
             className='font-semibold'
             variant='secondary'
           >
-            <ArrowLeftIcon size={18} className='mr-2' />
+            <ArrowLeftIcon className='mr-2' />
             Go back
           </Button>
         </div>

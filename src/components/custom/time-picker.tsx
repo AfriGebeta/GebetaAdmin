@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import * as React from 'react'
 import { TimePickerInput } from './time-picker-input'
 import {

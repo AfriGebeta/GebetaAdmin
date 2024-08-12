@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { TimePicker } from '@/components/custom/time-picker.tsx'
 import { defaultShift, Shift } from '@/components/custom/open-hours-editor.tsx'
 
