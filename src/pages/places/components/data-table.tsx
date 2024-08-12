@@ -85,16 +85,15 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onPaginationChange(updaterOrValue) {
       setPagination((pagination) => {
-        const newPagination = updaterOrValue(pagination)
-        onPaginationChange(newPagination)
-        return newPagination
+        const ret = updaterOrValue(pagination)
+
+        onPaginationChange(ret)
+
+        return ret
       })
     },
   })
 
-  useEffect(() => {
-    onFetch()
-  }, [pagination.pageIndex, pagination.pageSize])
   return (
     <div className='space-y-4'>
       <DataTableToolbar table={table} />
@@ -152,7 +151,7 @@ export function DataTable<TData, TValue>({
                 >
                   No results. <br />
                   <Button
-                    variant={'outline'}
+                    variant='outline'
                     className={'mt-1'}
                     disabled={fetching}
                     onClick={onFetch}
@@ -165,7 +164,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination count={count} onNextPage={onFetch} table={table} />
+      <DataTablePagination count={count} table={table} onNextPage={onFetch} />
     </div>
   )
 }
