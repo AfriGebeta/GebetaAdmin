@@ -63,18 +63,18 @@ export default function AddBoundary() {
     parseFloat(coord.longitude),
   ])
 
-  // src/pages/boundary/addBoundary/index.tsx
   const handleSubmit = async () => {
     setLoading(true)
     const data = { collectionBoundary: { name, bounds: coordinates } }
-    console.log('Data being sent:', data)
 
     const response = await api.createBoundary({
       apiAccessToken: String(apiAccessToken),
-      collectionBoundary: { name: name, bounds: coordinates },
+      name: name,
+      bounds: coordinates,
     })
 
     if (response.ok) {
+      navigate('/boundary')
       toast({
         title: 'Adding boundary',
         description: 'boundary added successfully',
@@ -114,7 +114,7 @@ export default function AddBoundary() {
           {loading ? (
             <div className='flex w-full flex-col items-center'>
               <video autoPlay loop src={mapLoader} />
-              <p>Adding collector...</p>
+              <p>Adding boundary...</p>
             </div>
           ) : (
             <div className='space-y-4'>
