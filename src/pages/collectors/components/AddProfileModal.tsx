@@ -33,8 +33,7 @@ interface AddProfileModalProps {
     email: string
     password: string
     phoneNumber: string
-    collectionBoundary: { latitude: string; longitude: string }[]
-    collectionBoundaryId: string
+    collectionBoundary: { latitude: string; longitude: string }[] | string
   }) => void
 }
 
@@ -117,8 +116,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
       email,
       password,
       phoneNumber: phoneNumber2,
-      collectionBoundary: formattedBounds,
-      collectionBoundaryId: selectedBoundaryData?.id,
+      collectionBoundary: selectedBoundaryData?.id ?? formattedBounds,
     })
     await onSubmit({
       firstName,
@@ -126,8 +124,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
       email,
       password,
       phoneNumber: phoneNumber2,
-      collectionBoundary: formattedBounds,
-      collectionBoundaryId: selectedBoundaryData.id,
+      collectionBoundary: selectedBoundaryData?.id ?? formattedBounds,
     })
     setLoading(false)
   }
@@ -216,8 +213,9 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               </div>
             </div>
             <div>
+              <Label htmlFor='boundary'>Boundary</Label>
               <select
-                className=''
+                className='block w-full rounded-lg border-gray-200 px-3 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600'
                 id='collectionBoundary'
                 value={selectedBoundary}
                 onChange={(e) => setSelectedBoundary(e.target.value)}

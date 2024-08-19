@@ -137,6 +137,7 @@ export default function Collectors() {
     password: string
     phoneNumber: string
     collectionBoundary: { latitude: string; longitude: string }[]
+    collectionBoundaryId: string
   }) => {
     try {
       const response = await api.createProfile({

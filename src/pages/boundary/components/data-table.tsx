@@ -1,4 +1,5 @@
 //@ts-nocheck
+
 import * as React from 'react'
 import {
   ColumnDef,
@@ -9,11 +10,7 @@ import {
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
-  PaginationState,
 } from '@tanstack/react-table'
 
 import {
@@ -26,7 +23,6 @@ import {
 } from '@/components/ui/table'
 
 import { DataTableToolbar } from './data-table-toolbar'
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button.tsx'
 import Loader from '@/components/loader.tsx'
 import { DataTableRowActions } from './data-table-row-actions'
@@ -135,7 +131,7 @@ export function DataTable<TData, TValue>({
                 >
                   No results. <br />
                   <Button
-                    variant={'outline'}
+                    variant='outline'
                     className={'mt-1'}
                     disabled={fetching}
                     onClick={onFetch}
