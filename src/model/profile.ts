@@ -9,6 +9,7 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export interface Boundary {
   id?: string
+  name: string
   bounds: Array<string>
   radius?: number
   createdAt?: string

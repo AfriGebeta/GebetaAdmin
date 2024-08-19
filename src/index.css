@@ -111,7 +111,7 @@
 /* Add this to your global styles or specific CSS file */
 @font-face {
   font-family: 'arieva';
-  src: url(/public/AvenirLTStd-Roman.otf);
+  src: url(/public/Roboto-Regular.ttf);
 }
 body {
   font-family: arieva !important;

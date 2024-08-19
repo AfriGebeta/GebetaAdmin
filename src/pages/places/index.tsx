@@ -52,6 +52,8 @@ export default function Places() {
     defaultValue: null,
   })
 
+  const [collectors, setCollectors] = useState([])
+
   const places = useAppSelector(selectPlaces)
 
   const [requesting, setRequesting] = useState(false)
@@ -130,7 +132,22 @@ export default function Places() {
     }
   }
 
-  //make the map full screen
+  async function getProfiles() {
+    try {
+      const response = await api.getProfiles({
+        apiAccessToken: String(apiAccessToken),
+      })
+      const data = await response.json()
+      setCollectors(data.data)
+    } catch (e) {
+      console.log('erorr fetching collectors', e)
+    }
+  }
+
+  useEffect(() => {
+    getProfiles()
+  }, [])
+
   const handleFullScreen = () => {
     if (mapRef.current) {
       if (!document.fullscreenElement) {
@@ -228,22 +245,31 @@ export default function Places() {
                         new Date(b.createdAt).getTime() -
                         new Date(a.createdAt).getTime()
                     )
-                    .map((v) => ({
-                      id: v.id,
-                      type: v.type,
-                      customType: v.customType,
-                      latitude: v.location.latitude,
-                      longitude: v.location.longitude,
-                      name: v.names.official,
-                      status: v.status,
-                      createdAt: moment(v.createdAt).format(
-                        'ddd DD, MMM YYYY [at] HH:mm:ss a'
-                      ),
-                      addedBy: v.addedBy,
-                      images: v.images,
-                      address: v.address,
-                      contact: v.contact,
-                    })) as any
+                    .map((v) => {
+                      const profile = collectors.find(
+                        (c) => c.id === v.addedById
+                      )
+
+                      console.log('collectors', collectors)
+                      return {
+                        id: v.id,
+                        type: v.type,
+                        customType: v.customType,
+                        latitude: v.location.latitude,
+                        longitude: v.location.longitude,
+                        name: v.names.official,
+                        status: v.status,
+                        createdAt: moment(v.createdAt).format(
+                          'ddd DD, MMM YYYY [at] HH:mm:ss a'
+                        ),
+                        addedById: profile
+                          ? profile.firstName + ' ' + profile.lastName
+                          : 'Unknown',
+                        images: v.images,
+                        address: v.address,
+                        contact: v.contact,
+                      }
+                    }) as any
                 }
                 columns={columns}
                 onFetch={() =>

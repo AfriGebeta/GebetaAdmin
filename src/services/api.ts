@@ -285,6 +285,31 @@ export default {
       body: JSON.stringify({ name: name, bounds: bounds }),
     })
   },
+  async updateBoundary({
+    apiAccessToken,
+    id,
+    boundaryData,
+  }: {
+    apiAccessToken: string
+    id: string | undefined
+    boundaryData: {
+      name: string
+      bounds: { latitude: string; longitude: string }[]
+    }
+  }) {
+    console.log('upating')
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+      body: JSON.stringify({
+        name: boundaryData.name,
+        bounds: boundaryData.bounds,
+      }),
+    })
+  },
   async deleteBoundary({
     apiAccessToken,
     id,

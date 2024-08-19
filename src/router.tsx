@@ -98,6 +98,25 @@ export function Router() {
               />
 
               <Route
+                path='boundary'
+                Component={React.lazy(() => import('./pages/boundary'))}
+              />
+
+              <Route
+                path='boundary/add'
+                Component={React.lazy(
+                  () => import('./pages/boundary/addBoundary')
+                )}
+              />
+
+              <Route
+                path='boundary/update/:id'
+                Component={React.lazy(
+                  () => import('./pages/boundary/updateBoundary')
+                )}
+              />
+
+              <Route
                 path='collectors'
                 Component={React.lazy(() => import('./pages/collectors'))}
               />
