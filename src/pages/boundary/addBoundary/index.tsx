@@ -8,7 +8,7 @@ import {
 import ThemeSwitch from '@/components/theme-switch.tsx'
 import { UserNav } from '@/components/user-nav.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { PlusIcon, Trash2Icon } from 'lucide-react'
+import { Minus, PlusIcon, Trash2Icon } from 'lucide-react'
 import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -19,6 +19,7 @@ import { MapContainer, Polyline, TileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 import { useToast } from '@/components/ui/use-toast.ts'
+import { Label } from '@/components/ui/label.tsx'
 
 export default function AddBoundary() {
   const navigate = useNavigate()
@@ -118,16 +119,20 @@ export default function AddBoundary() {
             </div>
           ) : (
             <div className='space-y-4'>
-              <div className='mt-4 flex-1'>
+              <div className='mb-4 mt-8 flex-1'>
+                <Label htmlFor='name' className='mb-4'>
+                  Boundary Name
+                </Label>
                 <Input
                   id='name'
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder='Name'
-                  className='w-fit'
+                  className='mt-4 w-fit'
                 />
               </div>
-              <div className='mt-6 flex items-center space-x-2'>
+              <Label className='mb-0'>Bounds</Label>
+              <div className='mt-0 flex items-center space-x-2'>
                 <div className='flex-1'>
                   <Input
                     id='latitude'
@@ -145,10 +150,7 @@ export default function AddBoundary() {
                   />
                 </div>
                 <div className='flex items-center'>
-                  <Button
-                    onClick={handleAddCoordinate}
-                    className='bg-[#ffa818]'
-                  >
+                  <Button onClick={handleAddCoordinate} variant='ghost'>
                     <PlusIcon size={18} />
                   </Button>
                 </div>
@@ -159,7 +161,7 @@ export default function AddBoundary() {
                     {coordinates.map((coord, index) => (
                       <li
                         key={index}
-                        className='mt-2 flex items-center justify-between rounded-md border p-2'
+                        className='mt-2 flex items-center justify-between rounded-md p-2'
                       >
                         <div className='flex'>
                           <Input
@@ -171,7 +173,7 @@ export default function AddBoundary() {
                                 e.target.value
                               )
                             }
-                            className='mr-2 w-1/2'
+                            className='mr-4 w-1/2'
                           />
                           <Input
                             value={coord.longitude}
@@ -187,10 +189,9 @@ export default function AddBoundary() {
                         </div>
                         <Button
                           onClick={() => handleDeleteCoordinate(index)}
-                          variant='outline'
-                          className='ml-2 border-none bg-[#ffa818]'
+                          variant='ghost'
                         >
-                          <Trash2Icon size={18} />
+                          <Minus size={18} />
                         </Button>
                       </li>
                     ))}
@@ -219,7 +220,7 @@ export default function AddBoundary() {
 
               <Button
                 onClick={handleSubmit}
-                variant='outline'
+                variant='primary'
                 className='bg-[#ffa818] font-semibold text-white'
               >
                 Submit
