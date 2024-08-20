@@ -72,9 +72,11 @@ export default function Places() {
   async function fetchPlaces({
     limit,
     offset,
+    searchString,
   }: {
-    limit: number
-    offset: number
+    limit?: number
+    offset?: number
+    searchString?: string
   }) {
     try {
       setRequesting(true)
@@ -85,6 +87,7 @@ export default function Places() {
         apiAccessToken: String(apiAccessToken),
         offset,
         limit,
+        searchString,
         orderBy: JSON.stringify([{ by: 'createdAt', direction: 'DESC' }]),
       })
 
@@ -144,10 +147,6 @@ export default function Places() {
     }
   }
 
-  useEffect(() => {
-    getProfiles()
-  }, [])
-
   const handleFullScreen = () => {
     if (mapRef.current) {
       if (!document.fullscreenElement) {
@@ -160,6 +159,10 @@ export default function Places() {
         mapRef.current.style.height = '30rem'
       }
     }
+  }
+
+  const handleSearch = async (searchTerm) => {
+    await fetchPlaces({ searchString: searchTerm })
   }
 
   useEffect(() => {
@@ -202,6 +205,14 @@ export default function Places() {
         )[0].id
       )
   }, [places])
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      getProfiles()
+    }, 1)
+
+    return () => clearTimeout(id)
+  }, [])
 
   return (
     <Layout>
@@ -279,6 +290,7 @@ export default function Places() {
                   })
                 }
                 fetching={requesting}
+                onSearch={handleSearch}
                 count={count}
                 onPaginationChange={(_pagination) => {
                   pagination.current = _pagination
