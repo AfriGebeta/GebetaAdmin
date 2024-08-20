@@ -42,11 +42,13 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   onFetch,
   fetching,
+  onSearch,
   count,
 }: DataTableProps<TData, TValue> & {
   fetching: boolean
   count: number
   onFetch: () => Promise<void>
+  onSearch: () => Promise<void>
   onPaginationChange: (value: PaginationState) => void
 }) {
   const [rowSelection, setRowSelection] = React.useState({})
@@ -96,7 +98,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className='space-y-4'>
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} onSearch={onSearch} />
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
