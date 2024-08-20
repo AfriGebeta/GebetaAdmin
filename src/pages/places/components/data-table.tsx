@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({
   fetching: boolean
   count: number
   onFetch: () => Promise<void>
-  onSearch: () => Promise<void>
+  onSearch: (searchTerm: string) => Promise<void>
   onPaginationChange: (value: PaginationState) => void
 }) {
   const [rowSelection, setRowSelection] = React.useState({})
