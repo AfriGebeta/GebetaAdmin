@@ -161,7 +161,7 @@ export default function Places() {
     }
   }
 
-  const handleSearch = async (searchTerm) => {
+  const handleSearch = async (searchTerm: string) => {
     await fetchPlaces({ searchString: searchTerm })
   }
 
@@ -208,7 +208,7 @@ export default function Places() {
 
   useEffect(() => {
     const id = setTimeout(() => {
-      getProfiles()
+      void getProfiles()
     }, 1)
 
     return () => clearTimeout(id)
