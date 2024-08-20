@@ -250,7 +250,8 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               <div className='flex items-center'>
                 <Button
                   onClick={handleAddCoordinate}
-                  className='translate-y-[10px] bg-[#ffa818]'
+                  variant='ghost'
+                  className='translate-y-[10px]'
                 >
                   <PlusIcon size={18} />
                 </Button>
@@ -290,8 +291,8 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                       </div>
                       <Button
                         onClick={() => handleDeleteCoordinate(index)}
-                        variant='outline'
-                        className='ml-2 border-none bg-[#ffa818]'
+                        variant='ghost'
+                        className='ml-2'
                       >
                         <Trash2Icon size={18} />
                       </Button>
