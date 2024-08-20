@@ -323,7 +323,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
 
             <Button
               onClick={handleSubmit}
-              variant='outline'
               className='bg-[#ffa818] font-semibold text-white'
             >
               Submit
