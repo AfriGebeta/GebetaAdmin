@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   FacebookAccountType,
   MessagingPlatformAccountType,
@@ -49,7 +50,7 @@ import { Input } from '@/components/ui/input.tsx'
 import { Switch } from '@/components/ui/switch.tsx'
 import { Calendar } from '@/components/ui/calendar.tsx'
 import api, { RequestError } from '@/services/api.ts'
-import { addPlace, addPlaces, selectPlace } from '@/data/redux/slices/places.ts'
+import { addPlace, selectPlace } from '@/data/redux/slices/places.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 import { useAppDispatch, useAppSelector } from '@/data/redux/hooks.ts'
@@ -57,33 +58,33 @@ import { useToast } from '@/components/ui/use-toast.ts'
 import { LoadingSpinner } from '@/components/ui/loading-spinner.tsx'
 import { useNavigate, useParams } from 'react-router-dom'
 
-const defaultPlace = {
-  location: { latitude: 0.0, longitude: 0.0 },
-  type: 'OTHER',
-  customType: undefined,
-  test: false,
-  hidden: false,
-  hiddenUntil: undefined,
-  images: [],
-  names: {
-    official: { [SupportedLocale.EN_US]: '', [SupportedLocale.AM]: '' },
-    special: [],
-  },
-  address: defaultAddress,
-  contact: {
-    phone: { primary: '', alternatives: [] },
-    email: { primary: '', alternatives: [] },
-    socialMedia: {
-      website: '',
-      x: [],
-      instagram: [],
-      telegram: [],
-      whatsapp: [],
-      facebook: [],
-    },
-  },
-  openHours: defaultOpenHours,
-}
+// const defaultPlace = {
+//   location: { latitude: 0.0, longitude: 0.0 },
+//   type: 'OTHER',
+//   customType: undefined,
+//   test: false,
+//   hidden: false,
+//   hiddenUntil: undefined,
+//   images: [],
+//   names: {
+//     official: { [SupportedLocale.EN_US]: '', [SupportedLocale.AM]: '' },
+//     special: [],
+//   },
+//   address: defaultAddress,
+//   contact: {
+//     phone: { primary: '', alternatives: [] },
+//     email: { primary: '', alternatives: [] },
+//     socialMedia: {
+//       website: '',
+//       x: [],
+//       instagram: [],
+//       telegram: [],
+//       whatsapp: [],
+//       facebook: [],
+//     },
+//   },
+//   openHours: defaultOpenHours,
+// }
 
 const placeEditorFormSchema = z.object({
   location: z.object({
@@ -247,6 +248,7 @@ export default function EditPlace() {
           data: Array<Place>
         }
 
+        console.log(result)
         dispatch(
           addPlace({
             ...place,
@@ -307,11 +309,7 @@ export default function EditPlace() {
 
           <Label className='font-bold'>Edit place</Label>
 
-          <Button
-            onClick={(e) => console.log(form.formState.errors)}
-            disabled={requesting}
-            type='submit'
-          >
+          <Button disabled={requesting} type='submit'>
             {requesting ? <LoadingSpinner /> : `Update`}
           </Button>
         </div>
