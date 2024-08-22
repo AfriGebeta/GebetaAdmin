@@ -120,8 +120,8 @@ export function DataTableToolbar<TData>({
 
       if (response.ok) {
         toast({
-          title: 'Succefully approved places',
-          description: 'The selected places have been approved',
+          title: 'Succefully hidden place',
+          description: 'The selected place/s have been hidden',
         })
       } else {
         const responseData = (await response.json()).error as RequestError
@@ -134,7 +134,7 @@ export function DataTableToolbar<TData>({
       }
     } catch (error) {
       setTogglingHidden(false)
-      console.error('Failed to approve place:', error)
+      console.error('Failed to hide place:', error)
     } finally {
       setTogglingHidden(false)
     }
@@ -149,8 +149,8 @@ export function DataTableToolbar<TData>({
 
       if (response.ok) {
         toast({
-          title: 'Succefully approved places',
-          description: 'The selected places have been approved',
+          title: 'Succefully update place to test',
+          description: 'The selected places have been updated to test',
         })
       } else {
         const responseData = (await response.json()).error as RequestError
