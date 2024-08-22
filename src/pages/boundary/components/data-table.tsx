@@ -1,4 +1,5 @@
 //@ts-nocheck
+
 import * as React from 'react'
 import {
   ColumnDef,
@@ -9,11 +10,7 @@ import {
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
-  PaginationState,
 } from '@tanstack/react-table'
 
 import {
@@ -25,11 +22,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { DataTablePagination } from '../components/data-table-pagination'
-import { DataTableToolbar } from '../components/data-table-toolbar'
-import { useEffect, useState } from 'react'
+import { DataTableToolbar } from './data-table-toolbar'
 import { Button } from '@/components/custom/button.tsx'
 import Loader from '@/components/loader.tsx'
+import { DataTableRowActions } from './data-table-row-actions'
+
+import useLocalStorage from '@/hooks/use-local-storage'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -39,19 +37,12 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  onPaginationChange,
   onFetch,
   fetching,
-  onSearch,
-  count,
 }: DataTableProps<TData, TValue> & {
   fetching: boolean
-  count: number
   onFetch: () => Promise<void>
-  onSearch: (searchTerm: string) => Promise<void>
-  onPaginationChange: (value: PaginationState) => void
 }) {
-  const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -59,46 +50,27 @@ export function DataTable<TData, TValue>({
   )
   const [sorting, setSorting] = React.useState<SortingState>([])
 
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageSize: 10,
-    pageIndex: 0,
+  const [apiAccessToken, __] = useLocalStorage({
+    key: 'apiAccessToken',
+    defaultValue: null,
   })
 
   const table = useReactTable({
     data,
     columns,
     state: {
-      sorting,
       columnVisibility,
-      rowSelection,
-      columnFilters,
-      pagination,
     },
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    onPaginationChange(updaterOrValue) {
-      setPagination((pagination) => {
-        const ret = updaterOrValue(pagination)
-
-        onPaginationChange(ret)
-
-        return ret
-      })
-    },
   })
 
   return (
     <div className='space-y-4'>
-      <DataTableToolbar table={table} onSearch={onSearch} />
+      <DataTableToolbar table={table} />
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -143,6 +115,12 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                  <TableCell>
+                    <DataTableRowActions
+                      row={row}
+                      apiAccessToken={apiAccessToken}
+                    ></DataTableRowActions>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -166,7 +144,6 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination count={count} table={table} onNextPage={onFetch} />
     </div>
   )
 }

@@ -45,7 +45,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='h-[70%]'>
         <DialogHeader>
-          <DialogTitle>Add Profile</DialogTitle>
+          <DialogTitle>Add Admin</DialogTitle>
         </DialogHeader>
         <div className='space-y-4'>
           <div>
@@ -95,7 +95,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
           </div>
           <Button
             onClick={handleSubmit}
-            variant='outline'
             className='bg-[#ffa818] font-semibold text-white'
           >
             Submit

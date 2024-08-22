@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { FC, useEffect, useState, memo } from 'react'
 import { LanguagesIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'

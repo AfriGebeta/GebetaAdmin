@@ -45,45 +45,46 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RepeatableInput } from '@/components/custom/repeatable-input.tsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input.tsx'
 import { Switch } from '@/components/ui/switch.tsx'
 import { Calendar } from '@/components/ui/calendar.tsx'
 import api, { RequestError } from '@/services/api.ts'
-import { addPlace, addPlaces } from '@/data/redux/slices/places.ts'
+import { addPlace, selectPlace } from '@/data/redux/slices/places.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
-import { useAppDispatch } from '@/data/redux/hooks.ts'
+import { useAppDispatch, useAppSelector } from '@/data/redux/hooks.ts'
 import { useToast } from '@/components/ui/use-toast.ts'
 import { LoadingSpinner } from '@/components/ui/loading-spinner.tsx'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const defaultPlace = {
-  location: { latitude: 0.0, longitude: 0.0 },
-  type: 'OTHER',
-  customType: undefined,
-  test: false,
-  hidden: false,
-  hiddenUntil: undefined,
-  images: [],
-  names: {
-    official: { [SupportedLocale.EN_US]: '', [SupportedLocale.AM]: '' },
-    special: [],
-  },
-  address: defaultAddress,
-  contact: {
-    phone: { primary: '', alternatives: [] },
-    email: { primary: '', alternatives: [] },
-    socialMedia: {
-      website: '',
-      x: [],
-      instagram: [],
-      telegram: [],
-      whatsapp: [],
-      facebook: [],
-    },
-  },
-  openHours: defaultOpenHours,
-}
+// const defaultPlace = {
+//   location: { latitude: 0.0, longitude: 0.0 },
+//   type: 'OTHER',
+//   customType: undefined,
+//   test: false,
+//   hidden: false,
+//   hiddenUntil: undefined,
+//   images: [],
+//   names: {
+//     official: { [SupportedLocale.EN_US]: '', [SupportedLocale.AM]: '' },
+//     special: [],
+//   },
+//   address: defaultAddress,
+//   contact: {
+//     phone: { primary: '', alternatives: [] },
+//     email: { primary: '', alternatives: [] },
+//     socialMedia: {
+//       website: '',
+//       x: [],
+//       instagram: [],
+//       telegram: [],
+//       whatsapp: [],
+//       facebook: [],
+//     },
+//   },
+//   openHours: defaultOpenHours,
+// }
 
 const placeEditorFormSchema = z.object({
   location: z.object({
@@ -181,22 +182,14 @@ const placeEditorFormSchema = z.object({
   ),
 })
 
-interface PlaceEditorProps {
-  id: string
-  value: z.infer<typeof placeEditorFormSchema>
-  onChange: (value: z.infer<typeof placeEditorFormSchema>) => void
-  onClose: () => void
-  containerClasses?: string
-}
+export default function EditPlace() {
+  const { id } = useParams()
 
-const PlaceEditor = function PlaceEditor({
-  id,
-  value,
-  onChange,
-  onClose,
-  containerClasses,
-}: PlaceEditorProps) {
+  const navigate = useNavigate()
+
   const dispatch = useAppDispatch()
+
+  const place = useAppSelector(selectPlace(String(id) ?? ''))
 
   const { toast } = useToast()
 
@@ -212,12 +205,31 @@ const PlaceEditor = function PlaceEditor({
   const form = useForm<z.infer<typeof placeEditorFormSchema>>({
     resolver: zodResolver(placeEditorFormSchema),
     defaultValues: {
-      ...value,
-      test: value.test ?? false,
-      hidden: value.hidden ?? false,
-      hiddenUntil: value.test ?? undefined,
-    } as any,
+      ...place,
+      test: place?.test ?? false,
+      hidden: place?.hidden ?? false,
+      hiddenUntil: place?.hiddenUntil ?? undefined,
+    },
   })
+
+  async function fetchPlace() {
+    const res = await api.getPlace({
+      apiAccessToken: String(apiAccessToken),
+      id: String(id),
+    })
+
+    const data = await res.json()
+
+    form.setValue('root', data.data)
+  }
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      fetchPlace()
+    }, 1)
+
+    return () => clearTimeout(id)
+  }, [])
 
   async function updatePlace(place: z.infer<typeof placeEditorFormSchema>) {
     try {
@@ -236,14 +248,13 @@ const PlaceEditor = function PlaceEditor({
           data: Array<Place>
         }
 
+        console.log(result)
         dispatch(
           addPlace({
-            ...value,
+            ...place,
             ...place,
           } as any)
         )
-
-        onChange(place)
       } else {
         const responseData = (await response.json()).error as RequestError
 
@@ -271,38 +282,40 @@ const PlaceEditor = function PlaceEditor({
     }
   }
 
-  async function onSubmit(values: z.infer<typeof placeEditorFormSchema>) {
-    console.log({ submitted: values })
-    onChange(values)
-
-    // await updatePlace(values)
+  function onSubmit(values: z.infer<typeof placeEditorFormSchema>) {
+    try {
+      console.log('Submitting', values)
+      void updatePlace(values)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={`relative flex max-h-screen w-full flex-col items-center overflow-y-auto pb-16 ${containerClasses}`}
+        className={`relative flex max-h-screen w-full flex-col items-center overflow-y-auto pb-16`}
       >
         <div className='sticky top-0 z-[1000] flex w-full flex-row items-center justify-between border-b bg-background p-3'>
           <Button
             disabled={requesting}
+            onClick={() => navigate('/places')}
             type={'button'}
-            variant='ghost'
-            onClick={() => onClose()}
+            variant='secondary'
           >
-            <span className='text-destructive'>Cancel</span>
+            Go back
           </Button>
 
           <Label className='font-bold'>Edit place</Label>
 
-          <Button disabled={requesting} type={'submit'}>
+          <Button disabled={requesting} type='submit'>
             {requesting ? <LoadingSpinner /> : `Update`}
           </Button>
         </div>
 
         <div className='w-full max-w-3xl p-6'>
-          <div className='flex w-full flex-col gap-4'>
+          <div className='gundefinedap-4 flex w-full flex-col'>
             <FormField
               control={form.control}
               name='type'
@@ -504,7 +517,6 @@ const PlaceEditor = function PlaceEditor({
                             placeHolder={placeHolder}
                             value={value}
                             onChange={onChange}
-                            containerClasses={'flex-1'}
                           />
                         )}
                       />
@@ -972,7 +984,3 @@ const PlaceEditor = function PlaceEditor({
     </Form>
   )
 }
-
-PlaceEditor.displayName = 'PlaceEditor'
-
-export { PlaceEditorProps, PlaceEditor }

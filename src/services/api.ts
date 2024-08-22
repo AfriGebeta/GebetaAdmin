@@ -19,15 +19,15 @@ export default {
   },
   async getPlaces({
     apiAccessToken,
-    offset = 0,
+    offset,
     limit = 10,
     searchString,
     orderBy,
   }: {
     apiAccessToken: string
-    offset?: number
     limit?: number
-    searchString?: number
+    offset?: number
+    searchString?: string
     orderBy?: string
   }) {
     return fetch(
@@ -35,6 +35,7 @@ export default {
       {
         method: 'GET',
         headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+        cache: 'force-cache',
       }
     )
   },
@@ -65,16 +66,49 @@ export default {
       body: JSON.stringify(place),
     })
   },
-  async getTransportationRoutes({
+
+  async approvePlace({
     apiAccessToken,
+    ids,
   }: {
     apiAccessToken: string
+    ids: string[]
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/transportation-routes`, {
-      method: 'POST',
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+      method: 'PATCH',
       headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify({ ids }),
     })
   },
+
+  async togglePlacesToTest({
+    apiAccessToken,
+    ids,
+  }: {
+    apiAccessToken: string
+    ids: string[]
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+      method: 'PATCH',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify({ ids }),
+    })
+  },
+
+  async togglePlacesToHidden({
+    apiAccessToken,
+    ids,
+  }: {
+    apiAccessToken: string
+    ids: string[]
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+      method: 'PATCH',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify({ ids }),
+    })
+  },
+
   async getTransportationRoute({
     apiAccessToken,
     id,
@@ -102,6 +136,7 @@ export default {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
       method: 'GET',
       headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      cache: 'force-cache',
     })
   },
   async getProfile({
@@ -149,7 +184,7 @@ export default {
       email: string
       password: string
       phoneNumber: string
-      collectionBoundary: { latitude: string; longitude: string }[]
+      collectionBoundary: { latitude: string; longitude: string }[] | string
     }
   }) {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
@@ -165,6 +200,7 @@ export default {
   },
 
   async createAdminProfile({
+    apiAccessToken,
     profileData,
   }: {
     apiAccessToken: string
@@ -176,10 +212,11 @@ export default {
       phoneNumber: string
     }
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register/other`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
       },
       body: JSON.stringify({
         ...profileData,
@@ -242,6 +279,85 @@ export default {
         },
       }
     )
+  },
+  async getBoundary({ apiAccessToken }: { apiAccessToken: string }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary`, {
+      method: 'GET',
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+      },
+    })
+  },
+  async getSpecificBoundary({
+    id,
+    apiAccessToken,
+  }: {
+    id?: string
+    apiAccessToken: string
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary/${id}`, {
+      method: 'GET',
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+      },
+    })
+  },
+  async createBoundary({
+    apiAccessToken,
+    name,
+    bounds,
+  }: {
+    apiAccessToken: string
+    name: string
+    bounds: { latitude: string; longitude: string }[]
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+      body: JSON.stringify({ name: name, bounds: bounds }),
+    })
+  },
+  async updateBoundary({
+    apiAccessToken,
+    id,
+    boundaryData,
+  }: {
+    apiAccessToken: string
+    id: string | undefined
+    boundaryData: {
+      name: string
+      bounds: { latitude: string; longitude: string }[]
+    }
+  }) {
+    console.log('upating')
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+      body: JSON.stringify({
+        name: boundaryData.name,
+        bounds: boundaryData.bounds,
+      }),
+    })
+  },
+  async deleteBoundary({
+    apiAccessToken,
+    id,
+  }: {
+    apiAccessToken: string
+    id: string
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/boundary/${id}`, {
+      method: 'DELETE',
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+      },
+    })
   },
 }
 

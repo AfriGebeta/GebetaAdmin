@@ -88,6 +88,13 @@ export function Router() {
               />
 
               <Route
+                path='places/:id/edit'
+                Component={React.lazy(
+                  () => import('./pages/places/edit.place')
+                )}
+              />
+
+              <Route
                 path='/home'
                 Component={React.lazy(() => import('./pages/dashboard'))}
               />
@@ -95,6 +102,25 @@ export function Router() {
               <Route
                 path='transportation-routes'
                 Component={React.lazy(() => import('@/components/coming-soon'))}
+              />
+
+              <Route
+                path='boundary'
+                Component={React.lazy(() => import('./pages/boundary'))}
+              />
+
+              <Route
+                path='boundary/add'
+                Component={React.lazy(
+                  () => import('./pages/boundary/addBoundary')
+                )}
+              />
+
+              <Route
+                path='boundary/update/:id'
+                Component={React.lazy(
+                  () => import('./pages/boundary/updateBoundary')
+                )}
               />
 
               <Route
