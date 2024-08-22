@@ -1,3 +1,4 @@
+//@ts-nocheck
 export function arrayToHashMap<T = object>(
   arr: Array<T>,
   key: string

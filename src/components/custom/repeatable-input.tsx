@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useEffect, useState, memo, Fragment } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button.tsx'

@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { Label } from '@/components/ui/label.tsx'
 import { Checkbox } from '@/components/ui/checkbox.tsx'
 import { ShiftEditor } from '@/components/custom/shift-editor.tsx'

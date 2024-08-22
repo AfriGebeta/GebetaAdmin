@@ -9,11 +9,20 @@ import {
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 import mapLoader from '/animation.webm'
+import api from '@/services/api.ts'
+import useLocalStorage from '@/hooks/use-local-storage.tsx'
 
 interface AddProfileModalProps {
   isOpen: boolean
@@ -24,7 +33,7 @@ interface AddProfileModalProps {
     email: string
     password: string
     phoneNumber: string
-    collectionBoundary: { latitude: string; longitude: string }[]
+    collectionBoundary: { latitude: string; longitude: string }[] | string
   }) => void
 }
 
@@ -43,8 +52,29 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
   const [coordinates, setCoordinates] = useState<
     { latitude: string; longitude: string }[]
   >([])
-
+  const [boundaries, setBoundaries] = useState<
+    {
+      name: string
+      bounds: { latitude: string; longitude: string }[]
+    }[]
+  >([])
+  const [selectedBoundary, setSelectedBoundary] = useState<string>('')
   const [loading, setLoading] = useState(false)
+
+  const [apiAccessToken, __] = useLocalStorage({
+    key: 'apiAccessToken',
+    defaultValue: null,
+  })
+
+  useEffect(() => {
+    const fetchBoundaries = async () => {
+      const response = await api.getBoundary({ apiAccessToken })
+      const data = await response.json()
+      setBoundaries(data.data)
+      console.log(data.data)
+    }
+    fetchBoundaries()
+  }, [])
 
   const handleAddCoordinate = () => {
     if (latitude && longitude) {
@@ -71,13 +101,30 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
   const handleSubmit = async () => {
     setLoading(true)
     const phoneNumber2 = `+251${phoneNumber}`
+    const selectedBoundaryData = boundaries.find(
+      (boundary) => boundary.name === selectedBoundary
+    )
+    const formattedBounds = selectedBoundaryData
+      ? selectedBoundaryData.bounds.map((bound) => {
+          const [latitude, longitude] = bound.split(' ')
+          return { latitude, longitude }
+        })
+      : coordinates
+    console.log('Data being sent:', {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber: phoneNumber2,
+      collectionBoundary: selectedBoundaryData?.id ?? formattedBounds,
+    })
     await onSubmit({
       firstName,
       lastName,
       email,
       password,
       phoneNumber: phoneNumber2,
-      collectionBoundary: coordinates,
+      collectionBoundary: selectedBoundaryData?.id ?? formattedBounds,
     })
     setLoading(false)
   }
@@ -92,6 +139,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
       setLatitude('')
       setLongitude('')
       setCoordinates([])
+      setSelectedBoundary('')
     }
   }, [isOpen])
 
@@ -150,7 +198,7 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               />
             </div>
             <div>
-              {/* <Label htmlFor='phoneNumber'>Phone Number</Label> */}
+              <Label htmlFor='phoneNumber'>Phone Number</Label>
               <div className='relative mt-1 rounded-md shadow-sm'>
                 <span className='absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium  text-muted-foreground'>
                   +251
@@ -163,6 +211,23 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                   placeholder=''
                 />
               </div>
+            </div>
+            <div>
+              <Label htmlFor='boundary'>Boundary</Label>
+              <select
+                className='block w-full rounded-lg border-gray-200 px-3 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600'
+                id='collectionBoundary'
+                value={selectedBoundary}
+                onChange={(e) => setSelectedBoundary(e.target.value)}
+              >
+                <option value=''>Select boundary</option>
+                {boundaries?.length > 0 &&
+                  boundaries?.map((boundary, index) => (
+                    <option key={index} value={boundary.name}>
+                      {boundary.name}
+                    </option>
+                  ))}
+              </select>
             </div>
             <div className='flex items-center space-x-2'>
               <div className='flex-1'>
@@ -185,7 +250,8 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
               <div className='flex items-center'>
                 <Button
                   onClick={handleAddCoordinate}
-                  className='translate-y-[10px] bg-[#ffa818]'
+                  variant='ghost'
+                  className='translate-y-[10px]'
                 >
                   <PlusIcon size={18} />
                 </Button>
@@ -225,8 +291,8 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                       </div>
                       <Button
                         onClick={() => handleDeleteCoordinate(index)}
-                        variant='outline'
-                        className='ml-2 border-none bg-[#ffa818]'
+                        variant='ghost'
+                        className='ml-2'
                       >
                         <Trash2Icon size={18} />
                       </Button>
@@ -257,7 +323,6 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
 
             <Button
               onClick={handleSubmit}
-              variant='outline'
               className='bg-[#ffa818] font-semibold text-white'
             >
               Submit

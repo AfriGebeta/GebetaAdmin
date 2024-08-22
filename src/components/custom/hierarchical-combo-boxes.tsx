@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { Fragment } from 'react'
 import { Combobox } from '@/components/custom/combobox.tsx'
 import {

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/carousel.tsx'
 import { Badge } from '@/components/ui/badge.tsx'
 import { Link } from 'react-router-dom'
+import { Checkbox } from '@/components/ui/checkbox.tsx'
 
 export const columns: ColumnDef<{
   id: string
@@ -37,36 +38,36 @@ export const columns: ColumnDef<{
   longitude: bigint
   name: string
   status: PlaceStatus
-  addedBy: Profile
+  addedById: Profile
   createdAt: string
   images: Array<string>
   address: Address
   contact: Contact
 }>[] = [
-  // {
-  //   id: 'select',
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && 'indeterminate')
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label='Select all'
-  //       className='translate-y-[2px]'
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label='Select row'
-  //       className='translate-y-[2px]'
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label='Select all'
+        className='translate-y-[2px]'
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label='Select row'
+        className='translate-y-[2px]'
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -75,17 +76,24 @@ export const columns: ColumnDef<{
     cell: ({ row }) => {
       return (
         <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
-          {row.original.name['EN' as any]}
+          {row.original.name['EN']}
         </div>
       )
     },
     enableSorting: false,
     enableHiding: false,
+    filterFn: (row, id, value) => {
+      return row.original.name['EN'].toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: 'amharicName',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Amharic Name' />
+      <DataTableColumnHeader
+        column={column}
+        title='Amharic Name'
+        className='whitespace-nowrap'
+      />
     ),
     cell: ({ row }) => {
       return (
@@ -121,6 +129,7 @@ export const columns: ColumnDef<{
     enableSorting: false,
     enableHiding: false,
     enableResizing: true,
+    enableColumnFilter: true,
   },
   {
     accessorKey: 'coordinates',
@@ -142,31 +151,16 @@ export const columns: ColumnDef<{
     enableSorting: false,
     enableHiding: false,
   },
-  // {
-  //   accessorKey: 'addedBy',
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title='Added By' />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const addedBy = row.original.addedBy
-  //
-  //     if (!addedBy) return null
-  //
-  //     return (
-  //       <div className='hidden-scrollbar flex w-[100px] items-center overflow-hidden overflow-x-auto'>
-  //         <span>{`${addedBy.firstName}${addedBy.lastName ? ` ${addedBy.lastName}` : ''}`}</span>
-  //       </div>
-  //     )
-  //   },
-  //   enableSorting: false,
-  //   enableHiding: false,
-  //   // filterFn: (row, id, value) => {
-  //   //   return value.includes(row.original.addedBy)
-  //   // },
-  // },
   {
-    accessorKey: 'collectors',
-    header: 'Collectors',
+    accessorKey: 'addedById',
+    header: ({ column }) => <span className='whitespace-nowrap'>Added by</span>,
+    cell: ({ row }) => {
+      return (
+        <div className='hidden-scrollbar w-[80px] overflow-hidden overflow-x-auto'>
+          {row.original.addedById}
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'createdAt',
@@ -206,7 +200,7 @@ export const columns: ColumnDef<{
       )
     },
     filterFn: (row, status, value) => {
-      return value.includes(status)
+      return value.includes(String(status))
     },
   },
   {
