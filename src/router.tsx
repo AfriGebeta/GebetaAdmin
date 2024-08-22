@@ -88,6 +88,13 @@ export function Router() {
               />
 
               <Route
+                path='places/:id/edit'
+                Component={React.lazy(
+                  () => import('./pages/places/edit.place')
+                )}
+              />
+
+              <Route
                 path='/home'
                 Component={React.lazy(() => import('./pages/dashboard'))}
               />
