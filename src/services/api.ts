@@ -35,6 +35,7 @@ export default {
       {
         method: 'GET',
         headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+        cache: 'force-cache',
       }
     )
   },
@@ -65,16 +66,49 @@ export default {
       body: JSON.stringify(place),
     })
   },
-  async getTransportationRoutes({
+
+  async approvePlace({
     apiAccessToken,
+    ids,
   }: {
     apiAccessToken: string
+    ids: string[]
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/transportation-routes`, {
-      method: 'POST',
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+      method: 'PATCH',
       headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify({ ids }),
     })
   },
+
+  async togglePlacesToTest({
+    apiAccessToken,
+    ids,
+  }: {
+    apiAccessToken: string
+    ids: string[]
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+      method: 'PATCH',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify({ ids }),
+    })
+  },
+
+  async togglePlacesToHidden({
+    apiAccessToken,
+    ids,
+  }: {
+    apiAccessToken: string
+    ids: string[]
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+      method: 'PATCH',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      body: JSON.stringify({ ids }),
+    })
+  },
+
   async getTransportationRoute({
     apiAccessToken,
     id,
@@ -102,6 +136,7 @@ export default {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
       method: 'GET',
       headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      cache: 'force-cache',
     })
   },
   async getProfile({

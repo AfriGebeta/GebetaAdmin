@@ -1,4 +1,3 @@
-//@ts-nocheck
 import {
   FacebookAccountType,
   MessagingPlatformAccountType,
@@ -182,7 +181,7 @@ const placeEditorFormSchema = z.object({
   ),
 })
 
-export default function () {
+export default function EditPlace() {
   const { id } = useParams()
 
   const navigate = useNavigate()
@@ -208,8 +207,8 @@ export default function () {
       ...place,
       test: place?.test ?? false,
       hidden: place?.hidden ?? false,
-      hiddenUntil: place?.test ?? undefined,
-    } as any,
+      hiddenUntil: place?.hiddenUntil ?? undefined,
+    },
   })
 
   async function fetchPlace() {
@@ -251,6 +250,7 @@ export default function () {
         dispatch(
           addPlace({
             ...place,
+            ...place,
           } as any)
         )
       } else {
@@ -280,9 +280,10 @@ export default function () {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof placeEditorFormSchema>) {
+  function onSubmit(values: z.infer<typeof placeEditorFormSchema>) {
     try {
-      await updatePlace(values)
+      console.log('Submitting', values)
+      void updatePlace(values)
     } catch (e) {
       console.log(e)
     }
@@ -306,13 +307,17 @@ export default function () {
 
           <Label className='font-bold'>Edit place</Label>
 
-          <Button disabled={requesting} type={'submit'}>
+          <Button
+            onClick={(e) => console.log(form.formState.errors)}
+            disabled={requesting}
+            type='submit'
+          >
             {requesting ? <LoadingSpinner /> : `Update`}
           </Button>
         </div>
 
         <div className='w-full max-w-3xl p-6'>
-          <div className='flex w-full flex-col gap-4'>
+          <div className='gundefinedap-4 flex w-full flex-col'>
             <FormField
               control={form.control}
               name='type'
