@@ -10,9 +10,12 @@ import { statuses, types } from '../data/data'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { useEffect, useState } from 'react'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
-import api from '@/services/api.ts'
+import api, { RequestError } from '@/services/api.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { EyeOffIcon, PenIcon, TestTube2Icon, VerifiedIcon } from 'lucide-react'
+import { IconFidgetSpinner } from '@tabler/icons-react'
+import { LoadingSpinner } from '@/components/ui/loading-spinner.tsx'
+import { toast } from '@/components/ui/use-toast.ts'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -42,6 +45,10 @@ export function DataTableToolbar<TData>({
   const navigate = useNavigate()
 
   const [transition, setTransition] = useState(false)
+
+  const [approving, setApproving] = useState(false)
+  const [togglingTest, setTogglingTest] = useState(false)
+  const [togglingHidden, setTogglingHidden] = useState(false)
 
   const handleSearch = () => {
     onSearch(searchTerm)
@@ -74,33 +81,91 @@ export function DataTableToolbar<TData>({
 
   const handleApprovePlaces = async () => {
     try {
-      await api.approvePlace({
+      console.log('selectedPlacesIds', selectedPlacesIds)
+      setApproving(true)
+      const response = await api.approvePlace({
         apiAccessToken: String(apiAccessToken),
         ids: selectedPlacesIds,
       })
+
+      if (response.ok) {
+        toast({
+          title: 'Succefully approved places',
+          description: 'The selected places have been approved',
+        })
+      } else {
+        const responseData = (await response.json()).error as RequestError
+
+        toast({
+          title: `${responseData.namespace}/${responseData.code}`,
+          description: responseData.message,
+          variant: 'destructive',
+        })
+      }
     } catch (error) {
+      setApproving(false)
       console.error('Failed to approve place:', error)
+    } finally {
+      setApproving(false)
     }
   }
 
   const handleToggleHiddenPlaces = async () => {
     try {
-      await api.togglePlacesToHidden({
+      setTogglingHidden(true)
+      const response = await api.togglePlacesToHidden({
         apiAccessToken: String(apiAccessToken),
         ids: selectedPlacesIds,
       })
+
+      if (response.ok) {
+        toast({
+          title: 'Succefully approved places',
+          description: 'The selected places have been approved',
+        })
+      } else {
+        const responseData = (await response.json()).error as RequestError
+
+        toast({
+          title: `${responseData.namespace}/${responseData.code}`,
+          description: responseData.message,
+          variant: 'destructive',
+        })
+      }
     } catch (error) {
+      setTogglingHidden(false)
       console.error('Failed to approve place:', error)
+    } finally {
+      setTogglingHidden(false)
     }
   }
   const handleToggleTestPlaces = async () => {
     try {
-      await api.togglePlacesToTest({
+      setTogglingTest(true)
+      const response = await api.togglePlacesToTest({
         apiAccessToken: String(apiAccessToken),
         ids: selectedPlacesIds,
       })
+
+      if (response.ok) {
+        toast({
+          title: 'Succefully approved places',
+          description: 'The selected places have been approved',
+        })
+      } else {
+        const responseData = (await response.json()).error as RequestError
+
+        toast({
+          title: `${responseData.namespace}/${responseData.code}`,
+          description: responseData.message,
+          variant: 'destructive',
+        })
+      }
     } catch (error) {
+      setTogglingHidden(false)
       console.error('Failed to approve place:', error)
+    } finally {
+      setTogglingTest(false)
     }
   }
 
@@ -170,17 +235,47 @@ export function DataTableToolbar<TData>({
             <PenIcon size={12} className='mr-2' />
             Edit
           </Button>
-          <Button variant='outline' onClick={handleApprovePlaces}>
-            <VerifiedIcon size={12} className='mr-2' />
-            Approve
+          <Button
+            variant='outline'
+            onClick={handleApprovePlaces}
+            disabled={approving}
+          >
+            {!approving ? (
+              <>
+                <VerifiedIcon size={12} className='mr-2' />
+                Approve
+              </>
+            ) : (
+              <LoadingSpinner className='h-5 w-5' />
+            )}
           </Button>
-          <Button variant='outline' onClick={handleToggleHiddenPlaces}>
-            <EyeOffIcon size={12} className='mr-2' />
-            Hide
+          <Button
+            variant='outline'
+            onClick={handleToggleHiddenPlaces}
+            disabled={togglingHidden}
+          >
+            {!togglingHidden ? (
+              <>
+                <EyeOffIcon size={12} className='mr-2' />
+                Hide
+              </>
+            ) : (
+              <LoadingSpinner className='h-5 w-5' />
+            )}
           </Button>
-          <Button variant='outline' onClick={handleToggleTestPlaces}>
-            <TestTube2Icon size={12} className='mr-2' />
-            Test
+          <Button
+            variant='outline'
+            onClick={handleToggleTestPlaces}
+            disabled={togglingTest}
+          >
+            {!togglingTest ? (
+              <>
+                <TestTube2Icon size={12} className='mr-2' />
+                Test
+              </>
+            ) : (
+              <LoadingSpinner className='h-5 w-5' />
+            )}
           </Button>
           <Button
             variant='ghost'
