@@ -62,7 +62,10 @@ export default {
   }) {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/${id}`, {
       method: 'PATCH',
-      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(place),
     })
   },
@@ -74,9 +77,12 @@ export default {
     apiAccessToken: string
     ids: string[]
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/approve`, {
       method: 'PATCH',
-      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ ids }),
     })
   },
@@ -88,9 +94,12 @@ export default {
     apiAccessToken: string
     ids: string[]
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/toggle/test`, {
       method: 'PATCH',
-      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ ids }),
     })
   },
@@ -102,9 +111,12 @@ export default {
     apiAccessToken: string
     ids: string[]
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places`, {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/toggle/hidden`, {
       method: 'PATCH',
-      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      headers: {
+        ['Authorization']: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ ids }),
     })
   },
