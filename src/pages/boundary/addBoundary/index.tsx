@@ -220,7 +220,6 @@ export default function AddBoundary() {
 
               <Button
                 onClick={handleSubmit}
-                variant='primary'
                 className='bg-[#ffa818] font-semibold text-white'
               >
                 Submit
