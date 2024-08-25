@@ -59,7 +59,6 @@ export function DataTableToolbar<TData>({
       const response = await api.getProfiles({ apiAccessToken })
       const data = await response.json()
 
-      console.log('bro', data)
       setProfiles(
         data.data.map((profile: any) => ({
           label: `${profile.firstName} ${profile.lastName}`,

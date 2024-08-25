@@ -54,9 +54,10 @@ import { addPlace, selectPlace } from '@/data/redux/slices/places.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 import { useAppDispatch, useAppSelector } from '@/data/redux/hooks.ts'
-import { useToast } from '@/components/ui/use-toast.ts'
+import { toast, useToast } from '@/components/ui/use-toast.ts'
 import { LoadingSpinner } from '@/components/ui/loading-spinner.tsx'
 import { useNavigate, useParams } from 'react-router-dom'
+import { VerifiedIcon } from 'lucide-react'
 
 // const defaultPlace = {
 //   location: { latitude: 0.0, longitude: 0.0 },
@@ -237,7 +238,7 @@ export default function EditPlace() {
 
       const response = await api.updatePlace({
         apiAccessToken: String(apiAccessToken),
-        place,
+        place: { ...place, location: undefined },
         id,
       } as any)
 
@@ -249,6 +250,7 @@ export default function EditPlace() {
         }
 
         console.log(result)
+
         dispatch(
           addPlace({
             ...place,
@@ -291,6 +293,35 @@ export default function EditPlace() {
     }
   }
 
+  const handleApprovePlace = async () => {
+    try {
+      console.log('here', place)
+      const response = await api.approvePlace({
+        apiAccessToken: String(apiAccessToken),
+        ids: String(id),
+      })
+
+      if (response.ok) {
+        toast({
+          title: 'Succeffully approved place',
+          description: 'The place has been approved',
+        })
+      } else {
+        const responseData = (await response.json()).error as RequestError
+
+        toast({
+          title: `${responseData.namespace}/${responseData.code}`,
+          description: responseData.message,
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      console.error('Failed to approve place:', error)
+    }
+  }
+
+  console.log(place.status)
+
   return (
     <Form {...form}>
       <form
@@ -308,6 +339,24 @@ export default function EditPlace() {
           </Button>
 
           <Label className='font-bold'>Edit place</Label>
+
+          {place?.status != 'APPROVED' ? (
+            <Button
+              type='button'
+              onClick={() => {
+                console.log('hello wo')
+                handleApprovePlace()
+              }}
+              variant='secondary'
+            >
+              Approve
+            </Button>
+          ) : (
+            <p>
+              <VerifiedIcon size={12} className='mr-2' />
+              Approved
+            </p>
+          )}
 
           <Button disabled={requesting} type='submit'>
             {requesting ? <LoadingSpinner /> : `Update`}

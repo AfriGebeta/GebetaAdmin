@@ -47,7 +47,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue> & {
   fetching: boolean
   count: number
-  onFetch: () => Promise<void>
+  onFetch: (number: number, pageSize: number) => Promise<void>
   onSearch: (searchTerm: string) => Promise<void>
   onPaginationChange: (value: PaginationState) => void
 }) {
@@ -85,13 +85,20 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    onPaginationChange(updaterOrValue) {
-      setPagination((pagination) => {
-        const ret = updaterOrValue(pagination)
-
-        onPaginationChange(ret)
-
-        return ret
+    manualPagination: true,
+    pageCount: Math.ceil(count / pagination.pageSize),
+    onPaginationChange: (updaterOrValue) => {
+      setPagination((prevPagination) => {
+        const newPagination =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(prevPagination)
+            : updaterOrValue
+        onPaginationChange(newPagination)
+        onFetch(
+          newPagination.pageIndex * newPagination.pageSize,
+          newPagination.pageSize
+        )
+        return newPagination
       })
     },
   })

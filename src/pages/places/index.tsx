@@ -261,7 +261,6 @@ export default function Places() {
                         (c) => c.id === v.addedById
                       )
 
-                      console.log('collectors', collectors)
                       return {
                         id: v.id,
                         type: v.type,
@@ -283,17 +282,17 @@ export default function Places() {
                     }) as any
                 }
                 columns={columns}
-                onFetch={() =>
+                onFetch={(start, size) =>
                   fetchPlaces({
-                    limit: pagination.current.pageSize,
-                    offset: Object.keys(places).length,
+                    limit: size,
+                    offset: start,
                   })
                 }
                 fetching={requesting}
                 onSearch={handleSearch}
                 count={count}
-                onPaginationChange={(_pagination) => {
-                  pagination.current = _pagination
+                onPaginationChange={(newPagination) => {
+                  pagination.current = newPagination
                 }}
               />
             </div>

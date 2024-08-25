@@ -35,7 +35,6 @@ export default {
       {
         method: 'GET',
         headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
-        cache: 'force-cache',
       }
     )
   },
@@ -75,7 +74,7 @@ export default {
     ids,
   }: {
     apiAccessToken: string
-    ids: string[]
+    ids: string[] | string
   }) {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/approve`, {
       method: 'PATCH',
