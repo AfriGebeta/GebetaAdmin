@@ -172,7 +172,14 @@ export default function Places() {
   }
 
   const handleSearch = async (searchTerm: string) => {
-    await fetchPlaces({ searchString: searchTerm })
+    setRequesting(true)
+    const searchResults = await fetchPlaces({
+      searchString: searchTerm,
+      limit: pagination.current.pageSize,
+      offset: 0,
+    })
+    setTableData(searchResults.map(formatPlaceData))
+    setRequesting(false)
   }
 
   useEffect(() => {
@@ -194,17 +201,17 @@ export default function Places() {
     return () => eventSource.close()
   }, [])
 
-  useEffect(() => {
-    const id = setTimeout(
-      () =>
-        void fetchPlaces({
-          limit: pagination.current.pageSize,
-          offset: Object.keys(places).length,
-        }),
-      0
-    )
-    return () => clearTimeout(id)
-  }, [])
+  // useEffect(() => {
+  //   const id = setTimeout(
+  //     () =>
+  //       void fetchPlaces({
+  //         limit: pagination.current.pageSize,
+  //         offset: Object.keys(places).length,
+  //       }),
+  //     0
+  //   )
+  //   return () => clearTimeout(id)
+  // }, [])
 
   useEffect(() => {
     if (Object.keys(places).length)
