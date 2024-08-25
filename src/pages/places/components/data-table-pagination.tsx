@@ -35,6 +35,8 @@ export function DataTablePagination<TData>({
         {/*{count} total row(s)*/}
         {table.getFilteredSelectedRowModel().rows.length} of{' '}
         {table.getFilteredRowModel().rows.length} row(s) selected.
+        <br />
+        {` Total ${count} rows `}
       </div>
       <div className='flex items-center sm:space-x-6 lg:space-x-8'>
         <div className='flex items-center space-x-2'>
