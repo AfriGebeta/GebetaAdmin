@@ -83,6 +83,13 @@ export default function Places() {
 
       console.log('calling with: ', { limit, offset })
 
+      // Check if we have enough cached data
+      const cachedPlaces = Object.values(places)
+      if (cachedPlaces.length >= offset + limit && !searchString) {
+        console.log('Using cached data')
+        return cachedPlaces.slice(offset, offset + limit)
+      }
+
       const response = await api.getPlaces({
         apiAccessToken: String(apiAccessToken),
         offset,
@@ -100,7 +107,7 @@ export default function Places() {
         dispatch(addPlaces(result.data))
 
         setCount(result.count)
-        return result.data // Return the fetched data
+        return result.data
       } else {
         const responseData = (await response.json()).error as RequestError
 
@@ -109,7 +116,7 @@ export default function Places() {
           description: responseData.message,
           variant: 'destructive',
         })
-        return [] // Return an empty array if there's an error
+        return []
       }
     } catch (e) {
       console.error(e)
@@ -132,7 +139,7 @@ export default function Places() {
           </ToastAction>
         ),
       })
-      return [] // Return an empty array if there's an error
+      return []
     } finally {
       setRequesting(false)
     }
@@ -217,7 +224,40 @@ export default function Places() {
     return () => clearTimeout(id)
   }, [])
 
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const initialData = await fetchPlaces({
+        limit: pagination.current.pageSize,
+        offset: 0,
+      })
+      setTableData(initialData.map(formatPlaceData))
+    }
+    loadInitialData()
+  }, [])
+
   const [tableData, setTableData] = useState<any[]>([])
+
+  const formatPlaceData = (place: Place) => {
+    const profile = collectors.find((c) => c.id === place.addedById)
+    return {
+      id: place.id,
+      type: place.type,
+      customType: place.customType,
+      latitude: place.location.latitude,
+      longitude: place.location.longitude,
+      name: place.names.official,
+      status: place.status,
+      createdAt: moment(place.createdAt).format(
+        'ddd DD, MMM YYYY [at] HH:mm:ss a'
+      ),
+      addedById: profile
+        ? profile.firstName + ' ' + profile.lastName
+        : 'Unknown',
+      images: place.images,
+      address: place.address,
+      contact: place.contact,
+    }
+  }
 
   return (
     <Layout>
@@ -261,31 +301,7 @@ export default function Places() {
                     limit: size,
                     offset: start,
                   })
-                  setTableData(
-                    newData.map((v) => {
-                      const profile = collectors.find(
-                        (c) => c.id === v.addedById
-                      )
-                      return {
-                        id: v.id,
-                        type: v.type,
-                        customType: v.customType,
-                        latitude: v.location.latitude,
-                        longitude: v.location.longitude,
-                        name: v.names.official,
-                        status: v.status,
-                        createdAt: moment(v.createdAt).format(
-                          'ddd DD, MMM YYYY [at] HH:mm:ss a'
-                        ),
-                        addedById: profile
-                          ? profile.firstName + ' ' + profile.lastName
-                          : 'Unknown',
-                        images: v.images,
-                        address: v.address,
-                        contact: v.contact,
-                      }
-                    })
-                  )
+                  setTableData(newData.map(formatPlaceData))
                 }}
                 fetching={requesting}
                 onSearch={handleSearch}
