@@ -97,9 +97,10 @@ export default function Places() {
           atOffset: number
           data: Array<Place>
         }
-
         dispatch(addPlaces(result.data))
+
         setCount(result.count)
+        return result.data // Return the fetched data
       } else {
         const responseData = (await response.json()).error as RequestError
 
@@ -108,6 +109,7 @@ export default function Places() {
           description: responseData.message,
           variant: 'destructive',
         })
+        return [] // Return an empty array if there's an error
       }
     } catch (e) {
       console.error(e)
@@ -130,6 +132,7 @@ export default function Places() {
           </ToastAction>
         ),
       })
+      return [] // Return an empty array if there's an error
     } finally {
       setRequesting(false)
     }
@@ -214,6 +217,8 @@ export default function Places() {
     return () => clearTimeout(id)
   }, [])
 
+  const [tableData, setTableData] = useState<any[]>([])
+
   return (
     <Layout>
       {/* ===== Top Heading ===== */}
@@ -249,18 +254,18 @@ export default function Places() {
           <TabsContent value='tableview' className='space-y-4'>
             <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
               <DataTable
-                data={
-                  Object.values(places)
-                    .sort(
-                      (a, b) =>
-                        new Date(b.createdAt).getTime() -
-                        new Date(a.createdAt).getTime()
-                    )
-                    .map((v) => {
+                data={tableData}
+                columns={columns}
+                onFetch={async (start, size) => {
+                  const newData = await fetchPlaces({
+                    limit: size,
+                    offset: start,
+                  })
+                  setTableData(
+                    newData.map((v) => {
                       const profile = collectors.find(
                         (c) => c.id === v.addedById
                       )
-
                       return {
                         id: v.id,
                         type: v.type,
@@ -279,15 +284,9 @@ export default function Places() {
                         address: v.address,
                         contact: v.contact,
                       }
-                    }) as any
-                }
-                columns={columns}
-                onFetch={(start, size) =>
-                  fetchPlaces({
-                    limit: size,
-                    offset: start,
-                  })
-                }
+                    })
+                  )
+                }}
                 fetching={requesting}
                 onSearch={handleSearch}
                 count={count}
