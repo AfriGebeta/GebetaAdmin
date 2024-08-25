@@ -28,12 +28,13 @@ export function DataTablePagination<TData>({
   count: number
   onNextPage: () => Promise<void>
 }) {
-  console.log(count)
   return (
     <div className='flex items-center justify-between overflow-auto px-2'>
       <div className='hidden flex-1 text-sm text-muted-foreground sm:block'>
         {/*{table.getFilteredSelectedRowModel().rows.length} of{' '}*/}
-        {count} total row(s)
+        {/*{count} total row(s)*/}
+        {table.getFilteredSelectedRowModel().rows.length} of{' '}
+        {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
       <div className='flex items-center sm:space-x-6 lg:space-x-8'>
         <div className='flex items-center space-x-2'>
@@ -82,19 +83,8 @@ export function DataTablePagination<TData>({
           <Button
             variant='outline'
             className='h-8 w-8 p-0'
-            onClick={async () => {
-              console.log({ count, rows: table.getRowCount() })
-
-              if (table.getCanNextPage()) {
-                table.nextPage()
-              } else if (count > table.getRowCount()) {
-                console.log({ shouldcall: true })
-                await onNextPage()
-                console.log({ nextPage: table.getPageCount() })
-                table.setPageIndex(table.getPageCount())
-              }
-            }}
-            disabled={!table.getCanNextPage() && table.getRowCount() === count}
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
           >
             <span className='sr-only'>Go to next page</span>
             <ChevronRightIcon className='h-4 w-4' />
