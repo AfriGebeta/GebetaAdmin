@@ -94,7 +94,7 @@ export default function Places() {
         apiAccessToken: String(apiAccessToken),
         offset,
         limit,
-        searchString,
+        searchString: searchString || searchTerm,
         orderBy: JSON.stringify([{ by: 'createdAt', direction: 'DESC' }]),
       })
 
@@ -171,14 +171,18 @@ export default function Places() {
     }
   }
 
-  const handleSearch = async (searchTerm: string) => {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const handleSearch = async (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm)
     setRequesting(true)
     const searchResults = await fetchPlaces({
-      searchString: searchTerm,
+      searchString: newSearchTerm,
       limit: pagination.current.pageSize,
       offset: 0,
     })
     setTableData(searchResults.map(formatPlaceData))
+    pagination.current = { ...pagination.current, pageIndex: 0 }
     setRequesting(false)
   }
 
@@ -307,6 +311,7 @@ export default function Places() {
                   const newData = await fetchPlaces({
                     limit: size,
                     offset: start,
+                    searchString: searchTerm,
                   })
                   setTableData(newData.map(formatPlaceData))
                 }}
@@ -315,6 +320,13 @@ export default function Places() {
                 count={count}
                 onPaginationChange={(newPagination) => {
                   pagination.current = newPagination
+                  fetchPlaces({
+                    limit: newPagination.pageSize,
+                    offset: newPagination.pageIndex * newPagination.pageSize,
+                    searchString: searchTerm,
+                  }).then((newData) => {
+                    setTableData(newData.map(formatPlaceData))
+                  })
                 }}
               />
             </div>
