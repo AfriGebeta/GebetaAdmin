@@ -120,6 +120,29 @@ export default {
     })
   },
 
+  async getPreSignedUrl({ apiAccessToken }: { apiAccessToken: string }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/places/images/pre-signed-url`,
+      {
+        method: 'GET',
+        headers: {
+          ['Authorization']: `Bearer ${apiAccessToken}`,
+        },
+      }
+    )
+  },
+
+  async uploadImage({ file, uploadUrl }: { file: File; uploadUrl: string }) {
+    return fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'x-ms-blob-type': 'BlockBlob',
+        'Content-Type': file.type ?? 'application/octet-stream',
+      },
+      body: file,
+    })
+  },
+
   async getTransportationRoute({
     apiAccessToken,
     id,
