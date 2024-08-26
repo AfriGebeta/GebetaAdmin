@@ -58,6 +58,7 @@ import { toast, useToast } from '@/components/ui/use-toast.ts'
 import { LoadingSpinner } from '@/components/ui/loading-spinner.tsx'
 import { useNavigate, useParams } from 'react-router-dom'
 import { VerifiedIcon } from 'lucide-react'
+import { ImagesEditor } from '@/pages/places/edit.place/_components/images-editor.tsx'
 
 // const defaultPlace = {
 //   location: { latitude: 0.0, longitude: 0.0 },
@@ -320,8 +321,6 @@ export default function EditPlace() {
     }
   }
 
-  console.log(place.status)
-
   return (
     <Form {...form}>
       <form
@@ -340,27 +339,29 @@ export default function EditPlace() {
 
           <Label className='font-bold'>Edit place</Label>
 
-          {place?.status != 'APPROVED' ? (
-            <Button
-              type='button'
-              onClick={() => {
-                console.log('hello wo')
-                handleApprovePlace()
-              }}
-              variant='secondary'
-            >
-              Approve
-            </Button>
-          ) : (
-            <p>
-              <VerifiedIcon size={12} className='mr-2' />
-              Approved
-            </p>
-          )}
+          <div className='flex items-center justify-center gap-8'>
+            {place?.status != 'APPROVED' ? (
+              <Button
+                type='button'
+                onClick={() => {
+                  console.log('hello wo')
+                  handleApprovePlace()
+                }}
+                variant='secondary'
+              >
+                Approve
+              </Button>
+            ) : (
+              <div className='flex items-center justify-center whitespace-nowrap'>
+                <VerifiedIcon size={15} className='mr-2 text-green-700' />
+                <span className='text-green-700'>Approved</span>
+              </div>
+            )}
 
-          <Button disabled={requesting} type='submit'>
-            {requesting ? <LoadingSpinner /> : `Update`}
-          </Button>
+            <Button disabled={requesting} type='submit'>
+              {requesting ? <LoadingSpinner /> : `Update`}
+            </Button>
+          </div>
         </div>
 
         <div className='w-full max-w-3xl p-6'>
@@ -1017,6 +1018,27 @@ export default function EditPlace() {
                   <FormItem className='mt-2'>
                     <FormControl>
                       <OpenHoursEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className='flex w-full flex-col gap-2 rounded-lg border p-4'>
+              <Label className='text-muted-foreground'>Images</Label>
+
+              <FormField
+                control={form.control}
+                name={'images'}
+                render={({ field }) => (
+                  <FormItem className='mt-2'>
+                    <FormControl>
+                      <ImagesEditor
                         value={field.value}
                         onChange={field.onChange}
                       />

@@ -250,6 +250,7 @@ export default function Places() {
 
   const formatPlaceData = (place: Place) => {
     const profile = collectors.find((c) => c.id === place.addedById)
+    console.log(place.addedById)
     return {
       id: place.id,
       type: place.type,
@@ -269,6 +270,27 @@ export default function Places() {
       contact: place.contact,
     }
   }
+
+  async function fetchBereket() {
+    const response = await api.getPlaces({
+      apiAccessToken: String(apiAccessToken),
+      offset: 2600,
+      limit: count,
+    })
+    const result = await response.json()
+    console.log(result)
+    console.log(
+      Object.values(result.data).filter(
+        (v) => v.addedById === 'd03a1b23-5f4b-40b0-9544-81b6e26c2ece'
+      )
+    )
+
+    const response2 = await api.getProfile({ apiAccessToken: String })
+  }
+
+  useEffect(() => {
+    fetchBereket()
+  }, [])
 
   return (
     <Layout>
