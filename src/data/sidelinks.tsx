@@ -28,31 +28,31 @@ export const sidelinks: SideLink[] = [
     title: 'Places',
     label: '',
     href: '/places',
-    icon: <LucideLocateFixed size={18} />,
+    icon: <LucideLocateFixed size={20} className='text-gray-400' />,
   },
   {
     title: 'Transportation Routes',
     label: '',
     href: '/transportation-routes',
-    icon: <BusIcon size={18} />,
+    icon: <BusIcon size={20} className='text-gray-400' />,
   },
   {
     title: 'Boundary',
     label: '',
     href: '/boundary',
-    icon: <RectangleEllipsisIcon size={18} />,
+    icon: <RectangleEllipsisIcon size={20} className='text-gray-400' />,
   },
   {
     title: 'Collectors',
     label: '',
     href: '/collectors',
-    icon: <Users size={18} />,
+    icon: <Users size={20} className='text-gray-400' />,
   },
   {
     title: 'Admin',
     label: '',
     href: '/admins',
-    icon: <UserRoundCog size={18} />,
+    icon: <UserRoundCog size={20} className='text-gray-400' />,
   },
 
   // {

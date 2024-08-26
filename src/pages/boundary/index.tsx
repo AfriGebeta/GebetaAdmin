@@ -73,7 +73,9 @@ export default function Boundaries() {
   }
 
   useEffect(() => {
-    fetchBoundary()
+    const id = setTimeout(() => fetchBoundary(), 1)
+
+    return () => clearTimeout(id)
   }, [])
 
   return (

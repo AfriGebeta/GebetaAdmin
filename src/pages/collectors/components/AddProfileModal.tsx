@@ -229,6 +229,9 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
                   ))}
               </select>
             </div>
+
+            <p className='text-center text-gray-400'>Or</p>
+
             <div className='flex items-center space-x-2'>
               <div className='flex-1'>
                 <Label htmlFor='coordinate'>Coordinate</Label>

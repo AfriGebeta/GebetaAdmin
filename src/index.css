@@ -110,12 +110,20 @@
 
 /* Add this to your global styles or specific CSS file */
 @font-face {
-  font-family: 'arieva';
-  src: url(/public/Roboto-Regular.ttf);
+  font-family: 'Inter-Medium';
+  src: url(/public/Inter-Medium.ttf) format('truetype');
 }
+
+@font-face {
+  font-family: 'Inter-Regular';
+  src: url(/public/Inter-Regular.ttf) format('truetype');
+}
+
 body {
-  font-family: arieva !important;
+  font-family: 'Inter-Regular', sans-serif !important;
   font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 500 !important;
 }
 .table-head {
   font-weight: bold;
