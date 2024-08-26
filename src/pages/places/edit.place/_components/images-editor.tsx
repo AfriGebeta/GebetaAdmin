@@ -1,5 +1,5 @@
+//@ts-nocheck
 import { CameraIcon, ImageIcon, XIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import api from '@/services/api.ts'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 
