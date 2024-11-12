@@ -38,11 +38,7 @@ export function UserNav() {
           <Avatar className='h-8 w-8'>
             <AvatarImage src='/avatars/01.png' alt='@shadcn' />
             <AvatarFallback>
-              {`${String(currentProfile?.firstName)[0]}${
-                currentProfile?.lastName
-                  ? String(currentProfile?.lastName)[0]
-                  : ''
-              }`}
+              {`${String(currentProfile?.username)[0].toUpperCase()}`}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -51,20 +47,12 @@ export function UserNav() {
         <DropdownMenuLabel className='font-normal'>
           <div className='flex flex-col space-y-1'>
             <p className='text-sm font-medium leading-none'>
-              {`${currentProfile?.firstName}${
-                currentProfile?.lastName ? ` ${currentProfile?.lastName}` : ''
-              }`}
+              {`${currentProfile?.username}`}
             </p>
 
             {currentProfile?.email && (
               <p className='text-xs leading-none text-muted-foreground'>
                 {currentProfile.email}
-              </p>
-            )}
-
-            {currentProfile?.phoneNumber && (
-              <p className='text-xs leading-none text-muted-foreground'>
-                {currentProfile.phoneNumber}
               </p>
             )}
           </div>

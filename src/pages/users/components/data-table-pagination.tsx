@@ -54,7 +54,7 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className='flex w-[100px] items-center justify-center whitespace-nowrap text-sm font-medium'>
+        <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
           Page {pageIndex + 1} of {totalPages}
         </div>
         <div className='flex items-center space-x-2'>

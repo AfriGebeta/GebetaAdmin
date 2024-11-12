@@ -1,35 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 import { Profile } from '@/model'
-import { arrayToHashMap } from '@/utils'
 
 const NAME = 'profiles'
 
 interface ProfilesState {
-  profiles: { [profileId: string]: Profile }
+  profiles: { count: number; users: Profile[] }
 }
 
 const initialState: ProfilesState = {
-  profiles: {},
+  profiles: { count: 0, users: [] },
 }
 
 export const profilesSlice = createSlice({
   name: NAME,
   initialState,
   reducers: {
-    // addProfiles: (state, action: PayloadAction<Profile[]>) => {
-    //   const profilesHash = arrayToHashMap(action.payload, 'id');
-    //   state.profiles = {
-    //     ...state.profiles,
-    //     ...profilesHash,
-    //   };
-    // },
     addProfiles: (state, action: PayloadAction<Array<Profile>>) => {
-      const placesHash = arrayToHashMap(action.payload, 'id')
+      const profiles = action.payload
 
       state.profiles = {
         ...state.profiles,
-        ...placesHash,
+        ...profiles,
       }
     },
     addProfile: (state, action: PayloadAction<Profile>) => {
@@ -38,79 +30,39 @@ export const profilesSlice = createSlice({
         [action.payload.id]: action.payload,
       }
     },
-    updateProfileActivation: (
-      state,
-      action: PayloadAction<{ id: string; isActive: boolean }>
-    ) => {
-      const { id, isActive } = action.payload
-      const profile = state.profiles[id]
-
-      if (profile) {
-        profile.active = isActive
-      }
-    },
     updateProfile: (
       state,
       action: PayloadAction<{
         id: string
         data: {
-          firstName: string
-          lastName: string
+          name: string
+          phone: string
+          purchased_date: string
           email: string
-          collectionBoundary: { latitude: string; longitude: string }[]
         }
       }>
     ) => {
       const {
         id,
-        data: { firstName, lastName, email, collectionBoundary },
+        data: { name, phone, email, purchased_date },
       } = action.payload
-      console.log(
-        'updateProfile',
-        id,
-        firstName,
-        lastName,
-        email,
-        collectionBoundary
-      )
-      const profile = state.profiles[id]
+      console.log('updateProfile', id, name, email, phone, purchased_date)
+      const profile = state.profiles.users.find((user) => user.id == id)
       if (profile) {
-        profile.firstName = firstName
-        profile.lastName = lastName
+        profile.name = name
+        profile.phone = phone
         profile.email = email
-        profile.collectionBoundary = collectionBoundary
+        profile.purchased_date = purchased_date
       }
-      // state.profiles = {
-      //   ...state.profiles,
-      //   [action.payload.id]: action.payload,
-      // }
-    },
-    removeProfile: (state, action: PayloadAction<string>) => {
-      const { [action.payload]: _, ...remainingProfiles } = state.profiles
-      state.profiles = remainingProfiles
-    },
-    removeProfiles: (state, action: PayloadAction<string[]>) => {
-      const remainingProfiles = { ...state.profiles }
-      action.payload.forEach((profileId) => {
-        delete remainingProfiles[profileId]
-      })
-      state.profiles = remainingProfiles
-    },
-    clearProfiles: (state) => {
-      state.profiles = {}
+      state.profiles = {
+        ...state.profiles,
+        [action.payload.id]: action.payload,
+      }
     },
   },
 })
 
-export const {
-  addProfiles,
-  addProfile,
-  updateProfile,
-  removeProfile,
-  removeProfiles,
-  clearProfiles,
-  updateProfileActivation,
-} = profilesSlice.actions
+export const { addProfiles, addProfile, updateProfile } = profilesSlice.actions
 
 export const selectProfiles = (state: RootState) => state.profiles.profiles
 

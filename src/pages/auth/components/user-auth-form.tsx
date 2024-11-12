@@ -22,24 +22,20 @@ import { useToast } from '@/components/ui/use-toast.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import { AuthContext } from '@/contexts'
 import api, { RequestError } from '@/services/api.ts'
+import { Profile } from '@/model'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {
   hasSocialSignIn: boolean
 }
 
 const formSchema = z.object({
-  phoneNumber: z
-    .string()
-    .min(1, { message: 'Please enter your phone number' })
-    .min(9, { message: 'Phone number must be 9 characters long' })
-    .max(9, { message: 'Phone number must be 9 characters long' })
-    .regex(/^\(?\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/g, 'Invalid phone number!'),
+  username: z.string(),
   password: z
     .string()
     .min(1, {
       message: 'Please enter your password',
     })
-    .min(6, {
+    .min(4, {
       message: 'Password must be at least 7 characters long',
     }),
 })
@@ -68,7 +64,7 @@ export function UserAuthForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      phoneNumber: '',
+      username: '',
       password: '',
     },
   })
@@ -79,7 +75,7 @@ export function UserAuthForm({
 
       const response = await api.signIn(data)
 
-      if (response.status === 201) {
+      if (response.status === 200) {
         const responseData = (await response.json()).data as {
           token: string
           user: Profile
@@ -141,16 +137,15 @@ export function UserAuthForm({
             <div className='grid gap-2'>
               <FormField
                 control={form.control}
-                name='phoneNumber'
+                name='username'
                 render={({ field }) => (
                   <FormItem className='space-y-1'>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
                       <div className='flex items-center'>
-                        <p className='p-2 text-sm text-gray-400'>+251</p>
                         <Input
-                          type='tel'
-                          placeholder='- -  - - -  - - - -'
+                          type='text'
+                          placeholder='Enter username'
                           {...field}
                         />
                       </div>

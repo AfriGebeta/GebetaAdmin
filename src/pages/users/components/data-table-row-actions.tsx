@@ -8,13 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useToast } from '@/components/ui/use-toast'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
   apiAccessToken: string
   onEdit: (profile: any) => void
   onDelete: (profile: any) => void
+  onUpdateDate: (profile: any) => void
+  onSetToken: () => void
+  onResetPassword: (profile: any) => void
+  onShowUsage: (profile: any) => void
 }
 
 export function DataTableRowActions<TData>({
@@ -22,9 +25,11 @@ export function DataTableRowActions<TData>({
   apiAccessToken,
   onEdit,
   onDelete,
+  onUpdateDate,
+  onSetToken,
+  onResetPassword,
+  onShowUsage,
 }: DataTableRowActionsProps<TData>) {
-  const { toast } = useToast()
-
   const handleEdit = () => {
     onEdit(row.original)
     // console.log("Editing profile")
@@ -32,6 +37,22 @@ export function DataTableRowActions<TData>({
 
   const handleDelete = () => {
     onDelete(row.original)
+  }
+
+  const handleUpdateDate = () => {
+    onUpdateDate(row.original)
+  }
+
+  const handleSetUserToken = () => {
+    onSetToken(row.original)
+  }
+
+  const handleResetPassword = () => {
+    onResetPassword(row.original)
+  }
+
+  const handleShowUsage = () => {
+    onShowUsage(row.original)
   }
 
   return (
@@ -47,7 +68,19 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleResetPassword}>
+          Reset Password
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleShowUsage}>
+          Show Usage
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSetUserToken}>
+          Set Token
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleUpdateDate}>
+          Update Date
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
