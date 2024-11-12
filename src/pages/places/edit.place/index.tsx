@@ -15,14 +15,8 @@ import {
   SupportedLocale,
   SupportedLocaleLabel,
 } from '@/components/custom/intl-input-filed.tsx'
-import {
-  AddressEditor,
-  defaultAddress,
-} from '@/components/custom/address-editor.tsx'
-import {
-  defaultOpenHours,
-  OpenHoursEditor,
-} from '@/components/custom/open-hours-editor.tsx'
+import { AddressEditor } from '@/components/custom/address-editor.tsx'
+import { OpenHoursEditor } from '@/components/custom/open-hours-editor.tsx'
 import { Label } from '@/components/ui/label.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
@@ -54,7 +48,7 @@ import { addPlace, selectPlace } from '@/data/redux/slices/places.ts'
 import { ToastAction } from '@/components/ui/toast.tsx'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 import { useAppDispatch, useAppSelector } from '@/data/redux/hooks.ts'
-import { toast, useToast } from '@/components/ui/use-toast.ts'
+import { useToast } from '@/components/ui/use-toast.ts'
 import { LoadingSpinner } from '@/components/ui/loading-spinner.tsx'
 import { useNavigate, useParams } from 'react-router-dom'
 import { VerifiedIcon } from 'lucide-react'

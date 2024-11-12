@@ -1,15 +1,6 @@
 //@ts-nocheck
-import { Button } from '@/components/ui/button'
 import { Profile } from '@/model'
-import MapModal from './MapModal'
 import { ColumnDef } from '@tanstack/react-table'
-import { useState } from 'react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 
 export const columns: ColumnDef<Profile>[] = [
   {

@@ -2,21 +2,18 @@
 import { Layout, LayoutBody, LayoutHeader } from '@/components/custom/layout'
 import ThemeSwitch from '@/components/theme-switch'
 import { Button } from '@/components/ui/button'
-import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
 import { UserNav } from '@/components/user-nav'
 import { useAppDispatch } from '@/data/redux/hooks'
 import useLocalStorage from '@/hooks/use-local-storage'
-import { Place, Profile } from '@/model'
+import { Place } from '@/model'
 import api, { RequestError } from '@/services/api'
 import 'leaflet/dist/leaflet.css'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { columns } from './components/columns.tsx'
 import { DataTable } from './components/data-table.tsx'
 import { useQuery } from '@tanstack/react-query'
 import AddPlaceModal from '@/pages/places/components/AddPlaceModal.tsx'
-import { Bundle } from '@/model/bundle.ts'
-import EditBundleModal from '@/pages/bundles/components/EditBundleModal.tsx'
 
 export default function Places() {
   const dispatch = useAppDispatch()
