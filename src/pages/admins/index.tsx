@@ -35,7 +35,9 @@ export default function Profiles() {
   async function fetchProfiles() {
     try {
       setRequesting(true)
-      const response = await api.getProfiles({
+      const response = await api.getUsers({
+        page: 1,
+        limit: 10,
         apiAccessToken: String(apiAccessToken),
       })
       if (response.ok) {

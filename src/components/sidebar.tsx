@@ -43,13 +43,13 @@ export default function Sidebar2({
 
       <Layout>
         {/* Header */}
-        <LayoutHeader className='sticky top-0 mb-8 justify-between px-4 py-3 md:px-4'>
+        <LayoutHeader className='sticky top-0 mb-0 justify-between px-4 py-3 md:px-4'>
           <div className={`flex items-center ${!isCollapsed ? 'gap-2' : ''}`}>
             <img src={logo} className='relative mr-2 h-6 w-6' alt='Logo' />
             <div
               className={`flex flex-col justify-end truncate ${isCollapsed ? 'invisible w-0' : 'visible w-auto'}`}
             >
-              <span className='font-bold'>Data Horde Admin</span>
+              <span className='font-bold'>Gebeta Admin</span>
               <span className='text-xs'></span>
             </div>
           </div>

@@ -13,10 +13,10 @@ interface AddProfileModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: {
-    firstName: string
-    lastName: string
-    email: string
+    username: string
     password: string
+    companyName: string
+    email: string
     phoneNumber: string
   }) => void
 }
@@ -26,19 +26,19 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [companyName, setCompanyName] = useState('')
 
   const handleSubmit = () => {
     onSubmit({
-      firstName,
-      lastName,
+      username,
       email,
       password,
       phoneNumber,
+      companyName,
     })
   }
   return (
@@ -51,23 +51,14 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
           <div>
             <Label htmlFor='firstName'>First Name</Label>
             <Input
-              id='firstName'
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder='First name'
+              id='username'
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder='Username'
             />
           </div>
           <div>
             <Label htmlFor='lastName'>Last Name</Label>
-            <Input
-              id='lastName'
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              placeholder='Last name'
-            />
-          </div>
-          <div>
-            <Label htmlFor='email'>Email</Label>
             <Input
               id='email'
               value={email}
@@ -76,12 +67,21 @@ const AddProfileModal: React.FC<AddProfileModalProps> = ({
             />
           </div>
           <div>
-            <Label htmlFor='password'>Password</Label>
+            <Label htmlFor='email'>Password</Label>
             <Input
               id='password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder='Password'
+            />
+          </div>
+          <div>
+            <Label htmlFor='companyName'>Password</Label>
+            <Input
+              id='companyName'
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              placeholder='Company Name'
             />
           </div>
           <div>

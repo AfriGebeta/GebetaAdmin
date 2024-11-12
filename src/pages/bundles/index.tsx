@@ -5,65 +5,61 @@ import { Button } from '@/components/ui/button'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
 import { UserNav } from '@/components/user-nav'
-import { useAppDispatch } from '@/data/redux/hooks'
+import { useAppDispatch, useAppSelector } from '@/data/redux/hooks'
+import { selectProfiles, updateProfile } from '@/data/redux/slices/profiles'
 import useLocalStorage from '@/hooks/use-local-storage'
-import { Place, Profile } from '@/model'
+import { Profile } from '@/model'
 import api, { RequestError } from '@/services/api'
 import 'leaflet/dist/leaflet.css'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
+import AddProfileModal from './components/AddBundleModal.tsx'
 import { columns } from './components/columns.tsx'
 import { DataTable } from './components/data-table.tsx'
-import { useQuery } from '@tanstack/react-query'
-import AddPlaceModal from '@/pages/places/components/AddPlaceModal.tsx'
-import { Bundle } from '@/model/bundle.ts'
-import EditBundleModal from '@/pages/bundles/components/EditBundleModal.tsx'
 
-export default function Places() {
+import EditBundleModal from './components/EditBundleModal.tsx'
+import DeleteProfileModal from './components/DeleteProfileModal.tsx'
+import { Bundle } from '@/model/bundle.ts'
+import { useQuery } from '@tanstack/react-query'
+
+export default function Bundles() {
   const dispatch = useAppDispatch()
   const { toast } = useToast()
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
     defaultValue: null,
   })
-  const [currentProfile, _] = useLocalStorage({
-    key: 'currentProfile',
-    defaultValue: null,
-  })
-  const [placeData, setPlaceData] = useState<Place[]>([])
   const [requesting, setRequesting] = useState(false)
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
-  const [isAddPlaceModalOpen, setAddPlaceModalOpen] = useState(false)
-  const [isEditPlaceModalOpen, setEditPlaceModalOpen] = useState(false)
+  const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null)
+  const [isAddProfileModalOpen, setAddProfileModalOpen] = useState(false)
+  const [isEditBundleModalOpen, setEditBundleModalOpen] = useState(false)
+  const [isDeleteBundleModalOpen, setDeleteBundleModalOpen] = useState(false)
+  const [bundleData, setBundleData] = useState([])
 
   const [count, setCount] = useState(0)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
 
   const { data } = useQuery({
-    queryKey: ['places', pagination.pageIndex, pagination.pageSize],
-    queryFn: () => fetchPlaces(pagination.pageIndex + 1, pagination.pageSize),
+    queryKey: ['bundles', pagination.pageIndex, pagination.pageSize],
+    queryFn: () => fetchBundles(pagination.pageIndex + 1, pagination.pageSize),
     staleTime: 1000 * 60 * 5,
   })
 
-  async function fetchPlaces(page, limit) {
+  async function fetchBundles(page, limit) {
     try {
       setRequesting(true)
-      const response = await api.getPlaces({
+      const response = await api.getBundles({
         apiAccessToken: String(apiAccessToken),
-        page,
-        limit,
+        page: page,
+        limit: limit,
       })
       if (response.ok) {
         const result = (await response.json()) as {
-          data: {
-            count: number
-            places: Array<Place>
-          }
+          data: Array<Bundle>
         }
 
         setCount(result.data.count)
-        setPlaceData(result.data.places)
-        console.log(result.data.places)
-        return { places: result.data.places, count: result.data.count }
+        return result.data
       } else {
         const responseData = (await response.json()).error as RequestError
         toast({
@@ -74,8 +70,8 @@ export default function Places() {
       }
     } catch (e) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while fetching places',
+        title: 'Ohh.. Something went wrong!`,',
+        description: `Here is ${e.message}`,
         variant: 'destructive',
       })
     } finally {
@@ -83,32 +79,34 @@ export default function Places() {
     }
   }
 
-  const handleAddPlace = async (data: {
+  console.log(count)
+
+  const handleAddBundle = async (data: {
     name: string
-    city: string
-    country: string
-    lat: string
-    lon: string
-    type: string
-    apiKey: string
+    price: number
+    rate: number
+    expirationDate: string
+    callCaps: number[]
+    includedCallTypes: string[]
+    expiredIn: number
   }) => {
     try {
-      const response = await api.createPlace({
-        apiAccessToken: String(currentProfile.token[0]),
-        place: data,
+      const response = await api.createBundle({
+        apiAccessToken: String(apiAccessToken),
+        bundleData: data,
       })
 
       if (response.ok) {
         const result = await response.json()
         toast({
-          title: 'Place Added',
-          description: 'The place has been added successfully!',
+          title: 'Bundle Added',
+          description: 'The bundle has been added successfully!',
           variant: 'default',
         })
       } else {
         const error = (await response.json()).error
         toast({
-          title: 'Error Adding Place',
+          title: 'Error Adding Bundle',
           description: error.message,
           variant: 'destructive',
         })
@@ -120,11 +118,33 @@ export default function Places() {
         variant: 'destructive',
       })
     } finally {
-      setAddPlaceModalOpen(false)
+      setAddProfileModalOpen(false)
     }
   }
 
-  const handleUpdatePlace = async (data: {
+  const handleEditBundle = (bundle: Bundle) => {
+    setSelectedBundle(bundle)
+    setEditBundleModalOpen(true)
+  }
+
+  const handleDeleteBundle = (bundle: Bundle) => {
+    setSelectedBundle(bundle)
+    setDeleteBundleModalOpen(true)
+  }
+
+  const handleDeleteBundleData = async (id: string) => {
+    if (selectedBundle) {
+      const selectedId = selectedBundle.id
+      try {
+        await api.deleteBundle({ apiAccessToken, id: selectedId })
+        setDeleteBundleModalOpen(false)
+      } catch (error) {
+        toast({ title: 'Unsuccesfull Deleting bundle' })
+      }
+    }
+  }
+
+  const handleUpdateBundle = async (data: {
     includedCallTypes: string[]
     name: string
     rate: number
@@ -176,10 +196,9 @@ export default function Places() {
     }
   }
 
-  const handleEditPlace = (place: Place) => {
-    setSelectedPlace(place)
-    setEditPlaceModalOpen(true)
-  }
+  useEffect(() => {
+    console.log(data)
+  }, [data])
 
   return (
     <Layout>
@@ -193,53 +212,63 @@ export default function Places() {
       <LayoutBody className='flex flex-col' fixedHeight>
         <div className='mb-2 flex justify-between space-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Places</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>Bundles</h2>
             <p className='mb-4 text-muted-foreground'>
-              Places managed by the application
+              Bundles managed by the application
             </p>
           </div>
           <Button
             className='font-medium'
-            onClick={() => setAddPlaceModalOpen(true)}
+            onClick={() => setAddProfileModalOpen(true)}
           >
-            Add Place
+            Add Bundle
           </Button>
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
           <DataTable
             data={
-              data?.places?.map((v) => ({
+              data?.credit_bundles.map((v) => ({
                 id: v.id,
                 name: v.name,
-                type: v.type,
-                ownedBy: v.ownedBy,
-                city: v.city,
-                country: v.country,
-                longitude: v.longitude,
-                latitude: v.latitude,
+                price: v.price,
+                rate: v.rate,
+                expiredIn: v.expiredIn,
+                expirationDate: moment(v.expirationDate).format('DD/MM/YYYY'),
+                callCaps: v.call_caps,
+                includedCallTypes: v.included_call_types,
               })) || ([] as any)
             }
             columns={columns}
             fetching={requesting}
-            count={data?.count || 0}
+            onEdit={handleEditBundle}
+            onDelete={handleDeleteBundle}
+            count={count || 0}
             pagination={pagination}
-            onEdit={handleEditPlace}
             onPaginationChange={setPagination}
           />
         </div>
 
-        <AddPlaceModal
-          isOpen={isAddPlaceModalOpen}
-          onClose={() => setAddPlaceModalOpen(false)}
-          onSubmit={handleAddPlace}
+        <AddProfileModal
+          isOpen={isAddProfileModalOpen}
+          onClose={() => setAddProfileModalOpen(false)}
+          onSubmit={handleAddBundle}
         />
 
-        {selectedPlace && (
-          <EditPlaceModal
-            placeData={selectedPlace}
-            isOpen={isEditPlaceModalOpen}
-            onClose={() => setEditPlaceModalOpen(false)}
-            onSubmit={handleUpdatePlace}
+        {selectedBundle && (
+          <EditBundleModal
+            bundleData={selectedBundle}
+            isOpen={isEditBundleModalOpen}
+            onClose={() => setEditBundleModalOpen(false)}
+            onSubmit={handleUpdateBundle}
+          />
+        )}
+
+        {selectedBundle && (
+          <DeleteProfileModal
+            id={selectedBundle.id}
+            isOpen={isDeleteBundleModalOpen}
+            onClose={() => setDeleteBundleModalOpen(false)}
+            onSubmit={handleDeleteBundleData}
           />
         )}
       </LayoutBody>

@@ -79,7 +79,7 @@ export function Router() {
               <Route
                 index
                 path=''
-                Component={React.lazy(() => import('./pages/places'))}
+                Component={React.lazy(() => import('./pages/users'))}
               />
 
               <Route
@@ -87,12 +87,12 @@ export function Router() {
                 Component={React.lazy(() => import('./pages/places'))}
               />
 
-              <Route
-                path='places/:id/edit'
-                Component={React.lazy(
-                  () => import('./pages/places/edit.place')
-                )}
-              />
+              {/*<Route*/}
+              {/*  path="places/:id/edit"*/}
+              {/*  Component={React.lazy(*/}
+              {/*    () => import('./pages/places/edit.place'),*/}
+              {/*  )}*/}
+              {/*/>*/}
 
               <Route
                 path='/home'
@@ -105,27 +105,13 @@ export function Router() {
               />
 
               <Route
-                path='boundary'
-                Component={React.lazy(() => import('./pages/boundary'))}
+                path='users'
+                Component={React.lazy(() => import('./pages/users'))}
               />
 
               <Route
-                path='boundary/add'
-                Component={React.lazy(
-                  () => import('./pages/boundary/addBoundary')
-                )}
-              />
-
-              <Route
-                path='boundary/update/:id'
-                Component={React.lazy(
-                  () => import('./pages/boundary/updateBoundary')
-                )}
-              />
-
-              <Route
-                path='collectors'
-                Component={React.lazy(() => import('./pages/collectors'))}
+                path='bundles'
+                Component={React.lazy(() => import('./pages/bundles'))}
               />
 
               <Route
@@ -146,6 +132,11 @@ export function Router() {
               <Route
                 path='analysis'
                 Component={React.lazy(() => import('@/components/coming-soon'))}
+              />
+
+              <Route
+                path='usage'
+                Component={React.lazy(() => import('./pages/usage'))}
               />
 
               <Route

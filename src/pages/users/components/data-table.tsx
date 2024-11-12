@@ -31,6 +31,8 @@ interface DataTableProps<TData, TValue> {
   onDelete: (profile: TData) => void
   onSetToken: () => void
   onUpdateDate: () => void
+  onResetPassword: (profile: any) => void
+  onShowUsage: (profile: any) => void
   count: number
   pagination: PaginationState
   onPaginationChange: (value: PaginationState) => void
@@ -45,6 +47,10 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   onEdit,
   onDelete,
+  onSetToken,
+  onUpdateDate,
+  onResetPassword,
+  onShowUsage,
 }: DataTableProps<TData, TValue>) {
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
@@ -112,8 +118,12 @@ export function DataTable<TData, TValue>({
                     <DataTableRowActions
                       row={row}
                       apiAccessToken={String(apiAccessToken)}
+                      onUpdateDate={onUpdateDate}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      onSetToken={onSetToken}
+                      onResetPassword={onResetPassword}
+                      onShowUsage={onShowUsage}
                     />
                   </TableCell>
                 </TableRow>

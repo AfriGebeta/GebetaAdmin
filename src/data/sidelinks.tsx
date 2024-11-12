@@ -1,10 +1,18 @@
 import {
+  AreaChartIcon,
+  BadgeCent,
   BusIcon,
   LucideLocateFixed,
   RectangleEllipsisIcon,
   UserRoundCog,
   Users,
 } from 'lucide-react'
+import {
+  IconBrandBunpo,
+  IconGraphFilled,
+  IconMessages,
+  IconSausage,
+} from '@tabler/icons-react'
 
 export interface NavLink {
   title: string
@@ -25,42 +33,36 @@ export const sidelinks: SideLink[] = [
   //   icon: <IconLayoutDashboard size={18} />,
   // },
   {
+    title: 'Dashboard',
+    label: '',
+    href: '/home',
+    icon: <IconGraphFilled size={20} className='text-gray-400' />,
+  },
+  {
+    title: 'Users',
+    label: '',
+    href: '/users',
+    icon: <Users size={20} className='text-gray-400' />,
+  },
+
+  {
     title: 'Places',
     label: '',
     href: '/places',
     icon: <LucideLocateFixed size={20} className='text-gray-400' />,
   },
   {
-    title: 'Transportation Routes',
+    title: 'Usage',
     label: '',
-    href: '/transportation-routes',
-    icon: <BusIcon size={20} className='text-gray-400' />,
+    href: '/usage',
+    icon: <AreaChartIcon size={20} className='text-gray-400' />,
   },
   {
-    title: 'Boundary',
+    title: 'Bundle',
     label: '',
-    href: '/boundary',
-    icon: <RectangleEllipsisIcon size={20} className='text-gray-400' />,
+    href: '/bundles',
+    icon: <BadgeCent size={20} className='text-gray-400' />,
   },
-  {
-    title: 'Collectors',
-    label: '',
-    href: '/collectors',
-    icon: <Users size={20} className='text-gray-400' />,
-  },
-  {
-    title: 'Admin',
-    label: '',
-    href: '/admins',
-    icon: <UserRoundCog size={20} className='text-gray-400' />,
-  },
-
-  // {
-  //   title: 'Chats',
-  //   label: '9',
-  //   href: '/chats',
-  //   icon: <IconMessages size={18} />,
-  // },
   // {
   //   title: 'Authentication',
   //   label: '',

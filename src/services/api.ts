@@ -1,15 +1,15 @@
 import { Place } from '@/model'
 
 export default {
-  async signIn(data: { phoneNumber: string; password: string }) {
-    return await fetch(`${import.meta.env['VITE_API_BASE_URL']}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...data,
-        phoneNumber: `+251${data.phoneNumber.replace(/\D/g, '')}`,
-      }),
-    })
+  async signIn(data: { username: string; password: string }) {
+    return await fetch(
+      `${import.meta.env['VITE_API_BASE_URL']}/api/auth/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }
+    )
   },
   async logout({ apiAccessToken }: { apiAccessToken: string }) {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
@@ -19,19 +19,15 @@ export default {
   },
   async getPlaces({
     apiAccessToken,
-    offset,
+    page,
     limit = 10,
-    searchString,
-    orderBy,
   }: {
     apiAccessToken: string
     limit?: number
-    offset?: number
-    searchString?: string
-    orderBy?: string
+    page?: number
   }) {
     return fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/places?offset=${offset}&limit=${limit}${searchString ? `&searchString=${searchString}` : ''}${orderBy ? `&orderBy=${orderBy}` : ''}`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/getAllPlaces?apiKey=${apiAccessToken}&limit=${limit}&page=${page}`,
       {
         method: 'GET',
         headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
@@ -48,6 +44,28 @@ export default {
     return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/${id}`, {
       method: 'GET',
       headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+    })
+  },
+  async createPlace({
+    apiAccessToken,
+    place,
+  }: {
+    place: {
+      name: string
+      city: string
+      country: string
+      lat: string
+      lon: string
+      type: string
+      apiKey: string
+    }
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/route/addPlace`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...place, apiKey: apiAccessToken }),
     })
   },
   async updatePlace({
@@ -69,57 +87,108 @@ export default {
     })
   },
 
-  async approvePlace({
+  async deletePlace({
     apiAccessToken,
-    ids,
+    id,
   }: {
     apiAccessToken: string
-    ids: string[] | string
+    id: string
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/approve`, {
-      method: 'PATCH',
-      headers: {
-        ['Authorization']: `Bearer ${apiAccessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ids }),
-    })
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/route/delete-place&id=${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          ['Authorization']: `Bearer ${apiAccessToken}`,
+        },
+      }
+    )
   },
-
-  async togglePlacesToTest({
+  async getBundles({
     apiAccessToken,
-    ids,
+    page,
+    limit,
   }: {
     apiAccessToken: string
-    ids: string[]
+    page: number
+    limit: number
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/toggle/test`, {
-      method: 'PATCH',
-      headers: {
-        ['Authorization']: `Bearer ${apiAccessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ids }),
-    })
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/credit-bundle/getAll?page=${page}&limit=${limit}`,
+      {
+        method: 'GET',
+        headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      }
+    )
   },
-
-  async togglePlacesToHidden({
+  async createBundle({
     apiAccessToken,
-    ids,
+    bundleData,
   }: {
     apiAccessToken: string
-    ids: string[]
+    bundleData: {
+      name: string
+      price: number
+      rate: number
+      expirationDate: string
+      callCaps: number[]
+      includedCallTypes: string[]
+      expiredIn: number
+    }
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/places/toggle/hidden`, {
-      method: 'PATCH',
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/credit-bundle`, {
+      method: 'POST',
       headers: {
-        ['Authorization']: `Bearer ${apiAccessToken}`,
-        'Content-Type': 'application/json',
+        'content-type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
       },
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify(bundleData),
     })
   },
-
+  async updateBundle({
+    apiAccessToken,
+    id,
+    data,
+  }: {
+    apiAccessToken: string
+    id: string
+    data: {
+      includedCallTypes: string[]
+      name: string
+      rate: number
+      price: number
+      expiration: string
+      callCaps: number[]
+      expiredIn: number
+    }
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/credit-bundle`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+      body: JSON.stringify({ ...data, id }),
+    })
+  },
+  async deleteBundle({
+    apiAccessToken,
+    id,
+  }: {
+    apiAccessToken: string
+    id: string
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/credit-bundle?id=${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${apiAccessToken}`,
+        },
+      }
+    )
+  },
   async getPreSignedUrl({ apiAccessToken }: { apiAccessToken: string }) {
     return fetch(
       `${import.meta.env.VITE_API_BASE_URL}/places/images/pre-signed-url`,
@@ -142,52 +211,25 @@ export default {
       body: file,
     })
   },
-
-  async getTransportationRoute({
+  async getUsers({
     apiAccessToken,
-    id,
+    page = 1,
+    limit,
   }: {
     apiAccessToken: string
-    id: string
+    page: number
+    limit: number
   }) {
     return fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/transportation-routes/${id}`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/user/getAll?apiKey=${apiAccessToken}&page=${page}&limit=${limit}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
       }
     )
   },
-  async getProfiles({
+  async updateUser({
     apiAccessToken,
-  }: {
-    apiAccessToken: string
-    offset?: number
-    limit?: number
-    searchString?: string
-    orderBy?: string
-  }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles`, {
-      method: 'GET',
-      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
-      cache: 'force-cache',
-    })
-  },
-  async getProfile({
-    apiAccessToken,
-    id,
-  }: {
-    apiAccessToken: string
-    id: string
-  }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles/${id}`, {
-      method: 'GET',
-      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
-    })
-  },
-  async updateProfile({
-    apiAccessToken,
-    id,
     data,
   }: {
     apiAccessToken: string
@@ -195,11 +237,9 @@ export default {
     data: {
       name?: string
       email?: string
-      phoneNumber?: string
-      collectionBoundary?: any
     }
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/profiles/${id}`, {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${apiAccessToken}`,
@@ -208,57 +248,64 @@ export default {
       body: JSON.stringify(data),
     })
   },
-  async createProfile({
-    profileData,
-  }: {
-    apiAccessToken: string
-    profileData: {
-      firstName: string
-      lastName: string
-      email: string
-      password: string
-      phoneNumber: string
-      collectionBoundary: { latitude: string; longitude: string }[] | string
-    }
-  }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...profileData,
-        role: 'COLLECTOR',
-      }),
-    })
-  },
-
-  async createAdminProfile({
+  async createUser({
     apiAccessToken,
     profileData,
   }: {
     apiAccessToken: string
     profileData: {
-      firstName: string
-      lastName: string
-      email: string
+      username: string
       password: string
-      phoneNumber: string
+      companyname: string
+      is_organization: boolean
+      firstname: string
+      lastname: string
+      email: string
+      phone: string
     }
   }) {
-    return fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register/other`, {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
-        'content-type': 'application/json',
         Authorization: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        ...profileData,
-        role: 'ADMIN',
-      }),
+      body: JSON.stringify({ ...profileData, otp: '1234' }),
     })
   },
-
+  async updatePurchasedDate({
+    apiAccessToken,
+    id,
+  }: {
+    apiAccessToken: string
+    id: string
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/updatedate`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId: id }),
+    })
+  },
+  async resetPassword({
+    apiAccessToken,
+    id,
+  }: {
+    apiAccessToken: string
+    id: string
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/reset/pass/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${apiAccessToken}`,
+        },
+      }
+    )
+  },
   async deleteProfile({
     apiAccessToken,
     selectedId,
@@ -277,7 +324,25 @@ export default {
       }
     )
   },
-
+  async setToken({
+    apiAccessToken,
+    id,
+  }: {
+    apiAccessToken: string
+    id: string
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/user/update-user-token`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${apiAccessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: id }),
+      }
+    )
+  },
   async activateProfile({
     apiAccessToken,
     id,
@@ -292,6 +357,27 @@ export default {
         headers: {
           Authorization: `Bearer ${apiAccessToken}`,
           'Content-Type': 'application/json',
+        },
+      }
+    )
+  },
+  async getUsage({
+    apiAccessToken,
+    id,
+    startDate,
+    endDate,
+  }: {
+    apiAccessToken: string
+    id: string
+    startDate: string
+    endDate: string
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/usage/graph/all?startDate=${startDate}&endDate=${endDate}&userId=${id}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${apiAccessToken}`,
         },
       }
     )
