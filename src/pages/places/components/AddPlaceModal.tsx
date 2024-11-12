@@ -9,19 +9,9 @@ import {
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { PlusIcon, Trash2Icon } from 'lucide-react'
-import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 import mapLoader from '/animation.webm'
-import api from '@/services/api.ts'
 import useLocalStorage from '@/hooks/use-local-storage.tsx'
 
 interface AddPlaceModalProps {

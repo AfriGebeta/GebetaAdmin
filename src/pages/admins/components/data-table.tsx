@@ -1,19 +1,19 @@
 //@ts-nocheck
 import * as React from 'react'
+import { useState } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
   PaginationState,
+  SortingState,
+  useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table'
 
 import {
@@ -24,10 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
-import { DataTablePagination } from '../components/data-table-pagination'
 import { DataTableToolbar } from '../components/data-table-toolbar'
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button.tsx'
 import Loader from '@/components/loader.tsx'
 

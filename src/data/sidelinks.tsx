@@ -1,18 +1,10 @@
 import {
   AreaChartIcon,
   BadgeCent,
-  BusIcon,
   LucideLocateFixed,
-  RectangleEllipsisIcon,
-  UserRoundCog,
   Users,
 } from 'lucide-react'
-import {
-  IconBrandBunpo,
-  IconGraphFilled,
-  IconMessages,
-  IconSausage,
-} from '@tabler/icons-react'
+import { IconGraphFilled } from '@tabler/icons-react'
 
 export interface NavLink {
   title: string

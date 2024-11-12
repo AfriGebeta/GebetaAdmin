@@ -1,5 +1,4 @@
 //@ts-nocheck
-import { Profile } from '@/model'
 
 export interface Place {
   id: string
