@@ -1,5 +1,6 @@
 import { Place } from '@/model'
 
+// @ts-ignore
 export default {
   async signIn(data: { username: string; password: string }) {
     return await fetch(
@@ -47,7 +48,6 @@ export default {
     })
   },
   async createPlace({
-    apiAccessToken,
     place,
   }: {
     place: {
@@ -65,7 +65,7 @@ export default {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ...place, apiKey: apiAccessToken }),
+      body: JSON.stringify(place),
     })
   },
   async updatePlace({

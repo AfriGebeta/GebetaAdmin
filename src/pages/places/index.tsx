@@ -91,8 +91,7 @@ export default function Places() {
   }) => {
     try {
       const response = await api.createPlace({
-        apiAccessToken: String(currentProfile.token[0]),
-        place: data,
+        place: { ...data, apiKey: String(currentProfile.token[0]) },
       })
 
       if (response.ok) {

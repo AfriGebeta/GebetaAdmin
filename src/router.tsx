@@ -115,11 +115,6 @@ export function Router() {
               />
 
               <Route
-                path='admins'
-                Component={React.lazy(() => import('./pages/admins'))}
-              />
-
-              <Route
                 path='chats'
                 Component={React.lazy(() => import('@/components/coming-soon'))}
               />
