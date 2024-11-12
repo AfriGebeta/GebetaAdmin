@@ -18,8 +18,8 @@ interface EditPlaceModalProps {
     name: string
     city: string
     country: string
-    longitude: string
-    latitude: string
+    longitude: number
+    latitude: number
     ownedBy: string
     type: string
   }) => void
@@ -49,13 +49,12 @@ const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
   const [type, setType] = useState('')
 
   const [loading, setLoading] = useState(false)
-  console.log('profle data', placeData)
   useEffect(() => {
     setName(placeData.name)
     setCity(placeData.city)
     setCountry(placeData.country)
-    setLongitude(placeData.longitude)
-    setLatitude(placeData.latitude)
+    setLongitude(Number(placeData.longitude))
+    setLatitude(Number(placeData.latitude))
     setOwnedBy(placeData.ownedBy)
     setType(placeData.type)
   }, [placeData])
@@ -119,8 +118,9 @@ const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
               <Label htmlFor='longitude'>Longitude</Label>
               <Input
                 id='longitude'
+                type='number'
                 value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
+                onChange={(e) => setLongitude(Number(e.target.value))}
                 placeholder='Longitude'
               />
             </div>
@@ -128,8 +128,9 @@ const EditPlaceModal: React.FC<EditPlaceModalProps> = ({
               <Label htmlFor='latitude'>Latitude</Label>
               <Input
                 id='latitude'
+                type='number'
                 value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
+                onChange={(e) => setLatitude(Number(e.target.value))}
                 placeholder='Latitude'
               />
             </div>
