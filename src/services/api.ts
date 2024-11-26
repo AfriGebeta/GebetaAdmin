@@ -145,6 +145,30 @@ export default {
       body: JSON.stringify(bundleData),
     })
   },
+  async buyBundle({
+    apiAccessToken,
+    data,
+  }: {
+    apiAccessToken: string
+    data: {
+      user_id: string
+      payment_method: string
+      payment_for: string
+      credit_bundle_id: string
+    }
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/payment/admin/credit`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${apiAccessToken}`,
+        },
+        body: JSON.stringify(data),
+      }
+    )
+  },
   async updateBundle({
     apiAccessToken,
     id,

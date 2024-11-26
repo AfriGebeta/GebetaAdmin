@@ -18,6 +18,7 @@ interface DataTableRowActionsProps<TData> {
   onSetToken: () => void
   onResetPassword: (profile: any) => void
   onShowUsage: (profile: any) => void
+  onBuyBundle: (profile: any) => void
 }
 
 export function DataTableRowActions<TData>({
@@ -29,6 +30,7 @@ export function DataTableRowActions<TData>({
   onSetToken,
   onResetPassword,
   onShowUsage,
+  onBuyBundle,
 }: DataTableRowActionsProps<TData>) {
   const handleEdit = () => {
     onEdit(row.original)
@@ -55,6 +57,10 @@ export function DataTableRowActions<TData>({
     onShowUsage(row.original)
   }
 
+  const handleBuyHandle = () => {
+    onBuyBundle(row.original)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -68,6 +74,9 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleBuyHandle}>
+          Buy Bundle
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleResetPassword}>
           Reset Password
         </DropdownMenuItem>

@@ -19,6 +19,7 @@ import { DataTable } from './components/data-table.tsx'
 
 import EditProfileModal from './components/EditProfileModal.tsx'
 import DeleteProfileModal from './components/DeleteProfileModal.tsx'
+import CreditPaymentModal from './components/CreditPaymentModal.tsx'
 import { useQuery } from '@tanstack/react-query'
 import ResetPasswordModal from '@/pages/users/components/ResetPasswordModal.tsx'
 import ShowUsageModal from '@/pages/users/components/ShowUsageModal.tsx'
@@ -39,6 +40,7 @@ export default function Users() {
   const [isShowUsageModalOpen, setShowUsageModalOpen] = useState(false)
   const [isDeleteProfileModalOpen, setDeleteProfileModalOpen] = useState(false)
   const [isAddProfileModalOpen, setAddProfileModalOpen] = useState(false)
+  const [isPaymentModalOpen, setPaymentModalOpen] = useState(false)
 
   const [count, setCount] = useState(0)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
@@ -135,6 +137,56 @@ export default function Users() {
   const handleDeleteProfile = (profile: Profile) => {
     setSelectedProfile(profile)
     setDeleteProfileModalOpen(true)
+  }
+
+  const handlePaymentModal = (profile: Profile) => {
+    setSelectedProfile(profile)
+    setPaymentModalOpen(true)
+  }
+
+  const handlePayment = async (data: {
+    payment_method: string
+    payment_for: string
+    credit_bundle_id: string
+  }) => {
+    if (selectedProfile) {
+      try {
+        const response = await api.buyBundle({
+          apiAccessToken: String(apiAccessToken),
+          id: selectedProfile.id,
+          data: {
+            user_id: selectedProfile.id,
+            payment_method: data.payment_method,
+            payment_for: data.payment_for,
+            credit_bundle_id: data.credit_bundle_id,
+          },
+        })
+
+        if (response.ok) {
+          toast({
+            title: 'Payment',
+            description: 'Payment has been made successfully',
+            variant: 'default',
+          })
+        } else {
+          const error = await response.json()
+
+          toast({
+            title: 'Error Making Payment',
+            description: `${error.message}`,
+            variant: 'destructive',
+          })
+        }
+      } catch (error) {
+        toast({
+          title: 'Request Failed',
+          description: 'Check your network connection!',
+          variant: 'destructive',
+        })
+      } finally {
+        setPaymentModalOpen(false)
+      }
+    }
   }
 
   const handleDeleteProfile2 = async (id: string) => {
@@ -367,6 +419,7 @@ export default function Users() {
             onUpdateDate={handleUpdateDate}
             onResetPassword={handleResetPasswordProfile}
             onShowUsage={handleShowUsageProfile}
+            onBuyBundle={handlePaymentModal}
             count={data?.count || 0}
             pagination={pagination}
             onPaginationChange={setPagination}
@@ -413,6 +466,15 @@ export default function Users() {
             isOpen={isDeleteProfileModalOpen}
             onClose={() => setDeleteProfileModalOpen(false)}
             onSubmit={handleDeleteProfile2}
+          />
+        )}
+
+        {selectedProfile && (
+          <CreditPaymentModal
+            id={selectProfiles.id}
+            isOpen={isPaymentModalOpen}
+            onClose={() => setPaymentModalOpen(false)}
+            onSubmit={handlePayment}
           />
         )}
       </LayoutBody>
