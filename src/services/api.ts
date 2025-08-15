@@ -252,6 +252,26 @@ export default {
       }
     )
   },
+  async searchUsers({
+    apiAccessToken,
+    page = 1,
+    limit,
+    query,
+  }: {
+    apiAccessToken: string
+    page: number
+    limit: number
+    query: string
+  }) {
+    const encodedQuery = encodeURIComponent(query)
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/user/search?query=${encodedQuery}&limit=${limit}&page=${page}`,
+      {
+        method: 'GET',
+        headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+      }
+    )
+  },
   async updateUser({
     apiAccessToken,
     data,
