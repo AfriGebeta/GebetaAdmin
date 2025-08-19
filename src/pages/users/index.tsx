@@ -12,7 +12,7 @@ import { Profile } from '@/model'
 import api, { RequestError } from '@/services/api'
 import 'leaflet/dist/leaflet.css'
 import moment from 'moment'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AddProfileModal from './components/AddProfileModal.tsx'
 import { columns } from './components/columns.tsx'
 import { DataTable } from './components/data-table.tsx'
@@ -23,6 +23,7 @@ import CreditPaymentModal from './components/CreditPaymentModal.tsx'
 import { useQuery } from '@tanstack/react-query'
 import ResetPasswordModal from '@/pages/users/components/ResetPasswordModal.tsx'
 import ShowUsageModal from '@/pages/users/components/ShowUsageModal.tsx'
+import { Input } from '@/components/ui/input'
 
 export default function Users() {
   const dispatch = useAppDispatch()
@@ -45,9 +46,39 @@ export default function Users() {
   const [count, setCount] = useState(0)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
 
+  // Search functionality
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Reset pagination when search term changes
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+  }, [debouncedSearchTerm])
+
   const { data, error, isLoading, isFetching } = useQuery({
-    queryKey: ['users', pagination.pageIndex, pagination.pageSize],
-    queryFn: () => fetchUsers(pagination.pageIndex + 1, pagination.pageSize),
+    queryKey: [
+      'users',
+      pagination.pageIndex,
+      pagination.pageSize,
+      debouncedSearchTerm,
+    ],
+    queryFn: () =>
+      debouncedSearchTerm
+        ? searchUsers(
+            pagination.pageIndex + 1,
+            pagination.pageSize,
+            debouncedSearchTerm
+          )
+        : fetchUsers(pagination.pageIndex + 1, pagination.pageSize),
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
   })
@@ -92,6 +123,45 @@ export default function Users() {
             Try again
           </ToastAction>
         ),
+      })
+      throw e
+    } finally {
+      setRequesting(false)
+    }
+  }
+
+  async function searchUsers(page, pageSize, query) {
+    try {
+      setRequesting(true)
+      const response = await api.searchUsers({
+        apiAccessToken: String(apiAccessToken),
+        page,
+        limit: pageSize,
+        query,
+      })
+      if (response.ok) {
+        const result = (await response.json()) as {
+          data: {
+            count: number
+            users: Array<Profile>
+          }
+        }
+        setCount(result.data.count)
+        return { users: result.data.users, count: result.data.count }
+      } else {
+        const responseData = (await response.json()).error as RequestError
+        toast({
+          title: `${responseData.namespace}/${responseData.code}`,
+          description: responseData.message,
+          variant: 'destructive',
+        })
+        throw new Error(responseData.message)
+      }
+    } catch (e) {
+      toast({
+        title: 'Request Failed',
+        description: 'Check your network connection!',
+        variant: 'destructive',
       })
       throw e
     } finally {
@@ -405,6 +475,14 @@ export default function Users() {
             <p className='mb-4 text-muted-foreground'>
               Users managed by the application
             </p>
+          </div>
+          <div className='flex items-start gap-2'>
+            <Input
+              placeholder='Search by username...'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className='w-64'
+            />
           </div>
           <Button onClick={() => setAddProfileModalOpen(true)}>Add User</Button>
         </div>
