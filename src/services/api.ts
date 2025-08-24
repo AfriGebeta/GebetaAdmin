@@ -104,6 +104,19 @@ export default {
       }
     )
   },
+
+  async searchPlaces({ name, apiKey }: { name: string; apiKey: string }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    return fetch(
+      `${baseUrl}/api/v1/route/geocoding?name=${encodeURIComponent(name)}&apiKey=${apiKey}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  },
   async getBundles({
     apiAccessToken,
     page,
