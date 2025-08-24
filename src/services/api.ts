@@ -104,6 +104,19 @@ export default {
       }
     )
   },
+
+  async searchPlaces({ name, apiKey }: { name: string; apiKey: string }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    return fetch(
+      `${baseUrl}/api/v1/route/geocoding?name=${encodeURIComponent(name)}&apiKey=${apiKey}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  },
   async getBundles({
     apiAccessToken,
     page,
@@ -239,18 +252,91 @@ export default {
     apiAccessToken,
     page = 1,
     limit,
+    creditUser,
+    onlyNotExpired,
+    minDate,
+    maxDate,
+    bundleId,
+    daysRemaining,
   }: {
     apiAccessToken: string
     page: number
     limit: number
+    creditUser?: boolean
+    onlyNotExpired?: boolean
+    minDate?: string
+    maxDate?: string
+    bundleId?: string
+    daysRemaining?: number
   }) {
-    return fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/user/getAll?apiKey=${apiAccessToken}&page=${page}&limit=${limit}`,
-      {
-        method: 'GET',
-        headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
-      }
-    )
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+
+    const base = `${baseUrl}/api/user`
+
+    const params = new URLSearchParams()
+    params.set('page', String(page))
+    params.set('limit', String(limit))
+
+    if (typeof creditUser === 'boolean')
+      params.set('credit_user', String(creditUser))
+    if (typeof onlyNotExpired === 'boolean')
+      params.set('only_not_expired', String(onlyNotExpired))
+    if (minDate) params.set('min_date', minDate)
+    if (maxDate) params.set('max_date', maxDate)
+    if (bundleId) params.set('bundle_id', bundleId)
+    if (typeof daysRemaining === 'number')
+      params.set('days_remaining', String(daysRemaining))
+
+    return fetch(`${base}?${params.toString()}`, {
+      method: 'GET',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+    })
+  },
+  async searchUsers({
+    apiAccessToken,
+    page = 1,
+    limit,
+    query,
+    creditUser,
+    onlyNotExpired,
+    minDate,
+    maxDate,
+    bundleId,
+    daysRemaining,
+  }: {
+    apiAccessToken: string
+    page: number
+    limit: number
+    query: string
+    creditUser?: boolean
+    onlyNotExpired?: boolean
+    minDate?: string
+    maxDate?: string
+    bundleId?: string
+    daysRemaining?: number
+  }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+
+    const base = `${baseUrl}/api/user/search`
+
+    const params = new URLSearchParams()
+    params.set('query', query)
+    params.set('limit', String(limit))
+    params.set('page', String(page))
+    if (typeof creditUser === 'boolean')
+      params.set('credit_user', String(creditUser))
+    if (typeof onlyNotExpired === 'boolean')
+      params.set('only_not_expired', String(onlyNotExpired))
+    if (minDate) params.set('min_date', minDate)
+    if (maxDate) params.set('max_date', maxDate)
+    if (bundleId) params.set('bundle_id', bundleId)
+    if (typeof daysRemaining === 'number')
+      params.set('days_remaining', String(daysRemaining))
+
+    return fetch(`${base}?${params.toString()}`, {
+      method: 'GET',
+      headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
+    })
   },
   async updateUser({
     apiAccessToken,
