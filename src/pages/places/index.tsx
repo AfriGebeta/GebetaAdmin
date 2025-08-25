@@ -9,6 +9,7 @@ import { useAppDispatch } from '@/data/redux/hooks'
 import useLocalStorage from '@/hooks/use-local-storage'
 import { Place } from '@/model'
 import api, { RequestError } from '@/services/api'
+import { getFeatureAccessToken } from '@/utils/token-feat'
 import 'leaflet/dist/leaflet.css'
 import { useState, useEffect } from 'react'
 import { columns } from './components/columns.tsx'
@@ -110,9 +111,20 @@ export default function Places() {
   async function searchPlaces(query: string) {
     try {
       setRequesting(true)
+      const featureAccessToken = getFeatureAccessToken(currentProfile)
+
+      if (!featureAccessToken) {
+        toast({
+          title: 'Error',
+          description: 'no token.',
+          variant: 'destructive',
+        })
+        return { places: [], count: 0 }
+      }
+
       const response = await api.searchPlaces({
         name: query,
-        apiKey: import.meta.env.VITE_GEBETA_API,
+        apiKey: featureAccessToken,
       })
 
       if (response.ok) {
