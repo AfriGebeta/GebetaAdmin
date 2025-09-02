@@ -17,7 +17,7 @@ import { DataTable } from './components/data-table.tsx'
 import { useQuery } from '@tanstack/react-query'
 import AddPlaceModal from '@/pages/places/components/AddPlaceModal.tsx'
 import EditPlaceModal from '@/pages/places/components/EditPlaceModal.tsx'
-import { X } from 'lucide-react'
+import { Filter, X } from 'lucide-react'
 
 export default function Places() {
   const dispatch = useAppDispatch()
@@ -39,6 +39,12 @@ export default function Places() {
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
+  const [city, setCity] = useState('')
+  const [debouncedCity, setDebouncedCity] = useState('')
+
+  const [showFilters, setShowFilters] = useState(false)
+  const [activeFilters, setActiveFilters] = useState<string[]>([])
+
   const [count, setCount] = useState(0)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
 
@@ -50,10 +56,18 @@ export default function Places() {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedCity(city.trim())
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [city])
+
   //resetting
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm, debouncedCity])
 
   const { data } = useQuery({
     queryKey: [
@@ -61,11 +75,18 @@ export default function Places() {
       pagination.pageIndex,
       pagination.pageSize,
       debouncedSearchTerm,
+      debouncedCity,
     ],
     queryFn: () =>
       debouncedSearchTerm
         ? searchPlaces(debouncedSearchTerm)
-        : fetchPlaces(pagination.pageIndex + 1, pagination.pageSize),
+        : debouncedCity
+          ? filterPlacesByCity(
+              debouncedCity,
+              pagination.pageIndex + 1,
+              pagination.pageSize
+            )
+          : fetchPlaces(pagination.pageIndex + 1, pagination.pageSize),
     staleTime: 1000 * 60 * 5,
   })
 
@@ -96,6 +117,7 @@ export default function Places() {
           description: responseData.message,
           variant: 'destructive',
         })
+        return { places: [], count: 0 }
       }
     } catch (e) {
       toast({
@@ -103,6 +125,7 @@ export default function Places() {
         description: 'An error occurred while fetching places',
         variant: 'destructive',
       })
+      return { places: [], count: 0 }
     } finally {
       setRequesting(false)
     }
@@ -163,6 +186,79 @@ export default function Places() {
     } finally {
       setRequesting(false)
     }
+  }
+
+  async function filterPlacesByCity(
+    cityQuery: string,
+    page: number,
+    limit: number
+  ) {
+    try {
+      setRequesting(true)
+      const featureAccessToken = getFeatureAccessToken(currentProfile)
+
+      if (!featureAccessToken) {
+        toast({
+          title: 'Error',
+          description: 'no tokenn.',
+          variant: 'destructive',
+        })
+        return { places: [], count: 0 }
+      }
+
+      const response = await api.filterPlacesByCity({
+        apiKey: featureAccessToken,
+        apiAccessToken: String(apiAccessToken),
+        city: cityQuery,
+        page,
+        limit,
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        const places = result?.data?.places || []
+        const countVal =
+          result?.data?.count ?? (Array.isArray(places) ? places.length : 0)
+
+        setCount(countVal)
+        setPlaceData(Array.isArray(places) ? places : [])
+        return { places: Array.isArray(places) ? places : [], count: countVal }
+      } else {
+        const error = await response.json()
+        toast({
+          title: 'error searching :(',
+          description: error.message || 'failed to search :(',
+          variant: 'destructive',
+        })
+        return { places: [], count: 0 }
+      }
+    } catch (e) {
+      toast({
+        title: 'error',
+        description: 'error searching :(',
+        variant: 'destructive',
+      })
+      return { places: [], count: 0 }
+    } finally {
+      setRequesting(false)
+    }
+  }
+
+  const addFilter = (filterType: string) => {
+    if (!activeFilters.includes(filterType)) {
+      setActiveFilters([...activeFilters, filterType])
+    }
+  }
+
+  const removeFilter = (filterType: string) => {
+    setActiveFilters(activeFilters.filter((f) => f !== filterType))
+
+    if (filterType === 'city') setCity('')
+  }
+
+  const resetAllFilters = () => {
+    setActiveFilters([])
+    setCity('')
   }
 
   const handleAddPlace = async (data: {
@@ -309,7 +405,67 @@ export default function Places() {
                 </button>
               )}
             </div>
+
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className='mr-2 h-4 w-4' /> Filters
+            </Button>
           </div>
+
+          {showFilters && (
+            <div className='mt-2 space-y-2'>
+              <div className='flex flex-wrap items-center gap-2'>
+                {!activeFilters.includes('city') && (
+                  <Button
+                    variant='secondary'
+                    size='sm'
+                    onClick={() => addFilter('city')}
+                  >
+                    + City
+                  </Button>
+                )}
+
+                {activeFilters.length > 0 && (
+                  <Button variant='ghost' size='sm' onClick={resetAllFilters}>
+                    Reset
+                  </Button>
+                )}
+              </div>
+
+              {activeFilters.includes('city') && (
+                <div className='flex items-center gap-2'>
+                  <div className='relative'>
+                    <Input
+                      placeholder='Filter by city...'
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className='w-64 pr-8'
+                    />
+                    {city && (
+                      <button
+                        type='button'
+                        aria-label='Clear city'
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                        onClick={() => setCity('')}
+                      >
+                        <X className='h-3 w-3' />
+                      </button>
+                    )}
+                  </div>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => removeFilter('city')}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
           <DataTable

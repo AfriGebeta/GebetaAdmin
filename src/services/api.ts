@@ -117,6 +117,40 @@ export default {
       }
     )
   },
+
+  async filterPlacesByCity({
+    apiKey,
+    apiAccessToken,
+    city,
+    page = 1,
+    limit = 10,
+    type,
+  }: {
+    apiKey: string
+    apiAccessToken: string
+    city: string
+    page?: number
+    limit?: number
+    type?: string
+  }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    const params = new URLSearchParams()
+    params.set('page', String(page - 1))
+    params.set('apiKey', apiKey)
+    if (type) params.set('type', type)
+    params.set('city', city)
+    params.set('limit', String(limit))
+
+    const url = `${baseUrl}/api/v1/places?${params.toString()}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+    })
+    return response
+  },
   async getBundles({
     apiAccessToken,
     page,
