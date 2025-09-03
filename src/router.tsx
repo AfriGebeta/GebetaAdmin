@@ -135,6 +135,11 @@ export function Router() {
               />
 
               <Route
+                path='/usage-details'
+                Component={React.lazy(() => import('./pages/usage/details'))}
+              />
+
+              <Route
                 path='extra-components'
                 Component={React.lazy(() => import('@/pages/extra-components'))}
               />

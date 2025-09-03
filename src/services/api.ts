@@ -526,6 +526,56 @@ export default {
       }
     )
   },
+  async getUsageMatrix({
+    apiAccessToken,
+    apiKey,
+    userId,
+    startDate,
+    endDate,
+  }: {
+    apiAccessToken: string
+    apiKey: string
+    userId: string
+    startDate: string
+    endDate: string
+  }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    const params = new URLSearchParams()
+    params.set('userId', userId)
+    params.set('startDate', startDate)
+    params.set('endDate', endDate)
+
+    const url = `${baseUrl}/api/usage/admin/matrix?${params.toString()}&apiKey=${apiKey}`
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+    })
+  },
+  async getUsageMatrixTotal({
+    apiAccessToken,
+    apiKey,
+    startDate,
+    endDate,
+  }: {
+    apiAccessToken: string
+    apiKey: string
+    startDate: string
+    endDate: string
+  }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    const params = new URLSearchParams()
+    params.set('startDate', startDate)
+    params.set('endDate', endDate)
+    const url = `${baseUrl}/api/usage/admin/matrix?${params.toString()}&apiKey=${apiKey}`
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+    })
+  },
   async deactivateProfile({
     apiAccessToken,
     id,
