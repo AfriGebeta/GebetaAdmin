@@ -24,6 +24,7 @@ import { useQuery } from '@tanstack/react-query'
 import ResetPasswordModal from '@/pages/users/components/ResetPasswordModal.tsx'
 import ShowUsageModal from '@/pages/users/components/ShowUsageModal.tsx'
 import { Input } from '@/components/ui/input'
+import { useNavigate } from 'react-router-dom'
 import {
   Select,
   SelectContent,
@@ -42,6 +43,7 @@ import { Filter, Plus, X } from 'lucide-react'
 export default function Users() {
   const dispatch = useAppDispatch()
   const { toast } = useToast()
+  const navigate = useNavigate()
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
     defaultValue: null,
@@ -337,8 +339,7 @@ export default function Users() {
   }
 
   const handleShowUsageProfile = (profile: Profile) => {
-    setSelectedProfile(profile)
-    setShowUsageModalOpen(true)
+    navigate(`/usage-details?userId=${profile.id}`)
   }
 
   const handleDeleteProfile = (profile: Profile) => {
@@ -942,16 +943,6 @@ export default function Users() {
             isOpen={isResetPasswordModalOpen}
             onClose={() => setResetPasswordModalOpen(false)}
             onSubmit={handleResetPassword}
-          />
-        )}
-
-        {selectedProfile && (
-          <ShowUsageModal
-            selectedProfile={selectedProfile}
-            isOpen={isShowUsageModalOpen}
-            onClose={() => setShowUsageModalOpen(false)}
-            // onSubmit={handleShowUsage}
-            apiAccessToken={apiAccessToken}
           />
         )}
 
