@@ -28,7 +28,7 @@ export default {
     page?: number
   }) {
     return fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/v1/getAllPlaces?apiKey=${apiAccessToken}&limit=${limit}&page=${page}`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/places?apiKey=${apiAccessToken}&limit=${limit}&page=${page}`,
       {
         method: 'GET',
         headers: { ['Authorization']: `Bearer ${apiAccessToken}` },
@@ -572,6 +572,32 @@ export default {
     params.set('startDate', startDate)
     params.set('endDate', endDate)
     const url = `${baseUrl}/api/usage/admin/matrix?${params.toString()}&apiKey=${apiKey}`
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${apiAccessToken}`,
+      },
+    })
+  },
+  async getUsageGraph({
+    apiAccessToken,
+    apiKey,
+    startDate,
+    endDate,
+    type = 'ALL',
+  }: {
+    apiAccessToken: string
+    apiKey: string
+    startDate: string
+    endDate: string
+    type?: string
+  }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    const params = new URLSearchParams()
+    params.set('type', type)
+    params.set('startDate', startDate)
+    params.set('endDate', endDate)
+    const url = `${baseUrl}/api/usage/admin/graph?${params.toString()}&apiKey=${apiKey}`
     return fetch(url, {
       method: 'GET',
       headers: {

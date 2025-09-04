@@ -130,7 +130,7 @@ export default function Usage() {
       </LayoutHeader>
 
       <LayoutBody className='flex flex-col' fixedHeight>
-        <div className='mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between'>
+        <div className='-mt-4 mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>
               Usage (All Users)
