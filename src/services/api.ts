@@ -118,27 +118,30 @@ export default {
     )
   },
 
-  async filterPlacesByCity({
+  async filterPlaces({
     apiKey,
     apiAccessToken,
     city,
+    country,
+    type,
     page = 1,
     limit = 10,
-    type,
   }: {
     apiKey: string
     apiAccessToken: string
-    city: string
+    city?: string
+    country?: string
+    type?: string
     page?: number
     limit?: number
-    type?: string
   }) {
     const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
     const params = new URLSearchParams()
     params.set('page', String(page - 1))
     params.set('apiKey', apiKey)
+    if (city) params.set('city', city)
+    if (country) params.set('country', country)
     if (type) params.set('type', type)
-    params.set('city', city)
     params.set('limit', String(limit))
 
     const url = `${baseUrl}/api/v1/places?${params.toString()}`
