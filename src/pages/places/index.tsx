@@ -41,6 +41,10 @@ export default function Places() {
 
   const [city, setCity] = useState('')
   const [debouncedCity, setDebouncedCity] = useState('')
+  const [country, setCountry] = useState('')
+  const [debouncedCountry, setDebouncedCountry] = useState('')
+  const [type, setType] = useState('')
+  const [debouncedType, setDebouncedType] = useState('')
 
   const [showFilters, setShowFilters] = useState(false)
   const [activeFilters, setActiveFilters] = useState<string[]>([])
@@ -64,10 +68,26 @@ export default function Places() {
     return () => clearTimeout(timer)
   }, [city])
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedCountry(country.trim())
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [country])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedType(type.trim())
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [type])
+
   //resetting
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }, [debouncedSearchTerm, debouncedCity])
+  }, [debouncedSearchTerm, debouncedCity, debouncedCountry, debouncedType])
 
   const { data } = useQuery({
     queryKey: [
@@ -76,13 +96,17 @@ export default function Places() {
       pagination.pageSize,
       debouncedSearchTerm,
       debouncedCity,
+      debouncedCountry,
+      debouncedType,
     ],
     queryFn: () =>
       debouncedSearchTerm
         ? searchPlaces(debouncedSearchTerm)
-        : debouncedCity
-          ? filterPlacesByCity(
+        : debouncedCity || debouncedCountry || debouncedType
+          ? filterPlaces(
               debouncedCity,
+              debouncedCountry,
+              debouncedType,
               pagination.pageIndex + 1,
               pagination.pageSize
             )
@@ -188,8 +212,10 @@ export default function Places() {
     }
   }
 
-  async function filterPlacesByCity(
+  async function filterPlaces(
     cityQuery: string,
+    countryQuery: string,
+    typeQuery: string,
     page: number,
     limit: number
   ) {
@@ -200,16 +226,18 @@ export default function Places() {
       if (!featureAccessToken) {
         toast({
           title: 'Error',
-          description: 'no tokenn.',
+          description: 'no token.',
           variant: 'destructive',
         })
         return { places: [], count: 0 }
       }
 
-      const response = await api.filterPlacesByCity({
+      const response = await api.filterPlaces({
         apiKey: featureAccessToken,
         apiAccessToken: String(apiAccessToken),
-        city: cityQuery,
+        city: cityQuery || undefined,
+        country: countryQuery || undefined,
+        type: typeQuery || undefined,
         page,
         limit,
       })
@@ -226,8 +254,8 @@ export default function Places() {
       } else {
         const error = await response.json()
         toast({
-          title: 'error searching :(',
-          description: error.message || 'failed to search :(',
+          title: 'filter  error',
+          description: error.message || 'failed to filter :(',
           variant: 'destructive',
         })
         return { places: [], count: 0 }
@@ -235,7 +263,7 @@ export default function Places() {
     } catch (e) {
       toast({
         title: 'error',
-        description: 'error searching :(',
+        description: 'error filtering :(',
         variant: 'destructive',
       })
       return { places: [], count: 0 }
@@ -254,11 +282,15 @@ export default function Places() {
     setActiveFilters(activeFilters.filter((f) => f !== filterType))
 
     if (filterType === 'city') setCity('')
+    if (filterType === 'country') setCountry('')
+    if (filterType === 'type') setType('')
   }
 
   const resetAllFilters = () => {
     setActiveFilters([])
     setCity('')
+    setCountry('')
+    setType('')
   }
 
   const handleAddPlace = async (data: {
@@ -427,6 +459,24 @@ export default function Places() {
                     + City
                   </Button>
                 )}
+                {!activeFilters.includes('country') && (
+                  <Button
+                    variant='secondary'
+                    size='sm'
+                    onClick={() => addFilter('country')}
+                  >
+                    + Country
+                  </Button>
+                )}
+                {!activeFilters.includes('type') && (
+                  <Button
+                    variant='secondary'
+                    size='sm'
+                    onClick={() => addFilter('type')}
+                  >
+                    + Type
+                  </Button>
+                )}
 
                 {activeFilters.length > 0 && (
                   <Button variant='ghost' size='sm' onClick={resetAllFilters}>
@@ -460,7 +510,67 @@ export default function Places() {
                     size='sm'
                     onClick={() => removeFilter('city')}
                   >
-                    Remove
+                    X
+                  </Button>
+                </div>
+              )}
+
+              {activeFilters.includes('country') && (
+                <div className='flex items-center gap-2'>
+                  <div className='relative'>
+                    <Input
+                      placeholder='Filter by country...'
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className='w-64 pr-8'
+                    />
+                    {country && (
+                      <button
+                        type='button'
+                        aria-label='Clear country'
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                        onClick={() => setCountry('')}
+                      >
+                        <X className='h-3 w-3' />
+                      </button>
+                    )}
+                  </div>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => removeFilter('country')}
+                  >
+                    X
+                  </Button>
+                </div>
+              )}
+
+              {activeFilters.includes('type') && (
+                <div className='flex items-center gap-2'>
+                  <div className='relative'>
+                    <Input
+                      placeholder='Filter by type...'
+                      value={type}
+                      onChange={(e) => setType(e.target.value)}
+                      className='w-64 pr-8'
+                    />
+                    {type && (
+                      <button
+                        type='button'
+                        aria-label='Clear type'
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                        onClick={() => setType('')}
+                      >
+                        <X className='h-3 w-3' />
+                      </button>
+                    )}
+                  </div>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => removeFilter('type')}
+                  >
+                    X
                   </Button>
                 </div>
               )}
