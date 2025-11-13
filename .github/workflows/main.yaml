@@ -1,0 +1,131 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  create-dot-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+
+      - name: Verify .env file exists
+        run: ls -la
+
+      - name: Show .env file contents
+        run: cat .env
+
+      - name: Upload .env file
+        uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: dot-env
+          path: .env
+
+  lint-and-build:
+    needs: create-dot-env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: "npm"
+
+      - name: Download .env file
+        uses: actions/download-artifact@v4
+        with:
+          name: dot-env
+          path: .
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Prepare deployment package
+        run: |
+          # Create deployment directory with necessary files
+          mkdir -p deploy
+          cp -r dist/* deploy/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: deploy
+          include-hidden-files: true
+
+  deploy:
+    needs: lint-and-build
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build
+
+      - name: Show directory contents
+        run: ls -la
+
+      - name: Verify build artifact structure
+        run: |
+          echo "Verifying build artifact structure..."
+          ls -la build/
+          echo "Checking for build files..."
+          if [ ! -d "build" ]; then
+            echo "ERROR: build directory not found!"
+            exit 1
+          fi
+
+      - name: Deploy to Server
+        env:
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          echo "Deploying to server"
+          echo "Downloaded artifact..."
+          ls -la
+          echo "Current working directory:"
+          pwd
+
+          # Create a directory for the new version
+          NEW_VERSION=$(date +%Y%m%d_%H%M%S)
+          if [[ ${{ github.ref }} == refs/tags/v* ]]; then
+            NEW_VERSION=$(echo ${{ github.ref }} | sed 's/refs\/tags\/v//')
+          fi
+
+          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p $DEPLOY_PATH/releases/$NEW_VERSION"
+
+          # Copy files to the new version directory
+          rsync -avzL --progress --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            build/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/releases/$NEW_VERSION/
+
+          # Update the symlink to point to the new version
+          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ln -sfn $DEPLOY_PATH/releases/$NEW_VERSION $DEPLOY_PATH/current"
+
+          # Optional: Restart web server
+          # ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "sudo systemctl reload nginx"
