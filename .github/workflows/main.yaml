@@ -120,7 +120,7 @@ jobs:
           elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
             NEW_VERSION="dev-$(date +%Y%m%d_%H%M%S)"
           fi
-          fi
+          
 
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p $DEPLOY_PATH/releases/$NEW_VERSION"
 
