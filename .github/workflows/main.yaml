@@ -72,7 +72,7 @@ jobs:
 
   deploy:
     needs: lint-and-build
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/dev'
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH Key
@@ -115,6 +115,11 @@ jobs:
           NEW_VERSION=$(date +%Y%m%d_%H%M%S)
           if [[ ${{ github.ref }} == refs/tags/v* ]]; then
             NEW_VERSION=$(echo ${{ github.ref }} | sed 's/refs\/tags\/v//')
+          elif [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            NEW_VERSION="main-$(date +%Y%m%d_%H%M%S)"
+          elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
+            NEW_VERSION="dev-$(date +%Y%m%d_%H%M%S)"
+          fi
           fi
 
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p $DEPLOY_PATH/releases/$NEW_VERSION"
