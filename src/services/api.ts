@@ -308,7 +308,7 @@ export default {
   }) {
     const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
 
-    const base = `${baseUrl}/api/user`
+    const base = `${baseUrl}/api/user/`
 
     const params = new URLSearchParams()
     params.set('page', String(page))
