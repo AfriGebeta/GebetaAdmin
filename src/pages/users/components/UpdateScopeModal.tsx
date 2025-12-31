@@ -42,7 +42,11 @@ export default function UpdateScopeModal({
   const [selectedScopes, setSelectedScopes] = useState<string[]>([])
 
   useEffect(() => {
-    setSelectedScopes([])
+    if (profileData?.allowed_scopes && profileData.allowed_scopes.length > 0) {
+      setSelectedScopes(profileData.allowed_scopes)
+    } else {
+      setSelectedScopes([])
+    }
   }, [profileData, isOpen])
 
   const handleToggleScope = (scope: string) => {
