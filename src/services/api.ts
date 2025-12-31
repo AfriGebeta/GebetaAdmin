@@ -474,19 +474,43 @@ export default {
   async setToken({
     apiAccessToken,
     id,
+    scopes,
   }: {
     apiAccessToken: string
     id: string
+    scopes?: string[]
   }) {
+    const scopesString = scopes && scopes.length > 0 ? scopes.join(',') : ''
     return fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/user/update-user-token`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/user/update-user-token?userId=${id}`,
       {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${apiAccessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: id }),
+        body: JSON.stringify({ scopes: scopesString }),
+      }
+    )
+  },
+  async updateUserScope({
+    apiAccessToken,
+    userId,
+    scopes,
+  }: {
+    apiAccessToken: string
+    userId: string
+    scopes: string[]
+  }) {
+    return fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/user/update-user-scope?userId=${userId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${apiAccessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scopes: scopes.join(',') }),
       }
     )
   },
