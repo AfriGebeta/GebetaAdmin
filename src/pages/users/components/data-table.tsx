@@ -29,11 +29,12 @@ interface DataTableProps<TData, TValue> {
   fetching: boolean
   onEdit: (profile: TData) => void
   onDelete: (profile: TData) => void
-  onSetToken: () => void
-  onUpdateDate: () => void
+  onSetToken: (profile: any) => void
+  onUpdateDate: (profile: any) => void
   onResetPassword: (profile: any) => void
   onBuyBundle: (profile: any) => void
   onShowUsage: (profile: any) => void
+  onUpdateScope: (profile: any) => void
   count: number
   pagination: PaginationState
   onPaginationChange: (value: PaginationState) => void
@@ -53,6 +54,7 @@ export function DataTable<TData, TValue>({
   onResetPassword,
   onShowUsage,
   onBuyBundle,
+  onUpdateScope,
 }: DataTableProps<TData, TValue>) {
   const [apiAccessToken, __] = useLocalStorage({
     key: 'apiAccessToken',
@@ -127,6 +129,7 @@ export function DataTable<TData, TValue>({
                       onResetPassword={onResetPassword}
                       onShowUsage={onShowUsage}
                       onBuyBundle={onBuyBundle}
+                      onUpdateScope={onUpdateScope}
                     />
                   </TableCell>
                 </TableRow>

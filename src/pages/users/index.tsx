@@ -23,6 +23,8 @@ import CreditPaymentModal from './components/CreditPaymentModal.tsx'
 import { useQuery } from '@tanstack/react-query'
 import ResetPasswordModal from '@/pages/users/components/ResetPasswordModal.tsx'
 import ShowUsageModal from '@/pages/users/components/ShowUsageModal.tsx'
+import UpdateScopeModal from './components/UpdateScopeModal.tsx'
+import SetTokenModal from './components/SetTokenModal.tsx'
 import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -58,6 +60,8 @@ export default function Users() {
   const [isDeleteProfileModalOpen, setDeleteProfileModalOpen] = useState(false)
   const [isAddProfileModalOpen, setAddProfileModalOpen] = useState(false)
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false)
+  const [isUpdateScopeModalOpen, setUpdateScopeModalOpen] = useState(false)
+  const [isSetTokenModalOpen, setSetTokenModalOpen] = useState(false)
 
   const [count, setCount] = useState(0)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
@@ -330,7 +334,7 @@ export default function Users() {
 
   const handleSetTokenUser = (profile: Profile) => {
     setSelectedProfile(profile)
-    handleSetUserToken(profile)
+    setSetTokenModalOpen(true)
   }
 
   const handleResetPasswordProfile = (profile: Profile) => {
@@ -350,6 +354,11 @@ export default function Users() {
   const handlePaymentModal = (profile: Profile) => {
     setSelectedProfile(profile)
     setPaymentModalOpen(true)
+  }
+
+  const handleUpdateScopeModal = (profile: Profile) => {
+    setSelectedProfile(profile)
+    setUpdateScopeModalOpen(true)
   }
 
   const handlePayment = async (data: {
@@ -522,24 +531,26 @@ export default function Users() {
     }
   }
 
-  const handleSetUserToken = async () => {
+  const handleSetUserToken = async (scopes: string[]) => {
     if (selectedProfile) {
       try {
         const response = await api.setToken({
           apiAccessToken: String(apiAccessToken),
           id: selectedProfile.id,
+          scopes,
         })
 
         if (response.ok) {
           toast({
-            title: 'Profile Updated',
-            description: 'The profile has been updated successfully!',
+            title: 'Token Set',
+            description:
+              'The token has been set successfully with selected scopes',
             variant: 'default',
           })
         } else {
           const error = await response.json()
           toast({
-            title: 'Error Updating Profile',
+            title: 'Error Setting Token',
             description: error.message,
             variant: 'destructive',
           })
@@ -551,6 +562,8 @@ export default function Users() {
           description: 'Check your network connection!',
           variant: 'destructive',
         })
+      } finally {
+        setSetTokenModalOpen(false)
       }
     }
   }
@@ -594,6 +607,42 @@ export default function Users() {
       })
     } finally {
       setAddProfileModalOpen(false)
+    }
+  }
+
+  const handleUpdateScope = async (scopes: string[]) => {
+    if (selectedProfile) {
+      try {
+        const response = await api.updateUserScope({
+          apiAccessToken: String(apiAccessToken),
+          userId: selectedProfile.id,
+          scopes,
+        })
+
+        if (response.ok) {
+          toast({
+            title: 'Scope Updated',
+            description: 'User scope has been updated successfully!',
+            variant: 'default',
+          })
+        } else {
+          const error = await response.json()
+          toast({
+            title: 'Error Updating Scope',
+            description: error.message || 'Failed to update scope',
+            variant: 'destructive',
+          })
+        }
+      } catch (error) {
+        console.error('Error updating scope:', error)
+        toast({
+          title: 'Request Failed',
+          description: 'Please try again',
+          variant: 'destructive',
+        })
+      } finally {
+        setUpdateScopeModalOpen(false)
+      }
     }
   }
 
@@ -911,11 +960,12 @@ export default function Users() {
             fetching={requesting}
             onEdit={handleEditProfile}
             onDelete={handleDeleteProfile}
-            onSetToken={handleSetUserToken}
+            onSetToken={handleSetTokenUser}
             onUpdateDate={handleUpdateDate}
             onResetPassword={handleResetPasswordProfile}
             onShowUsage={handleShowUsageProfile}
             onBuyBundle={handlePaymentModal}
+            onUpdateScope={handleUpdateScopeModal}
             count={data?.count || 0}
             pagination={pagination}
             onPaginationChange={setPagination}
@@ -961,6 +1011,24 @@ export default function Users() {
             isOpen={isPaymentModalOpen}
             onClose={() => setPaymentModalOpen(false)}
             onSubmit={handlePayment}
+          />
+        )}
+
+        {selectedProfile && (
+          <UpdateScopeModal
+            profileData={selectedProfile}
+            isOpen={isUpdateScopeModalOpen}
+            onClose={() => setUpdateScopeModalOpen(false)}
+            onSubmit={handleUpdateScope}
+          />
+        )}
+
+        {selectedProfile && (
+          <SetTokenModal
+            profileData={selectedProfile}
+            isOpen={isSetTokenModalOpen}
+            onClose={() => setSetTokenModalOpen(false)}
+            onSubmit={handleSetUserToken}
           />
         )}
       </LayoutBody>

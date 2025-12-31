@@ -15,10 +15,11 @@ interface DataTableRowActionsProps<TData> {
   onEdit: (profile: any) => void
   onDelete: (profile: any) => void
   onUpdateDate: (profile: any) => void
-  onSetToken: () => void
+  onSetToken: (profile: any) => void
   onResetPassword: (profile: any) => void
   onShowUsage: (profile: any) => void
   onBuyBundle: (profile: any) => void
+  onUpdateScope: (profile: any) => void
 }
 
 export function DataTableRowActions<TData>({
@@ -31,6 +32,7 @@ export function DataTableRowActions<TData>({
   onResetPassword,
   onShowUsage,
   onBuyBundle,
+  onUpdateScope,
 }: DataTableRowActionsProps<TData>) {
   const handleEdit = () => {
     onEdit(row.original)
@@ -61,6 +63,10 @@ export function DataTableRowActions<TData>({
     onBuyBundle(row.original)
   }
 
+  const handleUpdateScope = () => {
+    onUpdateScope(row.original)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -85,6 +91,9 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSetUserToken}>
           Set Token
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleUpdateScope}>
+          Update Scope
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
         <DropdownMenuItem onClick={handleUpdateDate}>
