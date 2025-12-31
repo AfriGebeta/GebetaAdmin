@@ -104,7 +104,7 @@ export default function Users() {
     daysRemaining,
   ])
 
-  const { data, error, isLoading, isFetching } = useQuery({
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: [
       'users',
       pagination.pageIndex,
@@ -272,13 +272,14 @@ export default function Users() {
   }
 
   const formatUserData = (profile: Profile) => ({
-    id: profile.id,
-    name: profile.username,
+    ...profile,
+    name: profile.username || profile.name,
     phone: profile.phone !== 'null' ? profile.phone : '-',
     email: profile.email,
     purchased_date: profile.purchased_date
       ? moment(profile.purchased_date).format('DD/MM/YYYY')
       : '-',
+    allowed_scopes: profile.allowed_scopes || [],
   })
 
   const addFilter = (filterType: string) => {
@@ -547,6 +548,7 @@ export default function Users() {
               'The token has been set successfully with selected scopes',
             variant: 'default',
           })
+          refetch()
         } else {
           const error = await response.json()
           toast({
@@ -625,6 +627,7 @@ export default function Users() {
             description: 'User scope has been updated successfully!',
             variant: 'default',
           })
+          refetch()
         } else {
           const error = await response.json()
           toast({

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,14 @@ export default function SetTokenModal({
   onSubmit,
 }: SetTokenModalProps) {
   const [selectedScopes, setSelectedScopes] = useState<string[]>([])
+
+  useEffect(() => {
+    if (profileData?.allowed_scopes && profileData.allowed_scopes.length > 0) {
+      setSelectedScopes(profileData.allowed_scopes)
+    } else {
+      setSelectedScopes([])
+    }
+  }, [profileData, isOpen])
 
   const handleToggleScope = (scope: string) => {
     setSelectedScopes((prev) =>
