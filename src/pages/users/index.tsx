@@ -352,6 +352,37 @@ export default function Users() {
     setDeleteProfileModalOpen(true)
   }
 
+  const handleBlockProfile = async (profile: Profile) => {
+    try {
+      const response = await api.blockUser({
+        apiAccessToken: String(apiAccessToken),
+        id: profile.id,
+      })
+
+      if (response.ok) {
+        toast({
+          title: 'User Blocked',
+          description: 'User has been blocked successfully',
+          variant: 'default',
+        })
+        // refetch()
+      } else {
+        const error = await response.json()
+        toast({
+          title: 'Error Blocking User',
+          description: error.message || 'Failed to block user',
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      toast({
+        title: 'Request Failed',
+        description: 'Check your network connection!',
+        variant: 'destructive',
+      })
+    }
+  }
+
   const handlePaymentModal = (profile: Profile) => {
     setSelectedProfile(profile)
     setPaymentModalOpen(true)
@@ -963,6 +994,7 @@ export default function Users() {
             fetching={requesting}
             onEdit={handleEditProfile}
             onDelete={handleDeleteProfile}
+            onBlock={handleBlockProfile}
             onSetToken={handleSetTokenUser}
             onUpdateDate={handleUpdateDate}
             onResetPassword={handleResetPasswordProfile}
