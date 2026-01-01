@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   fetching: boolean
   onEdit: (profile: TData) => void
   onDelete: (profile: TData) => void
+  onBlock: (profile: TData) => void
   onSetToken: (profile: any) => void
   onUpdateDate: (profile: any) => void
   onResetPassword: (profile: any) => void
@@ -49,6 +50,7 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   onEdit,
   onDelete,
+  onBlock,
   onSetToken,
   onUpdateDate,
   onResetPassword,
@@ -125,6 +127,7 @@ export function DataTable<TData, TValue>({
                       onUpdateDate={onUpdateDate}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      onBlock={onBlock}
                       onSetToken={onSetToken}
                       onResetPassword={onResetPassword}
                       onShowUsage={onShowUsage}

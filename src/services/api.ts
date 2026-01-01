@@ -471,6 +471,21 @@ export default {
       }
     )
   },
+  async blockUser({
+    apiAccessToken,
+    id,
+  }: {
+    apiAccessToken: string
+    id: string
+  }) {
+    return fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/?id=${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${apiAccessToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+  },
   async setToken({
     apiAccessToken,
     id,
