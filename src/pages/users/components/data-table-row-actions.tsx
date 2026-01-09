@@ -14,11 +14,13 @@ interface DataTableRowActionsProps<TData> {
   apiAccessToken: string
   onEdit: (profile: any) => void
   onDelete: (profile: any) => void
+  onBlock: (profile: any) => void
   onUpdateDate: (profile: any) => void
-  onSetToken: () => void
+  onSetToken: (profile: any) => void
   onResetPassword: (profile: any) => void
   onShowUsage: (profile: any) => void
   onBuyBundle: (profile: any) => void
+  onUpdateScope: (profile: any) => void
 }
 
 export function DataTableRowActions<TData>({
@@ -26,11 +28,13 @@ export function DataTableRowActions<TData>({
   apiAccessToken,
   onEdit,
   onDelete,
+  onBlock,
   onUpdateDate,
   onSetToken,
   onResetPassword,
   onShowUsage,
   onBuyBundle,
+  onUpdateScope,
 }: DataTableRowActionsProps<TData>) {
   const handleEdit = () => {
     onEdit(row.original)
@@ -39,6 +43,10 @@ export function DataTableRowActions<TData>({
 
   const handleDelete = () => {
     onDelete(row.original)
+  }
+
+  const handleBlock = () => {
+    onBlock(row.original)
   }
 
   const handleUpdateDate = () => {
@@ -59,6 +67,10 @@ export function DataTableRowActions<TData>({
 
   const handleBuyHandle = () => {
     onBuyBundle(row.original)
+  }
+
+  const handleUpdateScope = () => {
+    onUpdateScope(row.original)
   }
 
   return (
@@ -86,6 +98,10 @@ export function DataTableRowActions<TData>({
         <DropdownMenuItem onClick={handleSetUserToken}>
           Set Token
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleUpdateScope}>
+          Update Scope
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleBlock}>Block</DropdownMenuItem>
         <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
         <DropdownMenuItem onClick={handleUpdateDate}>
           Update Date
