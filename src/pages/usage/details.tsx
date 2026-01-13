@@ -100,8 +100,6 @@ export default function UsageDetails() {
     doc.text(`User ID: ${userId}`, 40, 58)
     doc.text(`Range: ${start} to ${end}`, 40, 72)
 
-    // Build one row per day in the selected range.
-    // If there is no usage for a date, show 0.
     const usageByDate = new Map<string, number>()
     dailyUsage.forEach((d) => {
       const key = moment(d.date).format('YYYY-MM-DD')
