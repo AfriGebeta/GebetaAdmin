@@ -113,6 +113,10 @@ export function Router() {
                 path='bundles'
                 Component={React.lazy(() => import('./pages/bundles'))}
               />
+              <Route
+                path='style'
+                Component={React.lazy(() => import('./pages/style/index'))}
+              />
 
               <Route
                 path='chats'
