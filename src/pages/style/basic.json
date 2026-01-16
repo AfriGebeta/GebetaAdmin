@@ -4,12 +4,12 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "tiles": ["http://localhost:3006/tiles/{z}/{x}/{y}.pbf"],
+      "tiles": ["https://tiles.gebeta.app/tiles/{z}/{x}/{y}.pbf"],
       "maxzoom": 14,
       "minzoom": 0
     }
   },
-  "sprite": "http://localhost:8080/sprite",
+  "sprite": "https://raw.githubusercontent.com/jpriebe/google-maps-gl-style/master/sprite",
   "glyphs": "https://tiles.gebeta.app/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {

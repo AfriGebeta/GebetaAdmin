@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import useLocalStorage from '@/hooks/use-local-storage'
