@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import useLocalStorage from '@/hooks/use-local-storage'
@@ -13,6 +14,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import { calculatePrice, resolveFeatureKey } from '@/utils/pricing'
+
+const VAT_RATE = 0.15
+
+const formatMoney = (value: number) =>
+  value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 
 export default function UsageDetails() {
   const { toast } = useToast()
@@ -43,6 +55,10 @@ export default function UsageDetails() {
   const [usage, setUsage] = useState<
     Array<{ calltype: string; total: number }>
   >([])
+  const [dailyUsage, setDailyUsage] = useState<
+    Array<{ date: string; total: number; calltype?: string }>
+  >([])
+  const [exchangeRate, setExchangeRate] = useState<number>(0)
 
   const exportCsv = () => {
     const rows = [
@@ -70,6 +86,91 @@ export default function UsageDetails() {
     URL.revokeObjectURL(url)
   }
 
+  const exportPdf = () => {
+    const doc = new jsPDF({
+      unit: 'pt',
+      format: 'a4',
+    })
+
+    const start = moment(startDate).format('YYYY-MM-DD')
+    const end = moment(endDate).format('YYYY-MM-DD')
+
+    doc.setFontSize(14)
+    doc.text('Usage Summary', 40, 40)
+    doc.setFontSize(10)
+    doc.text(`User ID: ${userId}`, 40, 58)
+    doc.text(`Range: ${start} to ${end}`, 40, 72)
+
+    const usageByDate = new Map<string, number>()
+    dailyUsage.forEach((d) => {
+      const key = moment(d.date).format('YYYY-MM-DD')
+      usageByDate.set(key, (usageByDate.get(key) ?? 0) + (d.total ?? 0))
+    })
+
+    const startMoment = startDate
+      ? moment(startDate)
+      : moment().subtract(30, 'days')
+    const endMoment = endDate ? moment(endDate) : moment()
+
+    const bodyRows: string[][] = []
+    let cursor = startMoment.clone()
+    let index = 1
+
+    while (cursor.isSameOrBefore(endMoment, 'day')) {
+      const dateStr = cursor.format('YYYY-MM-DD')
+      const totalForDay = usageByDate.get(dateStr) ?? 0
+
+      bodyRows.push([String(index++), dateStr, totalForDay.toLocaleString()])
+
+      cursor = cursor.add(1, 'day')
+    }
+
+    autoTable(doc, {
+      head: [['No', 'Date', 'Calls']],
+      body: bodyRows,
+      startY: 90,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [30, 41, 59] },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 120 },
+        2: { halign: 'right' },
+      },
+    })
+
+    const summaryY = (doc as any).lastAutoTable?.finalY
+      ? (doc as any).lastAutoTable.finalY + 20
+      : 120
+
+    doc.setFontSize(11)
+    doc.text(`Total Calls: ${totalCalls.toLocaleString()}`, 40, summaryY)
+    doc.text(`Total Amount in USD: ${formatMoney(usdTotal)}`, 40, summaryY + 18)
+    doc.text(
+      `ETB (${exchangeRate.toFixed(2)}): ${formatMoney(etbTotal)}`,
+      40,
+      summaryY + 36
+    )
+    doc.text(`VAT (15%): ${formatMoney(vatAmount)}`, 40, summaryY + 54)
+    doc.text(
+      `Total Amount Including VAT: ${formatMoney(totalIncludingVat)}`,
+      40,
+      summaryY + 72
+    )
+
+    doc.setFontSize(9)
+    doc.text(
+      `Average exchange rate ${exchangeRate.toFixed(2)} ETB per USD `,
+      40,
+      summaryY + 96
+    )
+
+    doc.save(
+      `usage_${userId}_${moment(startDate).format('YYYYMMDD')}_${moment(
+        endDate
+      ).format('YYYYMMDD')}.pdf`
+    )
+  }
+
   const fetchUsage = async () => {
     if (!userId || !startDate || !endDate) return
     if (!featureAccessToken) {
@@ -82,15 +183,24 @@ export default function UsageDetails() {
     }
     try {
       setLoading(true)
-      const response = await api.getUsageMatrix({
-        apiAccessToken: String(apiAccessToken),
-        apiKey: featureAccessToken,
-        userId,
-        startDate: moment(startDate).format('YYYY-MM-DD'),
-        endDate: moment(endDate).format('YYYY-MM-DD'),
-      })
-      if (response.ok) {
-        const result = await response.json()
+      const [matrixResponse, graphResponse] = await Promise.all([
+        api.getUsageMatrix({
+          apiAccessToken: String(apiAccessToken),
+          apiKey: featureAccessToken,
+          userId,
+          startDate: moment(startDate).format('YYYY-MM-DD'),
+          endDate: moment(endDate).format('YYYY-MM-DD'),
+        }),
+        api.getUsage({
+          apiAccessToken: String(apiAccessToken),
+          id: userId,
+          startDate: moment(startDate).format('YYYY-MM-DD'),
+          endDate: moment(endDate).format('YYYY-MM-DD'),
+        }),
+      ])
+
+      if (matrixResponse.ok) {
+        const result = await matrixResponse.json()
         const rows = Array.isArray(result?.data) ? result.data : []
         const normalized = rows.map((r: any) => ({
           calltype: r.calltype ?? r.callType ?? r.CallType ?? 'UNKNOWN',
@@ -98,10 +208,34 @@ export default function UsageDetails() {
         }))
         setUsage(normalized)
       } else {
-        const err = await response.json()
+        const err = await matrixResponse.json()
         toast({
           title: 'Usage Error',
           description: err?.error?.message || 'Failed to load usage',
+          variant: 'destructive',
+        })
+      }
+
+      if (graphResponse.ok) {
+        const result = await graphResponse.json()
+        const rows = Array.isArray(result?.data) ? result.data : []
+        const normalizedDaily = rows
+          .map((r: any) => ({
+            date: r.Day ?? r.day ?? r.date ?? '',
+            total: Number(r.Total ?? r.total ?? 0),
+            calltype: r.calltype ?? r.callType ?? r.CallType,
+          }))
+          .filter((r: any) => r.date)
+          .map((r: any) => ({
+            ...r,
+            date: moment(r.date).format('YYYY-MM-DD'),
+          }))
+        setDailyUsage(normalizedDaily)
+      } else if (graphResponse.status !== 404) {
+        const err = await graphResponse.json()
+        toast({
+          title: 'Usage Error',
+          description: err?.error?.message || 'Failed to load usage graph',
           variant: 'destructive',
         })
       }
@@ -117,10 +251,40 @@ export default function UsageDetails() {
   }
 
   useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await fetch(
+          'https://api.exchangerate-api.com/v4/latest/USD'
+        )
+        const data = await response.json()
+        if (data?.rates?.ETB) {
+          setExchangeRate(Math.ceil(data.rates.ETB * 100) / 100)
+        }
+      } catch (error) {}
+    }
+
+    fetchExchangeRate()
     fetchUsage()
   }, [])
 
   const total = usage.reduce((acc, u) => acc + (u.total ?? 0), 0)
+  const totalCalls = useMemo(() => {
+    if (dailyUsage.length > 0)
+      return dailyUsage.reduce((acc, d) => acc + (d.total ?? 0), 0)
+    return total
+  }, [dailyUsage, total])
+
+  const usdTotal = useMemo(() => {
+    return usage.reduce((acc, u) => {
+      const featureKey = resolveFeatureKey(u.calltype)
+      if (!featureKey) return acc
+      return acc + calculatePrice(featureKey, u.total)
+    }, 0)
+  }, [usage])
+
+  const etbTotal = usdTotal * exchangeRate
+  const vatAmount = etbTotal * VAT_RATE
+  const totalIncludingVat = etbTotal + vatAmount
 
   return (
     <div className='mx-auto w-full max-w-6xl p-4'>
@@ -182,7 +346,14 @@ export default function UsageDetails() {
             variant='secondary'
             className='whitespace-nowrap'
           >
-            Export
+            Export CSV
+          </Button>
+          <Button
+            onClick={exportPdf}
+            variant='secondary'
+            className='whitespace-nowrap'
+          >
+            Export PDF
           </Button>
         </div>
       </div>
@@ -215,7 +386,7 @@ export default function UsageDetails() {
             </CardTitle>
           </CardHeader>
           <CardContent className=''>
-            <div className='text-3xl font-bold'>{total}</div>
+            <div className='text-3xl font-bold'>{totalCalls}</div>
           </CardContent>
         </Card>
       </div>

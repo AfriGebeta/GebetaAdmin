@@ -55,6 +55,12 @@ export const sidelinks: SideLink[] = [
     href: '/bundles',
     icon: <BadgeCent size={20} className='text-gray-400' />,
   },
+  {
+    title: 'Style',
+    label: '',
+    href: '/style',
+    icon: <BadgeCent size={20} className='text-gray-400' />,
+  },
   // {
   //   title: 'Authentication',
   //   label: '',

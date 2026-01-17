@@ -25,4 +25,6 @@ export interface Profile {
   email: string | null
   purchased_date: string
   token?: Token[]
+  allowed_scopes?: string[]
+  username?: string
 }

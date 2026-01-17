@@ -10,6 +10,14 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import moment from 'moment'
 import {
   Popover,
@@ -42,6 +50,9 @@ export default function Usage() {
   const [usage, setUsage] = useState<
     Array<{ calltype: string; total: number }>
   >([])
+  const [graphData, setGraphData] = useState<
+    Array<{ Day: string; Total: number }>
+  >([])
 
   const fetchUsage = async () => {
     if (!startDate || !endDate) return
@@ -55,14 +66,26 @@ export default function Usage() {
     }
     try {
       setLoading(true)
-      const response = await api.getUsageMatrixTotal({
+
+      // data for cards
+      const matrixResponse = await api.getUsageMatrixTotal({
         apiAccessToken: String(apiAccessToken),
         apiKey: featureAccessToken,
         startDate: moment(startDate).format('YYYY-MM-DD'),
         endDate: moment(endDate).format('YYYY-MM-DD'),
       })
-      if (response.ok) {
-        const result = await response.json()
+
+      // data for table
+      const graphResponse = await api.getUsageGraph({
+        apiAccessToken: String(apiAccessToken),
+        apiKey: featureAccessToken,
+        startDate: moment(startDate).format('YYYY-MM-DD'),
+        endDate: moment(endDate).format('YYYY-MM-DD'),
+        type: 'ALL',
+      })
+
+      if (matrixResponse.ok) {
+        const result = await matrixResponse.json()
         const rows = Array.isArray(result?.data) ? result.data : []
         const normalized = rows.map((r: any) => ({
           calltype: r.calltype ?? r.callType ?? r.CallType ?? 'UNKNOWN',
@@ -70,12 +93,18 @@ export default function Usage() {
         }))
         setUsage(normalized)
       } else {
-        const err = await response.json()
+        const err = await matrixResponse.json()
         toast({
           title: 'Usage Error',
           description: err?.error?.message || 'Failed to load usage',
           variant: 'destructive',
         })
+      }
+
+      if (graphResponse.ok) {
+        const result = await graphResponse.json()
+        const rows = Array.isArray(result?.data) ? result.data : []
+        setGraphData(rows)
       }
     } catch (e) {
       toast({
@@ -92,19 +121,16 @@ export default function Usage() {
 
   const exportCsv = () => {
     const rows = [
-      ['startDate', 'endDate', 'calltype', 'total'],
-      ...usage.map((u) => [
-        moment(startDate).format('YYYY-MM-DD'),
-        moment(endDate).format('YYYY-MM-DD'),
-        u.calltype,
-        String(u.total),
+      ['Date', 'Usage'],
+      ...graphData.map((item) => [
+        moment(item.Day).format('YYYY-MM-DD'),
+        String(item.Total),
       ]),
-      ['', '', 'TOTAL', String(total)],
     ]
     const csv = rows
       .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
       .join('\n')
-    const filename = `usage_total_${moment(startDate).format('YYYYMMDD')}_${moment(endDate).format('YYYYMMDD')}.csv`
+    const filename = `usage_graph_${moment(startDate).format('YYYYMMDD')}_${moment(endDate).format('YYYYMMDD')}.csv`
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -231,6 +257,49 @@ export default function Usage() {
             </CardHeader>
             <CardContent>
               <div className='text-3xl font-bold'>{total}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/*table */}
+        <div className='mt-8'>
+          <Card>
+            <CardHeader>
+              <CardTitle>Daily Usage</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className='flex items-center justify-center py-10'>
+                  <LoadingSpinner />
+                </div>
+              ) : graphData.length === 0 ? (
+                <p className='text-muted-foreground'>
+                  No daily usage data available
+                </p>
+              ) : (
+                <div className='rounded-md border'>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead className='text-right'>Usage</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {graphData.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            {moment(item.Day).format('YYYY-MM-DD')}
+                          </TableCell>
+                          <TableCell className='text-right'>
+                            {item.Total.toLocaleString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
