@@ -624,18 +624,21 @@ export default {
     startDate,
     endDate,
     type = 'ALL',
+    userId,
   }: {
     apiAccessToken: string
     apiKey: string
     startDate: string
     endDate: string
     type?: string
+    userId?: string
   }) {
     const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
     const params = new URLSearchParams()
     params.set('type', type)
     params.set('startDate', startDate)
     params.set('endDate', endDate)
+    if (userId) params.set('userId', userId)
     const url = `${baseUrl}/api/usage/admin/graph?${params.toString()}&apiKey=${apiKey}`
     return fetch(url, {
       method: 'GET',
