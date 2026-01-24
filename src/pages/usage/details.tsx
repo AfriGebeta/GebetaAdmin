@@ -98,13 +98,11 @@ export default function UsageDetails() {
     doc.setFontSize(14)
     doc.text('Usage Summary', 40, 40)
     doc.setFontSize(10)
-    doc.text(`User ID: ${userId}`, 40, 58)
-    doc.text(`Range: ${start} to ${end}`, 40, 72)
+    doc.text(`Range: ${start} to ${end}`, 40, 58)
 
     const usageByDate = new Map<string, number>()
     dailyUsage.forEach((d) => {
-      const key = moment(d.date).format('YYYY-MM-DD')
-      usageByDate.set(key, (usageByDate.get(key) ?? 0) + (d.total ?? 0))
+      usageByDate.set(d.date, (usageByDate.get(d.date) ?? 0) + (d.total ?? 0))
     })
 
     const startMoment = startDate
@@ -128,9 +126,10 @@ export default function UsageDetails() {
     autoTable(doc, {
       head: [['No', 'Date', 'Calls']],
       body: bodyRows,
-      startY: 90,
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [30, 41, 59] },
+      startY: 75,
+      styles: { fontSize: 9, cellPadding: 4 },
+      headStyles: { fillColor: [30, 41, 59], minCellHeight: 20 },
+      bodyStyles: { minCellHeight: 18 },
       columnStyles: {
         0: { cellWidth: 40 },
         1: { cellWidth: 120 },
@@ -159,7 +158,7 @@ export default function UsageDetails() {
 
     doc.setFontSize(9)
     doc.text(
-      `Average exchange rate ${exchangeRate.toFixed(2)} ETB per USD `,
+      `Average exchange rate ${exchangeRate.toFixed(2)} ETB per USD as per ${moment().format('YYYY-MM-DD')}`,
       40,
       summaryY + 96
     )
@@ -191,11 +190,13 @@ export default function UsageDetails() {
           startDate: moment(startDate).format('YYYY-MM-DD'),
           endDate: moment(endDate).format('YYYY-MM-DD'),
         }),
-        api.getUsage({
+        api.getUsageGraph({
           apiAccessToken: String(apiAccessToken),
-          id: userId,
+          apiKey: featureAccessToken,
+          userId,
           startDate: moment(startDate).format('YYYY-MM-DD'),
           endDate: moment(endDate).format('YYYY-MM-DD'),
+          type: 'ALL',
         }),
       ])
 
@@ -219,17 +220,39 @@ export default function UsageDetails() {
       if (graphResponse.ok) {
         const result = await graphResponse.json()
         const rows = Array.isArray(result?.data) ? result.data : []
-        const normalizedDaily = rows
-          .map((r: any) => ({
-            date: r.Day ?? r.day ?? r.date ?? '',
-            total: Number(r.Total ?? r.total ?? 0),
-            calltype: r.calltype ?? r.callType ?? r.CallType,
-          }))
-          .filter((r: any) => r.date)
-          .map((r: any) => ({
-            ...r,
-            date: moment(r.date).format('YYYY-MM-DD'),
-          }))
+        const normalizedDaily: Array<{
+          date: string
+          total: number
+          calltype?: string
+        }> = []
+
+        rows.forEach((r: any) => {
+          const dateStr = r.date ? moment.utc(r.date).format('YYYY-MM-DD') : ''
+          if (!dateStr) return
+
+          if (r.services && typeof r.services === 'object') {
+            let dayTotal = 0
+            Object.entries(r.services).forEach(([serviceType, count]) => {
+              dayTotal += Number(count) || 0
+            })
+            if (dayTotal > 0) {
+              normalizedDaily.push({
+                date: dateStr,
+                total: dayTotal,
+              })
+            }
+          } else {
+            const total = Number(r.Total ?? r.total ?? 0)
+            if (total > 0) {
+              normalizedDaily.push({
+                date: dateStr,
+                total,
+                calltype: r.calltype ?? r.callType ?? r.CallType,
+              })
+            }
+          }
+        })
+
         setDailyUsage(normalizedDaily)
       } else if (graphResponse.status !== 404) {
         const err = await graphResponse.json()
