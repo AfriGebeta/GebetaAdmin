@@ -11,6 +11,8 @@ export const LayerEditor = ({
   onToggleSection,
   onLayerJSONChange,
   onApplyEdits,
+  isCollapsed,
+  onToggleCollapse,
 }: {
   selectedLayer: Layer | null
   selectedLayerId: string | null
@@ -20,23 +22,94 @@ export const LayerEditor = ({
   onToggleSection: (section: string) => void
   onLayerJSONChange: (json: string) => void
   onApplyEdits: (layer: Layer) => void
+  isCollapsed: boolean
+  onToggleCollapse: () => void
 }) => {
+  if (isCollapsed) {
+    return (
+      <div className='flex h-full w-10 flex-col items-center border-l bg-background py-3'>
+        <button
+          onClick={onToggleCollapse}
+          className='rounded-md p-2 hover:bg-accent'
+          title='Expand Editor'
+        >
+          <svg
+            className='h-4 w-4'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M9 5l7 7-7 7'
+            />
+          </svg>
+        </button>
+      </div>
+    )
+  }
+
   if (!selectedLayerId || !selectedLayer) {
     return (
-      <div className='flex flex-1 items-center justify-center text-muted-foreground'>
-        Select a layer to edit
+      <div className='flex h-full w-full flex-col bg-background'>
+        <div className='flex items-center justify-between border-b p-3'>
+          <h3 className='text-sm font-medium'>Layer Editor</h3>
+          <button
+            onClick={onToggleCollapse}
+            className='rounded-md p-1 hover:bg-accent'
+            title='Collapse Editor'
+          >
+            <svg
+              className='h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M15 19l-7-7 7-7'
+              />
+            </svg>
+          </button>
+        </div>
+        <div className='flex flex-1 items-center justify-center text-muted-foreground'>
+          Select a layer to edit
+        </div>
       </div>
     )
   }
 
   return (
-    <div className='flex h-full w-[50%] flex-col bg-background'>
-      <div className='border-b p-3'>
-        <h3 className='text-lg font-medium'>
-          Layer: <span className='text-primary'>{selectedLayerId}</span>
+    <div className='flex h-full w-full flex-col bg-background'>
+      <div className='flex items-center justify-between border-b p-3'>
+        <h3 className='text-sm font-medium'>
+          Layer: <span className='text-sm text-primary'>{selectedLayerId}</span>
         </h3>
+        <button
+          onClick={onToggleCollapse}
+          className='rounded-md p-1 hover:bg-accent'
+          title='Collapse Editor'
+        >
+          <svg
+            className='h-4 w-4'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M15 19l-7-7 7-7'
+            />
+          </svg>
+        </button>
       </div>
-      <div className='flex-1 space-y-3 overflow-y-auto p-3'>
+      <div className='flex-1 space-y-3 overflow-y-auto p-3 text-xs'>
         {selectedLayer.type === 'line' && (
           <div className='rounded-md border'>
             <button

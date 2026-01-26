@@ -44,6 +44,54 @@ export default function Style() {
     json: false,
   })
 
+  const [layerListCollapsed, setLayerListCollapsed] = useState(false)
+  const [layerEditorCollapsed, setLayerEditorCollapsed] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(30) // percentage
+
+  // Calculate absolute pixel widths for each panel
+  const getAbsoluteWidths = () => {
+    const viewportWidth =
+      typeof window !== 'undefined' ? window.innerWidth : 1920
+    const sidebarPx = (viewportWidth * sidebarWidth) / 100
+    return {
+      layerListPx: sidebarPx * 0.4,
+      layerEditorPx: sidebarPx * 0.6,
+    }
+  }
+
+  // Calculate individual panel widths based on sidebar width
+  const layerListWidth = sidebarWidth * 0.4 // 40% of sidebar
+  const layerEditorWidth = sidebarWidth * 0.6 // 60% of sidebar
+
+  const handleMouseDown = useCallback(
+    (e) => {
+      e.preventDefault()
+      const startX = e.clientX
+      const startWidth = sidebarWidth
+
+      const handleMouseMove = (e) => {
+        const deltaX = e.clientX - startX
+        const containerWidth = window.innerWidth
+        const deltaPercent = (deltaX / containerWidth) * 100
+        const newWidth = Math.min(Math.max(startWidth + deltaPercent, 15), 50)
+        setSidebarWidth(newWidth)
+      }
+
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+      }
+
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    },
+    [sidebarWidth]
+  )
+
   //for modals
   const [showAddLayerModal, setShowAddLayerModal] = useState(false)
   const [showOpenModal, setShowOpenModal] = useState(false)
@@ -420,36 +468,95 @@ export default function Style() {
 
       <LayoutBody className='space-y-4'>
         <div className='flex h-[90vh] w-full'>
-          <div className='flex h-full w-[40%] border-r'>
-            <LayerList
-              groupedLayers={groupedLayers}
-              selectedLayerId={selectedLayerId}
-              onSelectLayer={setSelectedLayerId}
-            />
+          {(() => {
+            const { layerListPx, layerEditorPx } = getAbsoluteWidths()
+            const totalWidth =
+              layerListCollapsed && layerEditorCollapsed
+                ? 80
+                : layerListCollapsed
+                  ? layerEditorPx + 40
+                  : layerEditorCollapsed
+                    ? layerListPx + 40
+                    : layerListPx + layerEditorPx
 
-            <LayerEditor
-              selectedLayer={selectedLayer}
-              selectedLayerId={selectedLayerId}
-              layerJSON={layerJSON}
-              jsonError={jsonError}
-              expandedSections={expandedSections}
-              onToggleSection={toggleSection}
-              onLayerJSONChange={(json) => {
-                setLayerJSON(json)
-                try {
-                  JSON.parse(json)
-                  setJsonError('')
-                } catch (err) {
-                  setJsonError(err.message)
-                }
-              }}
-              onApplyEdits={applyLayerEdits}
-            />
-          </div>
+            return (
+              <>
+                <div
+                  className='flex h-full border-r'
+                  style={{
+                    width: `${totalWidth}px`,
+                    transition: 'width 0.3s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: layerListCollapsed ? '40px' : `${layerListPx}px`,
+                    }}
+                  >
+                    <LayerList
+                      groupedLayers={groupedLayers}
+                      selectedLayerId={selectedLayerId}
+                      onSelectLayer={setSelectedLayerId}
+                      isCollapsed={layerListCollapsed}
+                      onToggleCollapse={() =>
+                        setLayerListCollapsed(!layerListCollapsed)
+                      }
+                    />
+                  </div>
 
-          <div className='relative h-full w-[60%]'>
-            <div ref={mapContainer} className='h-full w-full bg-muted' />
-          </div>
+                  <div
+                    style={{
+                      width: layerEditorCollapsed
+                        ? '40px'
+                        : `${layerEditorPx}px`,
+                    }}
+                  >
+                    <LayerEditor
+                      selectedLayer={selectedLayer}
+                      selectedLayerId={selectedLayerId}
+                      layerJSON={layerJSON}
+                      jsonError={jsonError}
+                      expandedSections={expandedSections}
+                      onToggleSection={toggleSection}
+                      onLayerJSONChange={(json) => {
+                        setLayerJSON(json)
+                        try {
+                          JSON.parse(json)
+                          setJsonError('')
+                        } catch (err) {
+                          setJsonError(err.message)
+                        }
+                      }}
+                      onApplyEdits={applyLayerEdits}
+                      isCollapsed={layerEditorCollapsed}
+                      onToggleCollapse={() =>
+                        setLayerEditorCollapsed(!layerEditorCollapsed)
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* Draggable divider */}
+                {!layerListCollapsed && !layerEditorCollapsed && (
+                  <div
+                    onMouseDown={handleMouseDown}
+                    className='w-1 cursor-col-resize bg-border transition-colors hover:bg-primary'
+                    style={{ flexShrink: 0 }}
+                  />
+                )}
+
+                <div
+                  className='relative h-full'
+                  style={{
+                    width: `calc(100% - ${totalWidth}px - ${!layerListCollapsed && !layerEditorCollapsed ? 4 : 0}px)`,
+                    transition: 'width 0.3s ease',
+                  }}
+                >
+                  <div ref={mapContainer} className='h-full w-full bg-muted' />
+                </div>
+              </>
+            )
+          })()}
         </div>
       </LayoutBody>
 
