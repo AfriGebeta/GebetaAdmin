@@ -3,6 +3,7 @@ import {
   BadgeCent,
   LucideLocateFixed,
   Users,
+  Palette,
 } from 'lucide-react'
 import { IconGraphFilled } from '@tabler/icons-react'
 
@@ -59,7 +60,7 @@ export const sidelinks: SideLink[] = [
     title: 'Style',
     label: '',
     href: '/style',
-    icon: <BadgeCent size={20} className='text-gray-400' />,
+    icon: <Palette size={20} className='text-gray-400' />,
   },
   // {
   //   title: 'Authentication',
