@@ -20,6 +20,7 @@ jobs:
       - name: Create .env file
         run: |
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+          echo "VITE_GEBETA_API_KEY=${{ secrets.VITE_GEBETA_API_KEY }}" >> .env
 
       - name: Verify .env file exists
         run: ls -la
