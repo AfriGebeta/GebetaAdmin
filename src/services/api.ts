@@ -118,6 +118,27 @@ export default {
     )
   },
 
+  async reverseGeocode({
+    lat,
+    lon,
+    apiKey,
+  }: {
+    lat: number
+    lon: number
+    apiKey: string
+  }) {
+    const baseUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE_URL
+    return fetch(
+      `${baseUrl}/api/v1/route/revgeocoding?lat=${lat}&lon=${lon}&apiKey=${apiKey}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  },
+
   async filterPlaces({
     apiKey,
     apiAccessToken,
