@@ -12,11 +12,20 @@ import { LayerEditor } from './components/LayerEditor'
 import { AddLayerModal } from './components/AddLayerModal'
 import { OpenStyleModal } from './components/OpenStyleModal'
 import { FullEditorModal } from './components/FullEditorModal'
+import useLocalStorage from '@/hooks/use-local-storage'
+import { getFeatureAccessToken } from '@/utils/token-feat'
 
 export default function Style() {
   const mapContainer = useRef(null)
   const mapRef = useRef(null)
   const fileInputRef = useRef(null)
+
+  const [currentProfile, _] = useLocalStorage({
+    key: 'currentProfile',
+    defaultValue: null,
+  })
+
+  const featureAccessToken = getFeatureAccessToken(currentProfile)
 
   const {
     originalStyle,
@@ -31,7 +40,7 @@ export default function Style() {
     getCurrentStyle,
     exportStyle,
     resetToDefault,
-  } = useStyleManager()
+  } = useStyleManager(featureAccessToken)
 
   const [layerJSON, setLayerJSON] = useState('')
   const [fullStyleJSON, setFullStyleJSON] = useState('')
@@ -44,6 +53,57 @@ export default function Style() {
     json: false,
   })
 
+  const [layerListCollapsed, setLayerListCollapsed] = useState(false)
+  const [layerEditorCollapsed, setLayerEditorCollapsed] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(30) // percentage
+
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchMarker, setSearchMarker] = useState(null)
+  const [isSearching, setIsSearching] = useState(false)
+
+  const getAbsoluteWidths = () => {
+    const viewportWidth =
+      typeof window !== 'undefined' ? window.innerWidth : 1920
+    const sidebarPx = (viewportWidth * sidebarWidth) / 100
+    return {
+      layerListPx: sidebarPx * 0.4,
+      layerEditorPx: sidebarPx * 0.6,
+    }
+  }
+
+  // Calculate individual panel widths based on sidebar width
+  const layerListWidth = sidebarWidth * 0.4 // 40% of sidebar
+  const layerEditorWidth = sidebarWidth * 0.6 // 60% of sidebar
+
+  const handleMouseDown = useCallback(
+    (e) => {
+      e.preventDefault()
+      const startX = e.clientX
+      const startWidth = sidebarWidth
+
+      const handleMouseMove = (e) => {
+        const deltaX = e.clientX - startX
+        const containerWidth = window.innerWidth
+        const deltaPercent = (deltaX / containerWidth) * 100
+        const newWidth = Math.min(Math.max(startWidth + deltaPercent, 15), 50)
+        setSidebarWidth(newWidth)
+      }
+
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+      }
+
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    },
+    [sidebarWidth]
+  )
+
   //for modals
   const [showAddLayerModal, setShowAddLayerModal] = useState(false)
   const [showOpenModal, setShowOpenModal] = useState(false)
@@ -54,6 +114,133 @@ export default function Style() {
     sourceLayer: '',
   })
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim() || !mapRef.current) return
+
+    setIsSearching(true)
+
+    try {
+      const coordPattern = /^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/
+      const coordMatch = searchQuery.trim().match(coordPattern)
+
+      if (coordMatch) {
+        const lat = parseFloat(coordMatch[1])
+        const lon = parseFloat(coordMatch[2])
+
+        if (!featureAccessToken) {
+          alert('No feature token available for reverse geocoding')
+          setIsSearching(false)
+          return
+        }
+
+        const baseUrl = import.meta.env.DEV
+          ? ''
+          : import.meta.env.VITE_API_BASE_URL
+        const url = `${baseUrl}/api/v1/route/revgeocoding?lat=${lat}&lon=${lon}&apiKey=${featureAccessToken}`
+
+        const response = await fetch(url)
+
+        if (response.ok) {
+          const result = await response.json()
+          const placeName =
+            result.data?.[0]?.name ||
+            result.data?.[0]?.display_name ||
+            `Location: ${lat}, ${lon}`
+
+          if (searchMarker) {
+            searchMarker.remove()
+          }
+
+          const marker = new maplibregl.Marker({ color: '#FF0000' })
+            .setLngLat([lon, lat])
+            .setPopup(
+              new maplibregl.Popup().setHTML(
+                `<div style="color: #000; padding: 8px;">
+                  <strong>${placeName}</strong><br/>
+                  <small>${lat.toFixed(6)}, ${lon.toFixed(6)}</small>
+                </div>`
+              )
+            )
+            .addTo(mapRef.current)
+
+          setSearchMarker(marker)
+
+          mapRef.current.flyTo({
+            center: [lon, lat],
+            zoom: 14,
+            duration: 1500,
+          })
+
+          marker.togglePopup()
+        } else {
+          const errorData = await response.json().catch(() => ({}))
+          alert(
+            `Failed to reverse geocode coordinates: ${errorData.message || response.statusText}`
+          )
+        }
+      } else {
+        if (!featureAccessToken) {
+          alert('No feature token available for geocoding')
+          setIsSearching(false)
+          return
+        }
+
+        const baseUrl = import.meta.env.DEV
+          ? ''
+          : import.meta.env.VITE_API_BASE_URL
+        const url = `${baseUrl}/api/v1/route/geocoding?name=${encodeURIComponent(searchQuery)}&apiKey=${featureAccessToken}`
+
+        const response = await fetch(url)
+
+        if (response.ok) {
+          const result = await response.json()
+          if (result.data && result.data.length > 0) {
+            const place = result.data[0]
+            const lat = place.latitude || 0
+            const lon = place.longitude || 0
+            const placeName = place.name || searchQuery
+            if (searchMarker) {
+              searchMarker.remove()
+            }
+
+            const marker = new maplibregl.Marker({ color: '#ff8800' })
+              .setLngLat([lon, lat])
+              .setPopup(
+                new maplibregl.Popup().setHTML(
+                  `<div style="color: #000; padding: 8px;">
+                    <strong>${placeName}</strong><br/>
+                    <small>${lat.toFixed(6)}, ${lon.toFixed(6)}</small>
+                  </div>`
+                )
+              )
+              .addTo(mapRef.current)
+
+            setSearchMarker(marker)
+
+            mapRef.current.flyTo({
+              center: [lon, lat],
+              zoom: 14,
+              duration: 1500,
+            })
+
+            marker.togglePopup()
+          } else {
+            alert('No results found')
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}))
+          alert(
+            `Failed to search for place: ${errorData.message || response.statusText}`
+          )
+        }
+      }
+    } catch (error) {
+      alert('An error occurred during search')
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
   useEffect(() => {
     const savedStyle = localStorage.getItem('mapStyleEditor')
     const savedOverrides = localStorage.getItem('mapStyleOverrides')
@@ -61,23 +248,21 @@ export default function Style() {
     if (savedStyle) {
       try {
         const parsed = JSON.parse(savedStyle)
-        const apiKey = import.meta.env.VITE_GEBETA_API_KEY
 
         if (!parsed.version || !parsed.sources || !parsed.layers) {
-          console.warn('Invalid saved style, loading default')
           loadDefaultStyle()
           return
         }
 
-        if (apiKey && parsed.sources?.openmaptiles?.tiles) {
+        if (featureAccessToken && parsed.sources?.openmaptiles?.tiles) {
           parsed.sources.openmaptiles.tiles =
             parsed.sources.openmaptiles.tiles.map((url) => {
               const cleanUrl = url.split('?')[0]
-              return `${cleanUrl}?apiKey=${apiKey}`
+              return `${cleanUrl}?apiKey=${featureAccessToken}`
             })
           if (parsed.glyphs) {
             const cleanGlyphs = parsed.glyphs.split('?')[0]
-            parsed.glyphs = `${cleanGlyphs}?apiKey=${apiKey}`
+            parsed.glyphs = `${cleanGlyphs}?apiKey=${featureAccessToken}`
           }
         }
 
@@ -87,7 +272,6 @@ export default function Style() {
           setLayerOverrides(JSON.parse(savedOverrides))
         }
       } catch (e) {
-        console.error('Failed to load saved style:', e)
         localStorage.removeItem('mapStyleEditor')
         localStorage.removeItem('mapStyleOverrides')
         loadDefaultStyle()
@@ -95,7 +279,12 @@ export default function Style() {
     } else {
       loadDefaultStyle()
     }
-  }, [loadDefaultStyle, setOriginalStyle, setLayerOverrides])
+  }, [
+    loadDefaultStyle,
+    setOriginalStyle,
+    setLayerOverrides,
+    featureAccessToken,
+  ])
 
   useEffect(() => {
     if (originalStyle) {
@@ -133,14 +322,6 @@ export default function Style() {
       new maplibregl.FullscreenControl(),
       'bottom-right'
     )
-
-    mapRef.current.on('error', (e) => {
-      console.error('Map error:', e)
-    })
-
-    mapRef.current.on('load', () => {
-      console.log('Map loaded successfully')
-    })
 
     mapRef.current.on('click', (e) => {
       const features = mapRef.current.queryRenderedFeatures(e.point)
@@ -280,7 +461,6 @@ export default function Style() {
       setShowAddLayerModal(false)
       setNewLayerConfig({ id: '', type: 'line', source: '', sourceLayer: '' })
     } catch (err) {
-      console.error('Failed to add layer:', err)
       alert(`Error: ${err.message}`)
     }
   }
@@ -387,6 +567,59 @@ export default function Style() {
             Add Layer
           </button>
         </div>
+
+        <div className='flex flex-1 items-center justify-center px-4'>
+          <div className='flex w-full max-w-md items-center gap-2'>
+            <div className='relative flex-1'>
+              <input
+                type='text'
+                placeholder='Enter name or lat,lng'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className='w-full rounded-md border border-input bg-background px-3 py-1.5 pr-8 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                disabled={isSearching}
+              />
+              {searchQuery && (
+                <button
+                  type='button'
+                  aria-label='Clear search'
+                  className='absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                  onClick={() => {
+                    setSearchQuery('')
+                    if (searchMarker) {
+                      searchMarker.remove()
+                      setSearchMarker(null)
+                    }
+                  }}
+                >
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    width='16'
+                    height='16'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  >
+                    <line x1='18' y1='6' x2='6' y2='18'></line>
+                    <line x1='6' y1='6' x2='18' y2='18'></line>
+                  </svg>
+                </button>
+              )}
+            </div>
+            <button
+              onClick={handleSearch}
+              disabled={isSearching || !searchQuery.trim()}
+              className='rounded-md border bg-primary px-3 py-1.5 text-sm text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50'
+            >
+              {isSearching ? 'Searching...' : 'Search'}
+            </button>
+          </div>
+        </div>
+
         <div className='ml-auto flex items-center space-x-4'>
           <button
             onClick={() => setShowOpenModal(true)}
@@ -418,38 +651,97 @@ export default function Style() {
         </div>
       </LayoutHeader>
 
-      <LayoutBody className='space-y-4'>
+      <LayoutBody className='space-y-4 !pr-1'>
         <div className='flex h-[90vh] w-full'>
-          <div className='flex h-full w-[40%] border-r'>
-            <LayerList
-              groupedLayers={groupedLayers}
-              selectedLayerId={selectedLayerId}
-              onSelectLayer={setSelectedLayerId}
-            />
+          {(() => {
+            const { layerListPx, layerEditorPx } = getAbsoluteWidths()
+            const totalWidth =
+              layerListCollapsed && layerEditorCollapsed
+                ? 80
+                : layerListCollapsed
+                  ? layerEditorPx + 40
+                  : layerEditorCollapsed
+                    ? layerListPx + 40
+                    : layerListPx + layerEditorPx
 
-            <LayerEditor
-              selectedLayer={selectedLayer}
-              selectedLayerId={selectedLayerId}
-              layerJSON={layerJSON}
-              jsonError={jsonError}
-              expandedSections={expandedSections}
-              onToggleSection={toggleSection}
-              onLayerJSONChange={(json) => {
-                setLayerJSON(json)
-                try {
-                  JSON.parse(json)
-                  setJsonError('')
-                } catch (err) {
-                  setJsonError(err.message)
-                }
-              }}
-              onApplyEdits={applyLayerEdits}
-            />
-          </div>
+            return (
+              <>
+                <div
+                  className='flex h-full border-r'
+                  style={{
+                    width: `${totalWidth}px`,
+                    transition: 'width 0.3s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: layerListCollapsed ? '40px' : `${layerListPx}px`,
+                    }}
+                  >
+                    <LayerList
+                      groupedLayers={groupedLayers}
+                      selectedLayerId={selectedLayerId}
+                      onSelectLayer={setSelectedLayerId}
+                      isCollapsed={layerListCollapsed}
+                      onToggleCollapse={() =>
+                        setLayerListCollapsed(!layerListCollapsed)
+                      }
+                    />
+                  </div>
 
-          <div className='relative h-full w-[60%]'>
-            <div ref={mapContainer} className='h-full w-full bg-muted' />
-          </div>
+                  <div
+                    style={{
+                      width: layerEditorCollapsed
+                        ? '40px'
+                        : `${layerEditorPx}px`,
+                    }}
+                  >
+                    <LayerEditor
+                      selectedLayer={selectedLayer}
+                      selectedLayerId={selectedLayerId}
+                      layerJSON={layerJSON}
+                      jsonError={jsonError}
+                      expandedSections={expandedSections}
+                      onToggleSection={toggleSection}
+                      onLayerJSONChange={(json) => {
+                        setLayerJSON(json)
+                        try {
+                          JSON.parse(json)
+                          setJsonError('')
+                        } catch (err) {
+                          setJsonError(err.message)
+                        }
+                      }}
+                      onApplyEdits={applyLayerEdits}
+                      isCollapsed={layerEditorCollapsed}
+                      onToggleCollapse={() =>
+                        setLayerEditorCollapsed(!layerEditorCollapsed)
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* Draggable divider */}
+                {!layerListCollapsed && !layerEditorCollapsed && (
+                  <div
+                    onMouseDown={handleMouseDown}
+                    className='w-1 cursor-col-resize bg-border transition-colors hover:bg-primary'
+                    style={{ flexShrink: 0 }}
+                  />
+                )}
+
+                <div
+                  className='relative h-full'
+                  style={{
+                    width: `calc(100% - ${totalWidth}px - ${!layerListCollapsed && !layerEditorCollapsed ? 4 : 0}px)`,
+                    transition: 'width 0.3s ease',
+                  }}
+                >
+                  <div ref={mapContainer} className='h-full w-full bg-muted' />
+                </div>
+              </>
+            )
+          })()}
         </div>
       </LayoutBody>
 

@@ -4,7 +4,7 @@ import dark from '../dark.json'
 import standard from '../standard.json'
 import darkCustom from '../dark-custom.json'
 
-export const useStyleManager = () => {
+export const useStyleManager = (apiKey?: string) => {
   const [originalStyle, setOriginalStyle] = useState<any>(null)
   const [layerOverrides, setLayerOverrides] = useState<Record<string, any>>({})
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null)
@@ -17,7 +17,6 @@ export const useStyleManager = () => {
   ]
 
   const loadDefaultStyle = useCallback(() => {
-    const apiKey = import.meta.env.VITE_GEBETA_API_KEY
     const styleWithAuth = JSON.parse(JSON.stringify(basic))
 
     if (apiKey && styleWithAuth.sources?.openmaptiles?.tiles) {
@@ -31,45 +30,46 @@ export const useStyleManager = () => {
     }
 
     setOriginalStyle(styleWithAuth)
-  }, [])
+  }, [apiKey])
 
-  const loadNewStyle = useCallback((style: any) => {
-    const apiKey = import.meta.env.VITE_GEBETA_API_KEY
+  const loadNewStyle = useCallback(
+    (style: any) => {
+      //replacing
+      if (style.sources?.openmaptiles?.tiles) {
+        style.sources.openmaptiles.tiles = style.sources.openmaptiles.tiles.map(
+          (url: string) => {
+            let cleanUrl = url.replace(
+              '~~TILE_ENDPOINT~~',
+              'https://tiles.gebeta.app/tiles'
+            )
+            cleanUrl = cleanUrl.split('?')[0]
+            return apiKey ? `${cleanUrl}?apiKey=${apiKey}` : cleanUrl
+          }
+        )
+      }
 
-    //replacing
-    if (style.sources?.openmaptiles?.tiles) {
-      style.sources.openmaptiles.tiles = style.sources.openmaptiles.tiles.map(
-        (url: string) => {
-          let cleanUrl = url.replace(
-            '~~TILE_ENDPOINT~~',
-            'https://tiles.gebeta.app/tiles'
-          )
-          cleanUrl = cleanUrl.split('?')[0]
-          return apiKey ? `${cleanUrl}?apiKey=${apiKey}` : cleanUrl
-        }
-      )
-    }
+      if (style.glyphs) {
+        let cleanGlyphs = style.glyphs.replace(
+          '~~TILE_ENDPOINT~~',
+          'https://tiles.gebeta.app'
+        )
+        cleanGlyphs = cleanGlyphs.split('?')[0]
+        style.glyphs = apiKey ? `${cleanGlyphs}?apiKey=${apiKey}` : cleanGlyphs
+      }
 
-    if (style.glyphs) {
-      let cleanGlyphs = style.glyphs.replace(
-        '~~TILE_ENDPOINT~~',
-        'https://tiles.gebeta.app'
-      )
-      cleanGlyphs = cleanGlyphs.split('?')[0]
-      style.glyphs = apiKey ? `${cleanGlyphs}?apiKey=${apiKey}` : cleanGlyphs
-    }
+      if (style.sprite && style.sprite.includes('~~TILE_ENDPOINT~~')) {
+        style.sprite = style.sprite.replace(
+          '~~TILE_ENDPOINT~~',
+          'https://tiles.gebeta.app'
+        )
+      }
 
-    if (style.sprite && style.sprite.includes('~~TILE_ENDPOINT~~')) {
-      style.sprite = style.sprite.replace(
-        '~~TILE_ENDPOINT~~',
-        'https://tiles.gebeta.app'
-      )
-    }
-
-    setOriginalStyle(style)
-    setLayerOverrides({})
-    setSelectedLayerId(null)
-  }, [])
+      setOriginalStyle(style)
+      setLayerOverrides({})
+      setSelectedLayerId(null)
+    },
+    [apiKey]
+  )
 
   const getCurrentStyle = useCallback(() => {
     if (!originalStyle) return null
